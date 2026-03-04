@@ -24,9 +24,7 @@ export default function PublicHome() {
   const [orgSlug, setOrgSlug] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const slug = params.get("org");
-    setOrgSlug(slug || "");
+    setOrgSlug("test-org");
   }, []);
 
   const { data: organization } = useQuery({
