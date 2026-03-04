@@ -1,1 +1,4 @@
-{}
+{
+  "source": "/(.*)",
+  "destination": "/index.html"
+}
