@@ -12,7 +12,7 @@
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "*"
+          "value": "https://iter-phi.vercel.app"
         },
         {
           "key": "Access-Control-Allow-Methods",
