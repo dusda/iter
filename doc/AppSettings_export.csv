@@ -1,0 +1,2 @@
+organization_name,organization_logo,organization_description,welcome_message,is_singleton,id,created_date,updated_date,created_by_id,created_by,is_sample
+"Acme School System","","","","true","6984ff11cff19912e0eecfa2","2026-02-05T20:35:29.884000","2026-02-05T20:40:50.107000","696eaf251ea813a9a69684ca","johnbartonstrawn@gmail.com","false"
