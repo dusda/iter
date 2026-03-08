@@ -13,7 +13,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/auth': { target: 'http://localhost:9999', changeOrigin: true },
+      '/auth': {
+        target: 'http://localhost:9999',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/auth\/v1/, ''),
+      },
       '/rest': {
         target: 'http://localhost:3001',
         changeOrigin: true,

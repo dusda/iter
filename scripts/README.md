@@ -35,6 +35,17 @@ DATABASE_URL='postgresql://user:pass@host:5432/dbname' node scripts/import-from-
 
 **Re-import in the future:** Replace or update the CSV files in `doc/`, then run `./scripts/import-from-csv.sh` again. The script truncates the app tables and reloads from CSV.
 
+## Default admin account
+
+Creates a default admin user **dev@gotham.design** (password: `changeme`, or set `ADMIN_DEFAULT_PASSWORD`).
+
+```bash
+# After DB + auth are running and migrations applied
+npm run db:create-admin
+```
+
+The script signs up the user in Supabase Auth (if not already present), then ensures a `profiles` row with `app_role=admin` and the first organization. Change the password after first login.
+
 ## Adding new migrations
 
 1. Add a new file under `supabase/migrations/` with a timestamp prefix, e.g. `20260308120000_add_foo.sql`.

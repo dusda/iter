@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "db:migrate": "psql -h ${PGHOST:-localhost} -p ${PGPORT:-54322} -U ${PGUSER:-postgres} -d ${PGDATABASE:-postgres} -v ON_ERROR_STOP=1 -f supabase/migrations/20260308000000_create_app_schema.sql",
     "db:seed": "node scripts/import-from-csv.mjs",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "db:create-admin": "node scripts/create-admin-user.mjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
@@ -81,6 +82,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "bcrypt": "^5.1.1",
     "@eslint/js": "^9.19.0",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
