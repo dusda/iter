@@ -486,26 +486,8 @@ export default function ReviewRequest() {
               </div>
               {request.attachments && request.attachments.length > 0 && (
                 <div>
-                  <p className="text-sm text-slate-500 mb-2">Attachments</p>
-                  <div className="space-y-2">
-                    {request.attachments.map((attachment, index) => {
-                      const fileUrl = typeof attachment === 'string' ? attachment : attachment.url;
-                      const fileName = typeof attachment === 'string' ? `Attachment ${index + 1}` : (attachment.name || `Attachment ${index + 1}`);
-                      return (
-                        <a
-                          key={index}
-                          href={fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
-                        >
-                          <FileText className="w-4 h-4 text-indigo-600" />
-                          <span className="text-sm text-indigo-700 flex-1">{fileName}</span>
-                          <ExternalLink className="w-4 h-4 text-indigo-400" />
-                        </a>
-                      );
-                    })}
-                  </div>
+                  <p className="text-sm text-slate-500 mb-2">Attachments ({request.attachments.length})</p>
+                  <AttachmentList attachments={request.attachments} />
                 </div>
               )}
             </CardContent>
