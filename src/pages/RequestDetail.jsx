@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import AttachmentList from "@/components/shared/AttachmentList";
 import {
   ArrowLeft,
   FileText,
@@ -26,8 +27,7 @@ import {
   Mail,
   Phone,
   Tag,
-  Paperclip,
-  File
+  Paperclip
 } from "lucide-react";
 import { format } from "date-fns";
 
