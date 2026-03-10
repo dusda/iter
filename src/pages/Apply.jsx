@@ -216,16 +216,14 @@ export default function Apply() {
     const uploadedFiles = [];
 
     for (const file of files) {
-      try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        uploadedFiles.push({ 
-          name: file.name, 
-          url: file_url,
-          type: file.type
-        });
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      uploadedFiles.push({ 
+        name: file.name, 
+        url: file_url,
+        type: file.type,
+        uploaded_by: "student",
+        uploaded_at: new Date().toISOString()
+      });
     }
 
     setFormData(prev => ({
