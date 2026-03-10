@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import AttachmentList from "@/components/shared/AttachmentList";
 import {
   ArrowLeft,
   FileText,
