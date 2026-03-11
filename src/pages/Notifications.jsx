@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -20,18 +20,18 @@ export default function Notifications() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications", user?.id],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user.id }, "-created_date"),
+    queryFn: () => api.entities.Notification.filter({ user_id: user.id }, "-created_date"),
     enabled: !!user,
   });
 
   const markAsRead = useMutation({
-    mutationFn: (notificationId) => base44.entities.Notification.update(notificationId, { is_read: true }),
+    mutationFn: (notificationId) => api.entities.Notification.update(notificationId, { is_read: true }),
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications"]);
     },
@@ -39,7 +39,7 @@ export default function Notifications() {
 
   const markAllAsRead = async () => {
     const unread = notifications.filter(n => !n.is_read);
-    await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { is_read: true })));
+    await Promise.all(unread.map(n => api.entities.Notification.update(n.id, { is_read: true })));
     queryClient.invalidateQueries(["notifications"]);
   };
 

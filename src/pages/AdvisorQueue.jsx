@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -38,7 +38,7 @@ export default function AdvisorQueue() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
@@ -46,7 +46,7 @@ export default function AdvisorQueue() {
     queryKey: ["advisorRequests", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      return base44.entities.FundRequest.filter(
+      return api.entities.FundRequest.filter(
         { advisor_user_id: user.id },
         "-created_date"
       );

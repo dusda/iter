@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -95,7 +95,7 @@ export default function Apply() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
     setFormData(prev => ({
       ...prev,
@@ -115,7 +115,7 @@ export default function Apply() {
 
   const { data: funds = [], isLoading } = useQuery({
     queryKey: ["activeFunds"],
-    queryFn: () => base44.entities.Fund.filter({ status: "active" }),
+    queryFn: () => api.entities.Fund.filter({ status: "active" }),
   });
 
   useEffect(() => {
@@ -216,7 +216,7 @@ export default function Apply() {
     const uploadedFiles = [];
 
     for (const file of files) {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       uploadedFiles.push({ 
         name: file.name, 
         url: file_url,
@@ -292,7 +292,7 @@ export default function Apply() {
     const year = new Date().getFullYear();
     
     // Get count of requests this year to generate sequence
-    const allRequests = await base44.entities.FundRequest.list();
+    const allRequests = await api.entities.FundRequest.list();
     const thisYearRequests = allRequests.filter(r => {
       const requestYear = new Date(r.created_date).getFullYear();
       return requestYear === year;
@@ -326,7 +326,7 @@ export default function Apply() {
       locked: false
     };
 
-    await base44.entities.FundRequest.create(requestData);
+    await api.entities.FundRequest.create(requestData);
 
     navigate(createPageUrl("MyRequests"));
   };
@@ -365,10 +365,10 @@ export default function Apply() {
       locked: true
     };
 
-    const newRequest = await base44.entities.FundRequest.create(requestData);
+    const newRequest = await api.entities.FundRequest.create(requestData);
 
     // Get routing rules for this fund
-    const rules = await base44.entities.RoutingRule.filter({ 
+    const rules = await api.entities.RoutingRule.filter({ 
       fund_id: selectedFund.id,
       is_active: true 
     }, "step_order");
@@ -405,7 +405,7 @@ export default function Apply() {
       // Create one review record per reviewer or one for the queue
       if (reviewerIds.length > 0) {
         for (let i = 0; i < reviewerIds.length; i++) {
-          await base44.entities.Review.create({
+          await api.entities.Review.create({
             organization_id: selectedFund.organization_id,
             fund_request_id: newRequest.id,
             reviewer_user_id: reviewerIds[i],
@@ -423,7 +423,7 @@ export default function Apply() {
 
     // Update request with current step info if there are rules
     if (applicableRules.length > 0) {
-      await base44.entities.FundRequest.update(newRequest.id, {
+      await api.entities.FundRequest.update(newRequest.id, {
         status: "In Review",
         current_step: applicableRules[0].step_name,
         current_step_order: applicableRules[0].step_order
@@ -431,7 +431,7 @@ export default function Apply() {
     }
 
     // Create audit log
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       organization_id: selectedFund.organization_id,
       actor_user_id: user.id,
       actor_name: user.full_name,

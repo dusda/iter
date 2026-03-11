@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,23 +24,21 @@ export default function PublicHome() {
   const [orgSlug, setOrgSlug] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const slug = params.get("org");
-    setOrgSlug(slug || "");
+    setOrgSlug("test-org");
   }, []);
 
   const { data: organization } = useQuery({
     queryKey: ["organization", orgSlug],
     queryFn: async () => {
       if (!orgSlug) return null;
-      const orgs = await base44.entities.Organization.filter({ slug: orgSlug });
+      const orgs = await api.entities.Organization.filter({ slug: orgSlug });
       return orgs[0] || null;
     },
     enabled: !!orgSlug,
   });
 
   const submitRequest = useMutation({
-    mutationFn: (data) => base44.entities.AccessRequest.create({
+    mutationFn: (data) => api.entities.AccessRequest.create({
       ...data,
       organization_id: organization?.id,
       organization_name: organization?.name
@@ -56,7 +54,7 @@ export default function PublicHome() {
   };
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin(createPageUrl("Home"));
+    api.auth.redirectToLogin(createPageUrl("Home"));
   };
 
   if (!orgSlug) {

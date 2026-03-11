@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -22,28 +22,28 @@ export default function Reports() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: requests = [] } = useQuery({
     queryKey: ["allRequests"],
-    queryFn: () => base44.entities.FundRequest.list(),
+    queryFn: () => api.entities.FundRequest.list(),
   });
 
   const { data: funds = [] } = useQuery({
     queryKey: ["allFunds"],
-    queryFn: () => base44.entities.Fund.list(),
+    queryFn: () => api.entities.Fund.list(),
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["allDisbursements"],
-    queryFn: () => base44.entities.Disbursement.list("-paid_at"),
+    queryFn: () => api.entities.Disbursement.list("-paid_at"),
   });
 
   const { data: reviews = [] } = useQuery({
     queryKey: ["allReviews"],
-    queryFn: () => base44.entities.Review.list(),
+    queryFn: () => api.entities.Review.list(),
   });
 
   // Filter funds based on user role

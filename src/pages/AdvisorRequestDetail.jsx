@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -53,13 +53,13 @@ export default function AdvisorRequestDetail() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: request, isLoading } = useQuery({
     queryKey: ["fundRequest", requestId],
-    queryFn: () => base44.entities.FundRequest.filter({ id: requestId }),
+    queryFn: () => api.entities.FundRequest.filter({ id: requestId }),
     enabled: !!requestId,
     select: (data) => data[0],
   });
@@ -73,7 +73,7 @@ export default function AdvisorRequestDetail() {
 
     for (const file of files) {
       try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await api.integrations.Core.UploadFile({ file });
         uploadedFiles.push({
           name: file.name,
           url: file_url,
@@ -88,11 +88,11 @@ export default function AdvisorRequestDetail() {
 
     if (uploadedFiles.length > 0) {
       const updatedAttachments = [...(request.attachments || []), ...uploadedFiles];
-      await base44.entities.FundRequest.update(request.id, {
+      await api.entities.FundRequest.update(request.id, {
         attachments: updatedAttachments
       });
 
-      await base44.entities.AuditLog.create({
+      await api.entities.AuditLog.create({
         organization_id: request.organization_id,
         actor_user_id: user.id,
         actor_name: user.full_name,
@@ -115,7 +115,7 @@ export default function AdvisorRequestDetail() {
 
   const removeAttachment = async (index) => {
     const updatedAttachments = request.attachments.filter((_, i) => i !== index);
-    await base44.entities.FundRequest.update(request.id, {
+    await api.entities.FundRequest.update(request.id, {
       attachments: updatedAttachments
     });
     queryClient.invalidateQueries(["fundRequest", requestId]);
@@ -124,12 +124,12 @@ export default function AdvisorRequestDetail() {
   const handleMarkComplete = async () => {
     setSubmitting(true);
 
-    await base44.entities.FundRequest.update(request.id, {
+    await api.entities.FundRequest.update(request.id, {
       advisor_tasks_completed: true
     });
 
     if (notes.trim()) {
-      await base44.entities.AuditLog.create({
+      await api.entities.AuditLog.create({
         organization_id: request.organization_id,
         actor_user_id: user.id,
         actor_name: user.full_name,
@@ -152,12 +152,12 @@ export default function AdvisorRequestDetail() {
   const handleCloseRequest = async () => {
     setSubmitting(true);
 
-    await base44.entities.FundRequest.update(request.id, {
+    await api.entities.FundRequest.update(request.id, {
       status: "Closed",
       locked: true
     });
 
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       organization_id: request.organization_id,
       actor_user_id: user.id,
       actor_name: user.full_name,

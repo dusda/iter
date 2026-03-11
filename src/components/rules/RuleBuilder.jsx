@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -48,7 +48,7 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
 
   const { data: users = [] } = useQuery({
     queryKey: ["allUsers"],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => api.entities.User.list(),
   });
 
   const toggleUser = (userId, userName) => {
@@ -84,7 +84,7 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
   const handleSave = async () => {
     setSubmitting(true);
 
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
 
     const ruleData = {
       fund_id: fundId,
@@ -104,8 +104,8 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
     };
 
     if (rule) {
-      await base44.entities.RoutingRule.update(rule.id, ruleData);
-      await base44.entities.AuditLog.create({
+      await api.entities.RoutingRule.update(rule.id, ruleData);
+      await api.entities.AuditLog.create({
         actor_user_id: currentUser.id,
         actor_name: currentUser.full_name,
         action_type: "RULE_UPDATED",
@@ -118,8 +118,8 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
         })
       });
     } else {
-      const newRule = await base44.entities.RoutingRule.create(ruleData);
-      await base44.entities.AuditLog.create({
+      const newRule = await api.entities.RoutingRule.create(ruleData);
+      await api.entities.AuditLog.create({
         actor_user_id: currentUser.id,
         actor_name: currentUser.full_name,
         action_type: "RULE_CREATED",
@@ -141,9 +141,9 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
     if (!confirm("Are you sure you want to delete this rule?")) return;
     setDeleting(true);
     
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       actor_user_id: currentUser.id,
       actor_name: currentUser.full_name,
       action_type: "RULE_DELETED",
@@ -156,7 +156,7 @@ export default function RuleBuilder({ fundId, fundName, rule, existingSteps, onC
       })
     });
     
-    await base44.entities.RoutingRule.delete(rule.id);
+    await api.entities.RoutingRule.delete(rule.id);
     setDeleting(false);
     onClose();
   };

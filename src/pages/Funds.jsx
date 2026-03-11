@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -48,23 +48,23 @@ export default function Funds() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: funds = [], isLoading } = useQuery({
     queryKey: ["allFunds"],
-    queryFn: () => base44.entities.Fund.list("-created_date"),
+    queryFn: () => api.entities.Fund.list("-created_date"),
   });
 
   const { data: requests = [] } = useQuery({
     queryKey: ["allRequests"],
-    queryFn: () => base44.entities.FundRequest.list(),
+    queryFn: () => api.entities.FundRequest.list(),
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["allDisbursements"],
-    queryFn: () => base44.entities.Disbursement.list(),
+    queryFn: () => api.entities.Disbursement.list(),
   });
 
   const calculateBudgetStats = (fundId) => {

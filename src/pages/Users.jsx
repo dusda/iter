@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -97,27 +97,27 @@ export default function Users() {
   }, []);
 
   const loadUser = async () => {
-    const user = await base44.auth.me();
+    const user = await api.auth.me();
     setCurrentUser(user);
   };
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["allUsers"],
-    queryFn: () => base44.entities.User.list("-created_date"),
+    queryFn: () => api.entities.User.list("-created_date"),
   });
 
   const { data: accessRequests = [], isLoading: loadingRequests } = useQuery({
     queryKey: ["accessRequests"],
     queryFn: async () => {
       if (!currentUser?.organization_id) return [];
-      return base44.entities.AccessRequest.filter({ organization_id: currentUser.organization_id }, "-created_date");
+      return api.entities.AccessRequest.filter({ organization_id: currentUser.organization_id }, "-created_date");
     },
     enabled: !!currentUser?.organization_id,
   });
 
   const updateAccessRequest = useMutation({
     mutationFn: ({ id, status }) =>
-      base44.entities.AccessRequest.update(id, {
+      api.entities.AccessRequest.update(id, {
         status,
         reviewed_by: currentUser.full_name,
         reviewed_at: new Date().toISOString(),
@@ -126,7 +126,7 @@ export default function Users() {
       queryClient.invalidateQueries(["accessRequests"]);
       const request = accessRequests.find(r => r.id === variables.id);
       if (request && variables.status === "approved") {
-        await base44.integrations.Core.SendEmail({
+        await api.integrations.Core.SendEmail({
           to: request.email,
           subject: "Access Request Approved",
           body: `Dear ${request.full_name},\n\nYour access request has been approved! You can now sign in to submit fund applications.\n\nBest regards,\nStudent Funds Team`
@@ -155,7 +155,7 @@ export default function Users() {
 
   const handleInvite = async () => {
     setSubmitting(true);
-    await base44.users.inviteUser(inviteEmail, inviteRole === "admin" ? "admin" : "user");
+    await api.users.inviteUser(inviteEmail, inviteRole === "admin" ? "admin" : "user");
     
     // Note: The invited user's app_role will need to be set after they accept
     // For now we track the intended role
@@ -175,7 +175,7 @@ export default function Users() {
   const handleUpdateUser = async (newRole, newStatus, permissions) => {
     setSubmitting(true);
     
-    await base44.entities.User.update(editingUser.id, {
+    await api.entities.User.update(editingUser.id, {
       app_role: newRole,
       status: newStatus,
       dashboard_permissions: permissions

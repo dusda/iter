@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -23,13 +23,13 @@ export default function AuditLog() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ["auditLogs"],
-    queryFn: () => base44.entities.AuditLog.list("-created_date", 500),
+    queryFn: () => api.entities.AuditLog.list("-created_date", 500),
   });
 
   const filteredLogs = logs.filter(log => {

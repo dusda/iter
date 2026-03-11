@@ -1,0 +1,81 @@
+# Simple local Supabase (PostgreSQL + Auth)
+#
+# Start:    docker compose up -d
+# Stop:     docker compose down
+# DB:       postgresql://supabase_admin:postgres@localhost:54322/postgres
+# Auth API: http://localhost:9999 (e.g. http://localhost:9999/auth/v1/signup)
+#
+# If you get "permission denied for schema auth", fix existing DB once:
+#   docker compose exec db psql -U supabase_admin -d postgres -c "ALTER SCHEMA auth OWNER TO postgres; GRANT ALL ON SCHEMA auth TO postgres; GRANT ALL ON ALL TABLES IN SCHEMA auth TO postgres; GRANT ALL ON ALL SEQUENCES IN SCHEMA auth TO postgres;"
+#
+# For full Supabase (Studio, REST, Realtime) use: npx supabase start
+
+services:
+  db:
+    image: supabase/postgres:15.8.1.085
+    container_name: supabase-db
+    restart: unless-stopped
+    ports:
+      - '54322:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-supabase_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+      - ./docker/db-init/01-auth-schema.sql:/docker-entrypoint-initdb.d/01-auth-schema.sql:ro
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-supabase_admin} -h localhost',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth:
+    image: supabase/gotrue:v2.186.0
+    container_name: supabase-auth
+    restart: unless-stopped
+    ports:
+      - '9999:9999'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:9999}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-supabase_admin}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+      GOTRUE_SITE_URL: ${GOTRUE_SITE_URL:-http://localhost:3000}
+      GOTRUE_URI_ALLOW_LIST: ${GOTRUE_URI_ALLOW_LIST:-}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+      GOTRUE_MAILER_AUTOCONFIRM: 'true'
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: 'false'
+
+  rest:
+    image: postgrest/postgrest:v14.5
+    container_name: supabase-rest
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-supabase_admin}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+
+volumes:
+  supabase-db-data:

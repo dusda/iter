@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import StatusTimeline from "@/components/requests/StatusTimeline";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -46,25 +46,25 @@ export default function RequestDetail() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: request, isLoading } = useQuery({
     queryKey: ["fundRequest", requestId],
-    queryFn: () => base44.entities.FundRequest.filter({ id: requestId }).then(res => res[0]),
+    queryFn: () => api.entities.FundRequest.filter({ id: requestId }).then(res => res[0]),
     enabled: !!requestId,
   });
 
   const { data: reviews = [] } = useQuery({
     queryKey: ["reviews", requestId],
-    queryFn: () => base44.entities.Review.filter({ fund_request_id: requestId }, "-created_date"),
+    queryFn: () => api.entities.Review.filter({ fund_request_id: requestId }, "-created_date"),
     enabled: !!requestId,
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["disbursements", requestId],
-    queryFn: () => base44.entities.Disbursement.filter({ fund_request_id: requestId }),
+    queryFn: () => api.entities.Disbursement.filter({ fund_request_id: requestId }),
     enabled: !!requestId,
   });
 
@@ -74,7 +74,7 @@ export default function RequestDetail() {
     setSubmitting(true);
 
     // Add student response as a review
-    await base44.entities.Review.create({
+    await api.entities.Review.create({
       fund_request_id: requestId,
       reviewer_user_id: user.id,
       reviewer_name: user.full_name,
@@ -85,12 +85,12 @@ export default function RequestDetail() {
     });
 
     // Update request status back to In Review
-    await base44.entities.FundRequest.update(requestId, {
+    await api.entities.FundRequest.update(requestId, {
       status: "In Review"
     });
 
     // Create audit log
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       actor_user_id: user.id,
       actor_name: user.full_name,
       action_type: "STUDENT_RESPONSE",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
@@ -28,14 +28,14 @@ export default function Settings() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["appSettings"],
     queryFn: async () => {
-      const allSettings = await base44.entities.AppSettings.list();
+      const allSettings = await api.entities.AppSettings.list();
       return allSettings[0];
     },
   });
@@ -56,9 +56,9 @@ export default function Settings() {
   const saveSettings = useMutation({
     mutationFn: async (data) => {
       if (settings) {
-        return base44.entities.AppSettings.update(settings.id, data);
+        return api.entities.AppSettings.update(settings.id, data);
       } else {
-        return base44.entities.AppSettings.create({ ...data, is_singleton: true });
+        return api.entities.AppSettings.create({ ...data, is_singleton: true });
       }
     },
     onSuccess: () => {
@@ -72,7 +72,7 @@ export default function Settings() {
     if (!file) return;
 
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setFormData({ ...formData, organization_logo: file_url });
     setUploading(false);
   };

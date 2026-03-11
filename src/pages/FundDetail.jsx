@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -81,25 +81,25 @@ export default function FundDetail() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: fund, isLoading } = useQuery({
     queryKey: ["fund", fundId],
-    queryFn: () => base44.entities.Fund.filter({ id: fundId }).then(res => res[0]),
+    queryFn: () => api.entities.Fund.filter({ id: fundId }).then(res => res[0]),
     enabled: !!fundId,
   });
 
   const { data: requests = [] } = useQuery({
     queryKey: ["fundRequests", fundId],
-    queryFn: () => base44.entities.FundRequest.filter({ fund_id: fundId }),
+    queryFn: () => api.entities.FundRequest.filter({ fund_id: fundId }),
     enabled: !!fundId,
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["fundDisbursements", fundId],
-    queryFn: () => base44.entities.Disbursement.filter({ fund_id: fundId }),
+    queryFn: () => api.entities.Disbursement.filter({ fund_id: fundId }),
     enabled: !!fundId,
   });
 
@@ -156,10 +156,10 @@ export default function FundDetail() {
       application_fields: formData.application_fields
     };
 
-    await base44.entities.Fund.update(fundId, updateData);
+    await api.entities.Fund.update(fundId, updateData);
 
     // Create audit log
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       actor_user_id: user.id,
       actor_name: user.full_name,
       action_type: "FUND_UPDATED",

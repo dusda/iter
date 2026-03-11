@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,33 +38,33 @@ export default function SuperAdminDashboard() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: organizations = [], isLoading } = useQuery({
     queryKey: ["organizations"],
-    queryFn: () => base44.entities.Organization.list("-created_date"),
+    queryFn: () => api.entities.Organization.list("-created_date"),
   });
 
   const { data: orgFunds = [] } = useQuery({
     queryKey: ["orgFunds", viewingOrg?.id],
-    queryFn: () => base44.entities.Fund.filter({ organization_id: viewingOrg.id }, "-created_date"),
+    queryFn: () => api.entities.Fund.filter({ organization_id: viewingOrg.id }, "-created_date"),
     enabled: !!viewingOrg?.id,
   });
 
   const { data: orgUsers = [] } = useQuery({
     queryKey: ["orgUsers", viewingOrg?.id],
-    queryFn: () => base44.entities.User.filter({ organization_id: viewingOrg.id }, "-created_date"),
+    queryFn: () => api.entities.User.filter({ organization_id: viewingOrg.id }, "-created_date"),
     enabled: !!viewingOrg?.id,
   });
 
   const saveOrganization = useMutation({
     mutationFn: (data) => {
       if (editingOrg) {
-        return base44.entities.Organization.update(editingOrg.id, data);
+        return api.entities.Organization.update(editingOrg.id, data);
       } else {
-        return base44.entities.Organization.create(data);
+        return api.entities.Organization.create(data);
       }
     },
     onSuccess: () => {
@@ -79,7 +79,7 @@ export default function SuperAdminDashboard() {
     if (!file) return;
 
     setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setFormData({ ...formData, logo: file_url });
     setUploading(false);
   };

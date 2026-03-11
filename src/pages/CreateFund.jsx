@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import PageHeader from "@/components/shared/PageHeader";
 import { DollarSign, Save, CheckCircle, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const USE_CATEGORIES = [
   "Tuition/Fees", "Books/Supplies", "Housing", "Food",
@@ -48,7 +49,7 @@ export default function CreateFund() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
@@ -88,9 +89,9 @@ export default function CreateFund() {
       application_fields: formData.application_fields
     };
 
-    const newFund = await base44.entities.Fund.create(fundData);
+    const newFund = await api.entities.Fund.create(fundData);
 
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       actor_user_id: user.id,
       actor_name: user.full_name,
       action_type: "FUND_CREATED",
@@ -118,12 +119,13 @@ export default function CreateFund() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to={createPageUrl("Funds")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Funds
-          </Link>
-        </Button>
+        <Link
+          to={createPageUrl("Funds")}
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "inline-flex items-center")}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Funds
+        </Link>
       </div>
 
       <PageHeader
@@ -432,9 +434,12 @@ export default function CreateFund() {
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" asChild>
-              <Link to={createPageUrl("Funds")}>Cancel</Link>
-            </Button>
+            <Link
+              to={createPageUrl("Funds")}
+              className={cn(buttonVariants({ variant: "outline" }))}
+            >
+              Cancel
+            </Link>
             <Button
               onClick={handleSubmit}
               disabled={submitting || !formData.fund_name || !formData.total_budget}

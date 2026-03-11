@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ export default function NotificationBell({ user }) {
 
   const { data: notifications = [] } = useQuery({
     queryKey: ["notifications", user?.id],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user.id }, "-created_date", 50),
+    queryFn: () => api.entities.Notification.filter({ user_id: user.id }, "-created_date", 50),
     enabled: !!user,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
@@ -23,7 +23,7 @@ export default function NotificationBell({ user }) {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const markAsRead = useMutation({
-    mutationFn: (notificationId) => base44.entities.Notification.update(notificationId, { is_read: true }),
+    mutationFn: (notificationId) => api.entities.Notification.update(notificationId, { is_read: true }),
     onSuccess: () => {
       queryClient.invalidateQueries(["notifications"]);
     },
@@ -31,7 +31,7 @@ export default function NotificationBell({ user }) {
 
   const markAllAsRead = async () => {
     const unread = notifications.filter(n => !n.is_read);
-    await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { is_read: true })));
+    await Promise.all(unread.map(n => api.entities.Notification.update(n.id, { is_read: true })));
     queryClient.invalidateQueries(["notifications"]);
   };
 

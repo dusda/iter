@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -70,31 +70,31 @@ export default function ReviewRequest() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
   };
 
   const { data: request, isLoading } = useQuery({
     queryKey: ["fundRequest", requestId],
-    queryFn: () => base44.entities.FundRequest.filter({ id: requestId }).then(res => res[0]),
+    queryFn: () => api.entities.FundRequest.filter({ id: requestId }).then(res => res[0]),
     enabled: !!requestId,
   });
 
   const { data: reviews = [] } = useQuery({
     queryKey: ["reviews", requestId],
-    queryFn: () => base44.entities.Review.filter({ fund_request_id: requestId }, "step_order"),
+    queryFn: () => api.entities.Review.filter({ fund_request_id: requestId }, "step_order"),
     enabled: !!requestId,
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["disbursements", requestId],
-    queryFn: () => base44.entities.Disbursement.filter({ fund_request_id: requestId }),
+    queryFn: () => api.entities.Disbursement.filter({ fund_request_id: requestId }),
     enabled: !!requestId,
   });
 
   const { data: fund } = useQuery({
     queryKey: ["fund", request?.fund_id],
-    queryFn: () => base44.entities.Fund.filter({ id: request.fund_id }).then(res => res[0]),
+    queryFn: () => api.entities.Fund.filter({ id: request.fund_id }).then(res => res[0]),
     enabled: !!request?.fund_id,
   });
 
@@ -117,13 +117,13 @@ export default function ReviewRequest() {
 
     // Check budget before approving (only for final approval)
     if (decision === "Approved" && fund && isFinalStep) {
-      const approvedRequests = await base44.entities.FundRequest.filter({ 
+      const approvedRequests = await api.entities.FundRequest.filter({ 
         fund_id: fund.id, 
         status: "Approved" 
       });
       const committedAmount = approvedRequests.reduce((sum, r) => sum + (r.requested_amount || 0), 0);
       
-      const fundDisbursements = await base44.entities.Disbursement.filter({ fund_id: fund.id });
+      const fundDisbursements = await api.entities.Disbursement.filter({ fund_id: fund.id });
       const paidAmount = fundDisbursements.reduce((sum, d) => sum + (d.amount_paid || 0), 0);
       
       const remaining = fund.total_budget - paidAmount - committedAmount;
@@ -143,7 +143,7 @@ export default function ReviewRequest() {
     }
 
     // Update current review record
-    await base44.entities.Review.update(currentReview.id, {
+    await api.entities.Review.update(currentReview.id, {
       decision: currentReview.permissions === "recommend_only" ? "Recommended" : decision,
       comments: reviewComments,
       decided_at: new Date().toISOString()
@@ -186,7 +186,7 @@ export default function ReviewRequest() {
     }
 
     // Update request
-    await base44.entities.FundRequest.update(requestId, {
+    await api.entities.FundRequest.update(requestId, {
       status: newStatus,
       current_step_order: nextStepOrder || request.current_step_order,
       current_step: nextStepOrder 
@@ -196,7 +196,7 @@ export default function ReviewRequest() {
     });
 
     // Create audit log
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       organization_id: request.organization_id,
       actor_user_id: user.id,
       actor_name: user.full_name,
@@ -237,7 +237,7 @@ export default function ReviewRequest() {
       }
 
       if (message) {
-        await base44.entities.Notification.create({
+        await api.entities.Notification.create({
           organization_id: request.organization_id,
           user_id: request.student_user_id,
           user_email: request.student_email,
@@ -250,7 +250,7 @@ export default function ReviewRequest() {
           email_sent: true
         });
 
-        await base44.integrations.Core.SendEmail({
+        await api.integrations.Core.SendEmail({
           to: request.student_email,
           subject: `${notifConfig.emailSubject} - ${request.request_id}`,
           body: emailBody
@@ -271,7 +271,7 @@ export default function ReviewRequest() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await api.integrations.Core.UploadFile({ file });
     setDisbursementData({ ...disbursementData, receipt_upload: file_url });
   };
 
@@ -280,7 +280,7 @@ export default function ReviewRequest() {
 
     const amountPaid = parseFloat(disbursementData.amount_paid);
 
-    await base44.entities.Disbursement.create({
+    await api.entities.Disbursement.create({
       fund_request_id: requestId,
       fund_id: request.fund_id,
       fund_name: request.fund_name,
@@ -298,20 +298,20 @@ export default function ReviewRequest() {
 
     // Update request status based on disbursement
     const newStatus = totalDisbursed >= request.requested_amount ? "Paid" : "Approved";
-    await base44.entities.FundRequest.update(requestId, {
+    await api.entities.FundRequest.update(requestId, {
       status: newStatus
     });
 
     // Update fund remaining budget
     if (fund) {
       const newRemaining = (fund.remaining_budget || fund.total_budget) - amountPaid;
-      await base44.entities.Fund.update(fund.id, {
+      await api.entities.Fund.update(fund.id, {
         remaining_budget: newRemaining
       });
     }
 
     // Create audit log
-    await base44.entities.AuditLog.create({
+    await api.entities.AuditLog.create({
       organization_id: request.organization_id,
       actor_user_id: user.id,
       actor_name: user.full_name,
@@ -329,7 +329,7 @@ export default function ReviewRequest() {
 
     // Notify student about payment
     const isPaidInFull = newStatus === "Paid";
-    await base44.entities.Notification.create({
+    await api.entities.Notification.create({
       organization_id: request.organization_id,
       user_id: request.student_user_id,
       user_email: request.student_email,
@@ -342,7 +342,7 @@ export default function ReviewRequest() {
       email_sent: true
     });
 
-    await base44.integrations.Core.SendEmail({
+    await api.integrations.Core.SendEmail({
       to: request.student_email,
       subject: `${isPaidInFull ? "Payment Processed" : "Partial Payment Processed"} - ${request.request_id}`,
       body: `Dear ${request.student_full_name},\n\n${isPaidInFull ? "Your full payment" : `A payment of $${amountPaid.toLocaleString()}`} has been processed.\n\nFund: ${request.fund_name}\nAmount Paid: $${amountPaid.toLocaleString()}\nPayment Method: ${disbursementData.payment_method}\nDate: ${format(new Date(disbursementData.paid_at), "MMMM d, yyyy")}\n\n${isPaidInFull ? "Your request is now complete." : `Remaining balance: $${(totalDisbursed + amountPaid - request.requested_amount).toLocaleString()}`}\n\nBest regards,\nStudent Funds Team`

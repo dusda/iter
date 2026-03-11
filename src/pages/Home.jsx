@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
 import StatCard from "@/components/shared/StatCard";
@@ -30,7 +30,7 @@ export default function Home() {
   }, []);
 
   const loadUser = async () => {
-    const currentUser = await base44.auth.me();
+    const currentUser = await api.auth.me();
     setUser(currentUser);
     
     // Redirect non-staff users to Apply page
@@ -62,19 +62,19 @@ function StaffDashboard({ user }) {
   
   const { data: allRequests = [], isLoading } = useQuery({
     queryKey: ["allRequests", user?.organization_id],
-    queryFn: () => base44.entities.FundRequest.filter({ organization_id: user.organization_id }, "-created_date"),
+    queryFn: () => api.entities.FundRequest.filter({ organization_id: user.organization_id }, "-created_date"),
     enabled: !!user?.organization_id && permissions.view_pending_requests !== false,
   });
 
   const { data: funds = [] } = useQuery({
     queryKey: ["allFunds", user?.organization_id],
-    queryFn: () => base44.entities.Fund.filter({ organization_id: user.organization_id }),
+    queryFn: () => api.entities.Fund.filter({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id && permissions.view_fund_overview !== false,
   });
 
   const { data: disbursements = [] } = useQuery({
     queryKey: ["disbursements", user?.organization_id],
-    queryFn: () => base44.entities.Disbursement.filter({ organization_id: user.organization_id }),
+    queryFn: () => api.entities.Disbursement.filter({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id && permissions.view_stats !== false,
   });
 
