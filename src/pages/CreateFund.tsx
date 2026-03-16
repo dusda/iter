@@ -51,6 +51,9 @@ const USE_CATEGORIES = [
   "Transportation", "Medical", "Technology", "Other"
 ];
 
+const dollarsToCents = (value: string) =>
+  Math.round((parseFloat(value || "0") || 0) * 100);
+
 export default function CreateFund() {
   const navigate = useNavigate();
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -102,14 +105,21 @@ export default function CreateFund() {
     setSubmitting(true);
 
     const fundData = {
+      // Ensure a non-null primary key for Fund
+      id: (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2),
       fund_name: formData.fund_name,
       description: formData.description,
       eligibility_notes: formData.eligibility_notes,
       start_date: formData.start_date || null,
       end_date: formData.end_date || null,
-      total_budget: parseFloat(formData.total_budget),
-      remaining_budget: parseFloat(formData.total_budget),
-      max_request_amount: formData.max_request_amount ? parseFloat(formData.max_request_amount) : null,
+      // store in cents
+      total_budget: dollarsToCents(formData.total_budget),
+      remaining_budget: dollarsToCents(formData.total_budget),
+      max_request_amount: formData.max_request_amount
+        ? dollarsToCents(formData.max_request_amount)
+        : null,
       requires_attachments: formData.requires_attachments,
       allowed_categories: formData.allowed_categories.length > 0 ? formData.allowed_categories : null,
       budget_enforcement: formData.budget_enforcement,
@@ -123,6 +133,10 @@ export default function CreateFund() {
     const newFund = await api.entities.Fund.create(fundData);
 
     await api.entities.AuditLog.create({
+      id: (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2),
+      organization_id: user.organization_id,
       actor_user_id: user.id,
       actor_name: user.full_name,
       action_type: "FUND_CREATED",

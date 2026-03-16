@@ -46,6 +46,12 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
+const centsToNumber = (cents?: number | null) =>
+  cents != null ? cents / 100 : 0;
+
+const dollarsToCents = (value: string) =>
+  Math.round((parseFloat(value || "0") || 0) * 100);
+
 export default function ReviewRequest() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -130,11 +136,11 @@ export default function ReviewRequest() {
       
       if (remaining < request.requested_amount) {
         if (fund.budget_enforcement === "block") {
-          alert(`Cannot approve: Insufficient budget. Remaining: $${remaining.toLocaleString()}, Requested: $${request.requested_amount.toLocaleString()}`);
+          alert(`Cannot approve: Insufficient budget. Remaining: $${centsToNumber(remaining).toLocaleString()}, Requested: $${centsToNumber(request.requested_amount).toLocaleString()}`);
           setSubmitting(false);
           return;
         } else if (fund.budget_enforcement === "warn") {
-          if (!confirm(`Warning: This approval will exceed the remaining budget by $${(request.requested_amount - remaining).toLocaleString()}. Continue?`)) {
+          if (!confirm(`Warning: This approval will exceed the remaining budget by $${centsToNumber(request.requested_amount - remaining).toLocaleString()}. Continue?`)) {
             setSubmitting(false);
             return;
           }
@@ -229,8 +235,8 @@ export default function ReviewRequest() {
         message = `Your application for ${request.fund_name} needs additional information. ${reviewComments}`;
         emailBody = `Dear ${request.student_full_name},\n\nWe need more information about your fund request (${request.request_id}).\n\n${reviewComments}\n\nPlease update your application with the requested information.\n\nBest regards,\nStudent Funds Team`;
       } else if (decision === "Approved" && isFullyApproved) {
-        message = `Your application for ${request.fund_name} has been approved for $${request.requested_amount.toLocaleString()}!`;
-        emailBody = `Dear ${request.student_full_name},\n\nGreat news! Your fund request (${request.request_id}) has been approved.\n\nFund: ${request.fund_name}\nAmount: $${request.requested_amount.toLocaleString()}\n\nPayment will be processed shortly.\n\nBest regards,\nStudent Funds Team`;
+        message = `Your application for ${request.fund_name} has been approved for $${centsToNumber(request.requested_amount).toLocaleString()}!`;
+        emailBody = `Dear ${request.student_full_name},\n\nGreat news! Your fund request (${request.request_id}) has been approved.\n\nFund: ${request.fund_name}\nAmount: $${centsToNumber(request.requested_amount).toLocaleString()}\n\nPayment will be processed shortly.\n\nBest regards,\nStudent Funds Team`;
       } else if (decision === "Denied") {
         message = `Your application for ${request.fund_name} was not approved. ${reviewComments}`;
         emailBody = `Dear ${request.student_full_name},\n\nWe regret to inform you that your fund request (${request.request_id}) was not approved.\n\n${reviewComments}\n\nYou may submit a new application if circumstances change.\n\nBest regards,\nStudent Funds Team`;
@@ -278,7 +284,7 @@ export default function ReviewRequest() {
   const submitDisbursement = async () => {
     setSubmitting(true);
 
-    const amountPaid = parseFloat(disbursementData.amount_paid);
+    const amountPaid = dollarsToCents(disbursementData.amount_paid);
 
     await api.entities.Disbursement.create({
       fund_request_id: requestId,
@@ -335,7 +341,7 @@ export default function ReviewRequest() {
       user_email: request.student_email,
       type: "paid",
       title: isPaidInFull ? "Payment Processed ✓" : "Partial Payment Processed",
-      message: `${isPaidInFull ? "Your full payment" : `A payment of $${amountPaid.toLocaleString()}`} for ${request.fund_name} has been processed via ${disbursementData.payment_method}.`,
+      message: `${isPaidInFull ? "Your full payment" : `A payment of $${centsToNumber(amountPaid).toLocaleString()}`} for ${request.fund_name} has been processed via ${disbursementData.payment_method}.`,
       link: createPageUrl(`RequestDetail?id=${requestId}`),
       related_entity_type: "FundRequest",
       related_entity_id: requestId,
@@ -345,7 +351,7 @@ export default function ReviewRequest() {
     await api.integrations.Core.SendEmail({
       to: request.student_email,
       subject: `${isPaidInFull ? "Payment Processed" : "Partial Payment Processed"} - ${request.request_id}`,
-      body: `Dear ${request.student_full_name},\n\n${isPaidInFull ? "Your full payment" : `A payment of $${amountPaid.toLocaleString()}`} has been processed.\n\nFund: ${request.fund_name}\nAmount Paid: $${amountPaid.toLocaleString()}\nPayment Method: ${disbursementData.payment_method}\nDate: ${format(new Date(disbursementData.paid_at), "MMMM d, yyyy")}\n\n${isPaidInFull ? "Your request is now complete." : `Remaining balance: $${(totalDisbursed + amountPaid - request.requested_amount).toLocaleString()}`}\n\nBest regards,\nStudent Funds Team`
+      body: `Dear ${request.student_full_name},\n\n${isPaidInFull ? "Your full payment" : `A payment of $${centsToNumber(amountPaid).toLocaleString()}`} has been processed.\n\nFund: ${request.fund_name}\nAmount Paid: $${centsToNumber(amountPaid).toLocaleString()}\nPayment Method: ${disbursementData.payment_method}\nDate: ${format(new Date(disbursementData.paid_at), "MMMM d, yyyy")}\n\n${isPaidInFull ? "Your request is now complete." : `Remaining balance: $${centsToNumber(totalDisbursed + amountPaid - request.requested_amount).toLocaleString()}`}\n\nBest regards,\nStudent Funds Team`
     });
 
     queryClient.invalidateQueries({ queryKey: ["fundRequest", requestId] });
@@ -434,7 +440,7 @@ export default function ReviewRequest() {
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-indigo-100 text-sm">Requested Amount</p>
-                <p className="text-3xl font-bold">${request.requested_amount?.toLocaleString()}</p>
+                <p className="text-3xl font-bold">${centsToNumber(request.requested_amount).toLocaleString()}</p>
               </div>
               <StatusBadge status={request.status} className="bg-white/20 border-white/30 text-white" />
             </div>
@@ -701,23 +707,23 @@ export default function ReviewRequest() {
               <CardContent className="space-y-3">
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-emerald-700">Approved Amount:</span>
-                    <span className="font-semibold text-emerald-800">
-                      ${request.requested_amount?.toLocaleString()}
-                    </span>
+                  <span className="text-emerald-700">Approved Amount:</span>
+                  <span className="font-semibold text-emerald-800">
+                    ${centsToNumber(request.requested_amount).toLocaleString()}
+                  </span>
                   </div>
                   {totalDisbursed > 0 && (
                     <>
                       <div className="flex justify-between text-sm">
                         <span className="text-emerald-700">Already Disbursed:</span>
                         <span className="font-semibold text-emerald-800">
-                          ${totalDisbursed.toLocaleString()}
+                          ${centsToNumber(totalDisbursed).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm pt-2 border-t border-emerald-200">
                         <span className="text-emerald-700">Remaining:</span>
                         <span className="font-bold text-emerald-900">
-                          ${remainingToDisburse.toLocaleString()}
+                          ${centsToNumber(remainingToDisburse).toLocaleString()}
                         </span>
                       </div>
                     </>
@@ -755,12 +761,12 @@ export default function ReviewRequest() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Budget</span>
-                  <span className="font-semibold">${fund.total_budget?.toLocaleString()}</span>
+                    <span className="font-semibold">${centsToNumber(fund.total_budget).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Remaining</span>
                   <span className="font-semibold text-emerald-600">
-                    ${(fund.remaining_budget || fund.total_budget)?.toLocaleString()}
+                    ${centsToNumber(fund.remaining_budget || fund.total_budget).toLocaleString()}
                   </span>
                 </div>
                 <div className="pt-2">
@@ -768,7 +774,9 @@ export default function ReviewRequest() {
                     <div
                       className="h-full bg-linear-to-r from-indigo-500 to-violet-500 rounded-full"
                       style={{
-                        width: `${Math.min(100, ((fund.remaining_budget || fund.total_budget) / fund.total_budget) * 100)}%`,
+                        width: fund.total_budget
+                          ? `${Math.min(100, ((fund.remaining_budget || fund.total_budget) / fund.total_budget) * 100)}%`
+                          : "0%",
                       }}
                     />
                   </div>
@@ -818,12 +826,12 @@ export default function ReviewRequest() {
                 <div className="pt-3 border-t border-violet-300">
                   <div className="flex justify-between font-bold">
                     <span className="text-violet-700">Total Paid:</span>
-                    <span className="text-violet-900">${totalDisbursed.toLocaleString()}</span>
+                    <span className="text-violet-900">${centsToNumber(totalDisbursed).toLocaleString()}</span>
                   </div>
                   {remainingToDisburse > 0 && (
                     <div className="flex justify-between text-sm mt-1">
                       <span className="text-violet-600">Remaining:</span>
-                      <span className="text-violet-700">${remainingToDisburse.toLocaleString()}</span>
+                      <span className="text-violet-700">${centsToNumber(remainingToDisburse).toLocaleString()}</span>
                     </div>
                   )}
                 </div>
@@ -878,13 +886,13 @@ export default function ReviewRequest() {
             <div className="p-3 bg-slate-50 rounded-lg text-sm space-y-1">
               <div className="flex justify-between">
                 <span className="text-slate-600">Requested:</span>
-                <span className="font-semibold">${request.requested_amount?.toLocaleString()}</span>
+                <span className="font-semibold">${centsToNumber(request.requested_amount).toLocaleString()}</span>
               </div>
               {totalDisbursed > 0 && (
                 <>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Previously Paid:</span>
-                    <span className="font-semibold">${totalDisbursed.toLocaleString()}</span>
+                <span className="font-semibold">${centsToNumber(totalDisbursed).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between pt-1 border-t">
                     <span className="text-slate-600">Remaining:</span>
@@ -978,8 +986,8 @@ export default function ReviewRequest() {
                 !disbursementData.amount_paid || 
                 !disbursementData.paid_at ||
                 !disbursementData.payment_method || 
-                parseFloat(disbursementData.amount_paid) > remainingToDisburse ||
-                parseFloat(disbursementData.amount_paid) <= 0 ||
+                dollarsToCents(disbursementData.amount_paid) > remainingToDisburse ||
+                dollarsToCents(disbursementData.amount_paid) <= 0 ||
                 submitting
               }
               className="bg-emerald-600 hover:bg-emerald-700"

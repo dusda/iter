@@ -38,6 +38,9 @@ import {
   DollarSign
 } from "lucide-react";
 
+const centsToNumber = (cents?: number | null) =>
+  cents != null ? cents / 100 : 0;
+
 export default function Funds() {
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -191,19 +194,19 @@ export default function Funds() {
                   <div className="grid grid-cols-2 gap-3 text-sm mb-3">
                     <div>
                       <p className="text-slate-500">Budget</p>
-                      <p className="font-semibold">${fund.total_budget?.toLocaleString()}</p>
+                      <p className="font-semibold">${centsToNumber(fund.total_budget).toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-slate-500">Paid</p>
-                      <p className="font-semibold text-violet-600">${stats.paid.toLocaleString()}</p>
+                      <p className="font-semibold text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-slate-500">Committed</p>
-                      <p className="font-semibold text-amber-600">${stats.approved.toLocaleString()}</p>
+                      <p className="font-semibold text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-slate-500">Remaining</p>
-                      <p className="font-semibold text-emerald-600">${remaining.toLocaleString()}</p>
+                      <p className="font-semibold text-emerald-600">${centsToNumber(remaining).toLocaleString()}</p>
                     </div>
                   </div>
                   <Button asChild variant="outline" size="sm" className="w-full">
@@ -236,7 +239,7 @@ export default function Funds() {
                 {filteredFunds.map((fund) => {
                   const stats = calculateBudgetStats(fund.id);
                   const remaining = (fund.total_budget || 0) - stats.paid - stats.approved;
-                  const percentRemaining = ((remaining / (fund.total_budget || 1)) * 100);
+                  const percentRemaining = fund.total_budget ? ((remaining / fund.total_budget) * 100) : 0;
                   
                   return (
                     <TableRow key={fund.id} className="hover:bg-slate-50/50">
@@ -255,21 +258,21 @@ export default function Funds() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${fund.total_budget?.toLocaleString()}
+                        ${centsToNumber(fund.total_budget).toLocaleString()}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-medium text-violet-600">${stats.paid.toLocaleString()}</span>
+                          <span className="font-medium text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</span>
                           <span className="text-xs text-slate-400">
-                            {((stats.paid / (fund.total_budget || 1)) * 100).toFixed(0)}%
+                            {fund.total_budget ? ((stats.paid / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-medium text-amber-600">${stats.approved.toLocaleString()}</span>
+                          <span className="font-medium text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</span>
                           <span className="text-xs text-slate-400">
-                            {((stats.approved / (fund.total_budget || 1)) * 100).toFixed(0)}%
+                            {fund.total_budget ? ((stats.approved / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
                         </div>
                       </TableCell>
@@ -280,7 +283,7 @@ export default function Funds() {
                             percentRemaining < 50 ? "text-amber-600" : 
                             "text-emerald-600"
                           }`}>
-                            ${remaining.toLocaleString()}
+                            ${centsToNumber(remaining).toLocaleString()}
                           </span>
                           <div className="flex items-center gap-1">
                             {percentRemaining < 20 && <TrendingDown className="w-3 h-3 text-red-500" />}

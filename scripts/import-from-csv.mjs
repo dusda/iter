@@ -18,18 +18,18 @@ const DOC = path.join(PROJECT_ROOT, 'doc');
 
 const CONN = process.env.DATABASE_URL || process.argv[2] || 'postgresql://supabase_admin:postgres@localhost:54322/postgres';
 
-// Table name -> { file, columns that are numeric, boolean, timestamptz, date, jsonb }
+// Table name -> { file, columns that are numeric, cents (money in dollars -> integer cents), boolean, timestamptz, date, jsonb }
 const TABLE_CONFIG = {
-  organization: { file: 'Organization_export.csv', numeric: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
-  app_settings: { file: 'AppSettings_export.csv', numeric: [], boolean: ['is_singleton', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
-  fund: { file: 'Fund_export.csv', numeric: ['total_budget', 'remaining_budget', 'max_request_amount'], boolean: ['requires_attachments', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: ['start_date', 'end_date'], jsonb: ['custom_categories', 'application_fields'] },
-  routing_rule: { file: 'RoutingRule_export.csv', numeric: ['sla_target_days', 'min_amount', 'max_amount', 'step_order'], boolean: ['is_active', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
+  organization: { file: 'Organization_export.csv', numeric: [], cents: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
+  app_settings: { file: 'AppSettings_export.csv', numeric: [], cents: [], boolean: ['is_singleton', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
+  fund: { file: 'Fund_export.csv', numeric: [], cents: ['total_budget', 'remaining_budget', 'max_request_amount'], boolean: ['requires_attachments', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: ['start_date', 'end_date'], jsonb: ['custom_categories', 'application_fields'] },
+  routing_rule: { file: 'RoutingRule_export.csv', numeric: ['sla_target_days', 'step_order'], cents: ['min_amount', 'max_amount'], boolean: ['is_active', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
   access_request: { file: 'AccessRequest_export.csv', numeric: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date', 'reviewed_at'], date: [], jsonb: [] },
-  fund_request: { file: 'FundRequest_export.csv', numeric: ['requested_amount', 'current_step_order'], boolean: ['advisor_tasks_completed', 'locked', 'is_sample'], timestamptz: ['created_date', 'updated_date', 'submitted_at'], date: [], jsonb: ['attachments'] },
-  review: { file: 'Review_export.csv', numeric: ['sla_target_days', 'step_order'], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date', 'decided_at'], date: [], jsonb: [] },
-  disbursement: { file: 'Disbursement_export.csv', numeric: ['amount_paid'], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date', 'paid_at'], date: [], jsonb: [] },
-  notification: { file: 'Notification_export.csv', numeric: [], boolean: ['is_read', 'email_sent', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
-  audit_log: { file: 'AuditLog_export.csv', numeric: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: ['details'] },
+  fund_request: { file: 'FundRequest_export.csv', numeric: ['current_step_order'], cents: ['requested_amount'], boolean: ['advisor_tasks_completed', 'locked', 'is_sample'], timestamptz: ['created_date', 'updated_date', 'submitted_at'], date: [], jsonb: ['attachments'] },
+  review: { file: 'Review_export.csv', numeric: ['sla_target_days', 'step_order'], cents: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date', 'decided_at'], date: [], jsonb: [] },
+  disbursement: { file: 'Disbursement_export.csv', numeric: [], cents: ['amount_paid'], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date', 'paid_at'], date: [], jsonb: [] },
+  notification: { file: 'Notification_export.csv', numeric: [], cents: [], boolean: ['is_read', 'email_sent', 'is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: [] },
+  audit_log: { file: 'AuditLog_export.csv', numeric: [], cents: [], boolean: ['is_sample'], timestamptz: ['created_date', 'updated_date'], date: [], jsonb: ['details'] },
 };
 
 /** Quote identifier for SQL (column names) */
@@ -39,11 +39,25 @@ function quoteId(name) {
 
 function coerce(row, config) {
   const out = { ...row };
+  // Plain numeric columns (non-money)
   for (const col of config.numeric ?? []) {
     if (out[col] !== undefined && out[col] !== '') {
       const n = Number(out[col]);
       if (!Number.isNaN(n)) out[col] = n;
       else out[col] = null;
+    } else {
+      out[col] = null;
+    }
+  }
+  // Money columns given in dollars in CSV -> integer cents in DB
+  for (const col of config.cents ?? []) {
+    if (out[col] !== undefined && out[col] !== '') {
+      const n = Number(out[col]);
+      if (!Number.isNaN(n)) {
+        out[col] = Math.round(n * 100);
+      } else {
+        out[col] = null;
+      }
     } else {
       out[col] = null;
     }

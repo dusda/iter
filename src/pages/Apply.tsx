@@ -119,6 +119,12 @@ const ALLOWED_FILE_TYPES = [
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+const dollarsToCents = (value: string) =>
+  Math.round((parseFloat(value || "0") || 0) * 100);
+
+const centsToNumber = (cents?: number | null) =>
+  cents != null ? cents / 100 : 0;
+
 export default function Apply() {
   const navigate = useNavigate();
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -194,16 +200,17 @@ export default function Apply() {
           delete newErrors.student_email;
         }
         break;
-      case "requested_amount":
+      case "requested_amount": {
         const amount = parseFloat(value);
         if (!value || amount <= 0) {
           newErrors.requested_amount = "Amount must be greater than 0";
-        } else if (selectedFund?.max_request_amount && amount > selectedFund.max_request_amount) {
-          newErrors.requested_amount = `Amount cannot exceed $${selectedFund.max_request_amount.toLocaleString()}`;
+        } else if (selectedFund?.max_request_amount && dollarsToCents(value) > selectedFund.max_request_amount) {
+          newErrors.requested_amount = `Amount cannot exceed $${centsToNumber(selectedFund.max_request_amount).toLocaleString()}`;
         } else {
           delete newErrors.requested_amount;
         }
         break;
+      }
       case "intended_use_category":
         if (!value) {
           newErrors.intended_use_category = "Category is required";
@@ -307,8 +314,8 @@ export default function Apply() {
     const amount = parseFloat(formData.requested_amount);
     if (!formData.requested_amount || amount <= 0) {
       newErrors.requested_amount = "Amount must be greater than 0";
-    } else if (selectedFund?.max_request_amount && amount > selectedFund.max_request_amount) {
-      newErrors.requested_amount = `Amount cannot exceed $${selectedFund.max_request_amount.toLocaleString()}`;
+    } else if (selectedFund?.max_request_amount && dollarsToCents(formData.requested_amount) > selectedFund.max_request_amount) {
+      newErrors.requested_amount = `Amount cannot exceed $${centsToNumber(selectedFund.max_request_amount).toLocaleString()}`;
     }
     
     // Validate intended_use_category
@@ -366,7 +373,8 @@ export default function Apply() {
       student_full_name: formData.student_full_name,
       student_email: formData.student_email,
       student_phone: formData.student_phone || "",
-      requested_amount: parseFloat(formData.requested_amount) || 0,
+      // store in cents
+      requested_amount: dollarsToCents(formData.requested_amount) || 0,
       intended_use_category: formData.intended_use_category,
       intended_use_description: formData.intended_use_description,
       justification_paragraph: formData.justification_paragraph,
@@ -404,7 +412,7 @@ export default function Apply() {
       student_full_name: formData.student_full_name,
       student_email: formData.student_email,
       student_phone: formData.student_phone || "",
-      requested_amount: parseFloat(formData.requested_amount),
+      requested_amount: dollarsToCents(formData.requested_amount),
       intended_use_category: formData.intended_use_category,
       intended_use_description: formData.intended_use_description,
       justification_paragraph: formData.justification_paragraph,
@@ -424,9 +432,10 @@ export default function Apply() {
 
     // Filter rules based on conditions
     const applicableRules = rules.filter(rule => {
+      const amountCents = dollarsToCents(formData.requested_amount);
       const amountMatch = 
-        (!rule.min_amount || parseFloat(formData.requested_amount) >= rule.min_amount) &&
-        (!rule.max_amount || parseFloat(formData.requested_amount) <= rule.max_amount);
+        (!rule.min_amount || amountCents >= rule.min_amount) &&
+        (!rule.max_amount || amountCents <= rule.max_amount);
       
       const categoryMatch = 
         !rule.applicable_categories || 
@@ -638,7 +647,7 @@ export default function Apply() {
             <div className="flex items-center justify-between">
               {selectedFund.max_request_amount && (
                 <span>
-                  <strong>Max Request:</strong> ${selectedFund.max_request_amount?.toLocaleString()}
+                  <strong>Max Request:</strong> ${centsToNumber(selectedFund.max_request_amount).toLocaleString()}
                 </span>
               )}
               {selectedFund.end_date && (
@@ -744,7 +753,7 @@ export default function Apply() {
                 </div>
                 {selectedFund.max_request_amount && (
                   <p className="text-xs text-slate-500">
-                    Maximum allowed: ${selectedFund.max_request_amount.toLocaleString()}
+                    Maximum allowed: ${centsToNumber(selectedFund.max_request_amount).toLocaleString()}
                   </p>
                 )}
               </div>

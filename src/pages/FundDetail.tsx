@@ -109,6 +109,12 @@ const USE_CATEGORIES = [
   "Other"
 ];
 
+const centsToNumber = (cents?: number | null) =>
+  cents != null ? cents / 100 : 0;
+
+const dollarsToCents = (value: string) =>
+  Math.round((parseFloat(value || "0") || 0) * 100);
+
 export default function FundDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -173,8 +179,8 @@ export default function FundDetail() {
         eligibility_notes: fund.eligibility_notes || "",
         start_date: fund.start_date || "",
         end_date: fund.end_date || "",
-        total_budget: fund.total_budget?.toString() || "",
-        max_request_amount: fund.max_request_amount?.toString() || "",
+        total_budget: fund.total_budget != null ? (centsToNumber(fund.total_budget)).toString() : "",
+        max_request_amount: fund.max_request_amount != null ? (centsToNumber(fund.max_request_amount)).toString() : "",
         requires_attachments: fund.requires_attachments || false,
         allowed_categories: fund.allowed_categories || [],
         budget_enforcement: fund.budget_enforcement || "warn",
@@ -208,8 +214,8 @@ export default function FundDetail() {
       eligibility_notes: formData.eligibility_notes,
       start_date: formData.start_date || null,
       end_date: formData.end_date || null,
-      total_budget: parseFloat(formData.total_budget),
-      max_request_amount: formData.max_request_amount ? parseFloat(formData.max_request_amount) : null,
+      total_budget: dollarsToCents(formData.total_budget),
+      max_request_amount: formData.max_request_amount ? dollarsToCents(formData.max_request_amount) : null,
       requires_attachments: formData.requires_attachments,
       allowed_categories: formData.allowed_categories,
       budget_enforcement: formData.budget_enforcement,
@@ -276,9 +282,9 @@ export default function FundDetail() {
   }
 
   const stats = calculateBudgetStats();
-  const percentPaid = (stats.paid / stats.totalBudget) * 100;
-  const percentCommitted = (stats.approved / stats.totalBudget) * 100;
-  const percentRemaining = (stats.remaining / stats.totalBudget) * 100;
+  const percentPaid = stats.totalBudget ? (stats.paid / stats.totalBudget) * 100 : 0;
+  const percentCommitted = stats.totalBudget ? (stats.approved / stats.totalBudget) * 100 : 0;
+  const percentRemaining = stats.totalBudget ? (stats.remaining / stats.totalBudget) * 100 : 0;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -313,7 +319,7 @@ export default function FundDetail() {
               <DollarSign className="w-5 h-5 text-indigo-200" />
             </div>
             <p className="text-2xl font-bold text-slate-900">
-              ${stats.totalBudget.toLocaleString()}
+              ${centsToNumber(stats.totalBudget).toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -325,7 +331,7 @@ export default function FundDetail() {
               <TrendingDown className="w-5 h-5 text-violet-200" />
             </div>
             <p className="text-2xl font-bold text-violet-600">
-              ${stats.paid.toLocaleString()}
+              ${centsToNumber(stats.paid).toLocaleString()}
             </p>
             <p className="text-xs text-slate-400 mt-1">{percentPaid.toFixed(1)}% of budget</p>
           </CardContent>
@@ -338,7 +344,7 @@ export default function FundDetail() {
               <FileText className="w-5 h-5 text-amber-200" />
             </div>
             <p className="text-2xl font-bold text-amber-600">
-              ${stats.approved.toLocaleString()}
+              ${centsToNumber(stats.approved).toLocaleString()}
             </p>
             <p className="text-xs text-slate-400 mt-1">{percentCommitted.toFixed(1)}% of budget</p>
           </CardContent>
@@ -355,7 +361,7 @@ export default function FundDetail() {
               percentRemaining < 50 ? "text-amber-600" :
               "text-emerald-600"
             }`}>
-              ${stats.remaining.toLocaleString()}
+              ${centsToNumber(stats.remaining).toLocaleString()}
             </p>
             <p className="text-xs text-slate-400 mt-1">{percentRemaining.toFixed(1)}% remaining</p>
           </CardContent>
@@ -863,7 +869,7 @@ export default function FundDetail() {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Max Request</span>
                   <span className="font-medium">
-                    {fund.max_request_amount ? `$${fund.max_request_amount.toLocaleString()}` : "No limit"}
+                    {fund.max_request_amount ? `$${centsToNumber(fund.max_request_amount).toLocaleString()}` : "No limit"}
                   </span>
                 </div>
                 <div className="flex justify-between">
