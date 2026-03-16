@@ -93,14 +93,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     if (shouldRedirect) {
-      api.auth.logout(window.location.href);
+      const returnPath = window.location.pathname + window.location.search;
+      api.auth.logout(returnPath);
     } else {
       api.auth.logout();
     }
   };
 
   const navigateToLogin = () => {
-    api.auth.redirectToLogin(window.location.href);
+    // Use path + query instead of full URL to avoid malformed routes like /login/http:/localhost...
+    const returnPath = window.location.pathname + window.location.search;
+    api.auth.redirectToLogin(returnPath);
   };
 
   return (
