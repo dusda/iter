@@ -105,12 +105,7 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <RouterProvider
-          router={router}
-          future={{
-            v7_startTransition: true,
-          }}
-        />
+        <RouterProvider router={router} />
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
