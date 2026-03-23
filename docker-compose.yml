@@ -25,10 +25,12 @@ services:
       - supabase-db-data:/var/lib/postgresql/data
       - ./docker/db-init/01-auth-schema.sql:/docker-entrypoint-initdb.d/01-auth-schema.sql:ro
     healthcheck:
+      # libpq defaults DB name to the username when -d is omitted; keep user/db
+      # in sync with POSTGRES_* above via the same ${VAR:-default} interpolation.
       test:
         [
           'CMD-SHELL',
-          'pg_isready -U ${POSTGRES_USER:-supabase_admin} -h localhost',
+          'pg_isready -U ${POSTGRES_USER:-supabase_admin} -d ${POSTGRES_DB:-postgres} -h localhost',
         ]
       interval: 5s
       timeout: 5s
