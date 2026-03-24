@@ -1,22 +1,25 @@
 #!/usr/bin/env node
 /**
- * Import doc/*.csv into local Postgres. Handles empty strings → NULL and types.
- * Usage: node scripts/import-from-csv.mjs [connection_string]
- * Default: postgresql://supabase_admin:postgres@localhost:54322/postgres
- * Requires: npm install pg csv-parse (or use as devDependencies)
+ * Read doc/*.csv and write INSERT SQL to supabase/seed.sql (for Supabase CLI db reset / psql).
+ * Handles empty strings → NULL and the same types as the previous direct-import path.
+ *
+ * Usage: node scripts/import-from-csv.mjs [output.sql]
+ * Default output: supabase/seed.sql
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import pg from 'pg';
 import { parse } from 'csv-parse/sync';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, '..');
 const DOC = path.join(PROJECT_ROOT, 'doc');
-
-const CONN = process.env.DATABASE_URL || process.argv[2] || 'postgresql://supabase_admin:postgres@localhost:54322/postgres';
+const DEFAULT_OUT = path.join(PROJECT_ROOT, 'supabase', 'seed.sql');
+const OUT = process.argv[2] ? path.resolve(process.argv[2]) : DEFAULT_OUT;
+const DEFAULT_ADMIN_EMAIL = 'dev@gotham.design';
+const DEFAULT_ADMIN_NAME = 'Dev Admin';
+const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_DEFAULT_PASSWORD || 'changeme';
 
 // Table name -> { file, columns that are numeric, cents (money in dollars -> integer cents), boolean, timestamptz, date, jsonb }
 const TABLE_CONFIG = {
@@ -37,9 +40,13 @@ function quoteId(name) {
   return `"${String(name).replace(/"/g, '""')}"`;
 }
 
+/** Escape a string for use inside single-quoted PostgreSQL literals */
+function escStr(s) {
+  return String(s).replace(/'/g, "''");
+}
+
 function coerce(row, config) {
   const out = { ...row };
-  // Plain numeric columns (non-money)
   for (const col of config.numeric ?? []) {
     if (out[col] !== undefined && out[col] !== '') {
       const n = Number(out[col]);
@@ -49,7 +56,6 @@ function coerce(row, config) {
       out[col] = null;
     }
   }
-  // Money columns given in dollars in CSV -> integer cents in DB
   for (const col of config.cents ?? []) {
     if (out[col] !== undefined && out[col] !== '') {
       const n = Number(out[col]);
@@ -82,12 +88,10 @@ function coerce(row, config) {
             try {
               val = JSON.parse(trimmed);
             } catch {
-              // CSV sometimes leaves doubled quotes ""; try normalizing (only if parse failed)
               val = JSON.parse(trimmed.replace(/""/g, '"'));
             }
           }
         }
-        // Send as JSON string so Postgres receives valid JSON
         out[col] = val == null ? null : JSON.stringify(val);
       } catch {
         out[col] = null;
@@ -98,58 +102,129 @@ function coerce(row, config) {
     if (out[col] === undefined || out[col] === '') out[col] = null;
     else out[col] = out[col];
   }
-  // Empty string -> null for any other column (optional fields)
   for (const key of Object.keys(out)) {
     if (out[key] === '') out[key] = null;
   }
   return out;
 }
 
-async function main() {
-  const client = new pg.Client({ connectionString: CONN });
-  await client.connect();
-
-  try {
-    // Truncate in FK-safe order
-    await client.query(`
-      TRUNCATE TABLE
-        public.audit_log, public.notification, public.disbursement, public.review,
-        public.fund_request, public.access_request, public.routing_rule, public.fund,
-        public.app_settings, public.organization
-      RESTART IDENTITY CASCADE
-    `);
-
-    for (const [table, config] of Object.entries(TABLE_CONFIG)) {
-      const filePath = path.join(DOC, config.file);
-      if (!fs.existsSync(filePath)) {
-        console.log('Skip %s: %s not found', table, config.file);
-        continue;
-      }
-      const raw = fs.readFileSync(filePath, 'utf8');
-      const rows = parse(raw, { columns: true, skip_empty_lines: true, relax_column_count: true });
-      const rowsCoerced = rows.map((r) => coerce(r, config));
-      if (rowsCoerced.length === 0) {
-        console.log('Import %s: 0 rows', table);
-        continue;
-      }
-      const columns = Object.keys(rowsCoerced[0]);
-      const cols = columns.map(quoteId).join(', ');
-      const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
-      const updateSet = columns.filter((c) => c !== 'id').map((c) => `${quoteId(c)} = EXCLUDED.${quoteId(c)}`).join(', ');
-      const sql = `INSERT INTO public.${table} (${cols}) VALUES (${placeholders}) ON CONFLICT (id) DO UPDATE SET ${updateSet}`;
-      for (const row of rowsCoerced) {
-        const values = columns.map((c) => row[c]);
-        await client.query(sql, values);
-      }
-      console.log('Import %s: %d rows', table, rowsCoerced.length);
-    }
-    console.log('Done.');
-  } finally {
-    await client.end();
+function sqlLiteral(value, column, config) {
+  if (value === null || value === undefined) return 'NULL';
+  if (config.boolean?.includes(column)) {
+    return value === true || value === 'true' ? 'TRUE' : 'FALSE';
   }
+  if (config.numeric?.includes(column)) {
+    const n = Number(value);
+    if (Number.isNaN(n)) return 'NULL';
+    return String(n);
+  }
+  if (config.cents?.includes(column)) {
+    const n = Number(value);
+    if (Number.isNaN(n)) return 'NULL';
+    return String(Math.round(n));
+  }
+  if (config.timestamptz?.includes(column)) {
+    return `'${escStr(value)}'::timestamptz`;
+  }
+  if (config.date?.includes(column)) {
+    return `'${escStr(value)}'::date`;
+  }
+  if (config.jsonb?.includes(column)) {
+    const json = typeof value === 'string' ? value : JSON.stringify(value);
+    return `'${escStr(json)}'::jsonb`;
+  }
+  if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
+  if (typeof value === 'number') return String(value);
+  return `'${escStr(value)}'`;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+function main() {
+  const lines = [];
+  lines.push('-- Generated by scripts/import-from-csv.mjs — do not edit by hand.');
+  lines.push('-- Regenerate: npm run db:seed');
+  lines.push('');
+  lines.push('BEGIN;');
+  lines.push('');
+  lines.push(`TRUNCATE TABLE
+  public.audit_log, public.notification, public.disbursement, public.review,
+  public.fund_request, public.access_request, public.routing_rule, public.fund,
+  public.app_settings, public.organization
+RESTART IDENTITY CASCADE;`);
+  lines.push('');
+
+  for (const [table, config] of Object.entries(TABLE_CONFIG)) {
+    const filePath = path.join(DOC, config.file);
+    if (!fs.existsSync(filePath)) {
+      console.log('Skip %s: %s not found', table, config.file);
+      continue;
+    }
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const rows = parse(raw, { columns: true, skip_empty_lines: true, relax_column_count: true });
+    const rowsCoerced = rows.map((r) => coerce(r, config));
+    if (rowsCoerced.length === 0) {
+      console.log('Import %s: 0 rows', table);
+      continue;
+    }
+    const columns = Object.keys(rowsCoerced[0]);
+    const cols = columns.map(quoteId).join(', ');
+    const updateSet = columns.filter((c) => c !== 'id').map((c) => `${quoteId(c)} = EXCLUDED.${quoteId(c)}`).join(', ');
+
+    for (const row of rowsCoerced) {
+      const values = columns.map((c) => sqlLiteral(row[c], c, config)).join(', ');
+      lines.push(
+        `INSERT INTO public.${table} (${cols}) VALUES (${values}) ON CONFLICT (id) DO UPDATE SET ${updateSet};`,
+      );
+    }
+    console.log('Wrote %s: %d rows', table, rowsCoerced.length);
+  }
+
+  // Keep local/dev admin account aligned with scripts/create-admin-user.mjs.
+  // This creates the auth user if missing and then upserts the profile as admin.
+  lines.push('');
+  lines.push('-- Ensure default admin auth user exists');
+  lines.push('DO $$');
+  lines.push('DECLARE');
+  lines.push('  v_admin_id uuid;');
+  lines.push('BEGIN');
+  lines.push(`  SELECT id INTO v_admin_id FROM auth.users WHERE email = '${escStr(DEFAULT_ADMIN_EMAIL)}' LIMIT 1;`);
+  lines.push('  IF v_admin_id IS NULL THEN');
+  lines.push('    v_admin_id := gen_random_uuid();');
+  lines.push('    INSERT INTO auth.users (');
+  lines.push('      id, instance_id, aud, role, email, encrypted_password,');
+  lines.push('      email_confirmed_at, confirmation_token, recovery_token,');
+  lines.push('      email_change, email_change_token_new, email_change_token_current,');
+  lines.push('      phone_change, phone_change_token, reauthentication_token,');
+  lines.push('      created_at, updated_at, raw_app_meta_data, raw_user_meta_data');
+  lines.push('    ) VALUES (');
+  lines.push(`      v_admin_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', '${escStr(DEFAULT_ADMIN_EMAIL)}',`);
+  lines.push(`      crypt('${escStr(DEFAULT_ADMIN_PASSWORD)}', gen_salt('bf')), now(), '', '',`);
+  lines.push(`      '', '', '', '', '', '',`);
+  lines.push(`      now(), now(), '{}'::jsonb, '{}'::jsonb`);
+  lines.push('    );');
+  lines.push('  END IF;');
+  lines.push('END $$;');
+  lines.push('');
+  lines.push('-- Ensure default admin profile exists/updated');
+  lines.push('INSERT INTO public.profiles (id, email, full_name, app_role, organization_id, updated_at)');
+  lines.push('SELECT');
+  lines.push(`  u.id, '${escStr(DEFAULT_ADMIN_EMAIL)}', '${escStr(DEFAULT_ADMIN_NAME)}', 'admin',`);
+  lines.push('  (SELECT id FROM public.organization ORDER BY created_date LIMIT 1),');
+  lines.push('  now()');
+  lines.push('FROM auth.users u');
+  lines.push(`WHERE u.email = '${escStr(DEFAULT_ADMIN_EMAIL)}'`);
+  lines.push('ON CONFLICT (id) DO UPDATE SET');
+  lines.push('  email = EXCLUDED.email,');
+  lines.push("  app_role = 'admin',");
+  lines.push('  organization_id = COALESCE(EXCLUDED.organization_id, public.profiles.organization_id),');
+  lines.push('  updated_at = now();');
+
+  lines.push('');
+  lines.push('COMMIT;');
+  lines.push('');
+
+  fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  fs.writeFileSync(OUT, lines.join('\n'), 'utf8');
+  console.log('Done. Wrote %s', OUT);
+}
+
+main();
