@@ -13,9 +13,9 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "db:migrate": "bash -c 'npx supabase db push --db-url \"${DATABASE_URL:-postgresql://${PGUSER:-supabase_admin}:${PGPASSWORD:-postgres}@${PGHOST:-localhost}:${PGPORT:-54322}/${PGDATABASE:-postgres}}\" --yes'",
+    "db:migrate": "bash -c 'npx supabase db push --db-url \"${DATABASE_URL:-postgresql://${PGUSER:-postgres}:${PGPASSWORD:-postgres}@${PGHOST:-localhost}:${PGPORT:-54322}/${PGDATABASE:-postgres}}\" --yes'",
     "db:seed": "node scripts/import-from-csv.mjs",
-    "db:seed:apply": "bash -c 'psql \"${DATABASE_URL:-postgresql://${PGUSER:-supabase_admin}:${PGPASSWORD:-postgres}@${PGHOST:-localhost}:${PGPORT:-54322}/${PGDATABASE:-postgres}}\" -v ON_ERROR_STOP=1 -f supabase/seed.sql'",
+    "db:seed:apply": "bash -c 'psql \"${DATABASE_URL:-postgresql://${PGUSER:-postgres}:${PGPASSWORD:-postgres}@${PGHOST:-localhost}:${PGPORT:-54322}/${PGDATABASE:-postgres}}\" -v ON_ERROR_STOP=1 -f supabase/seed.sql'",
     "db:create-admin": "node scripts/create-admin-user.mjs",
     "db:setup": "npm run db:migrate && npm run db:seed && npm run db:seed:apply && npm run db:create-admin"
   },

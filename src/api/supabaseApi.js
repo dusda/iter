@@ -22,6 +22,14 @@ const ORDER_COLUMN_ALIAS = {
   profiles: { created_date: 'created_at' },
 };
 
+/** Text primary keys in this schema have no DB default; generate when callers omit `id`. */
+function newEntityId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
 function parseOrder(order, tableName) {
   if (!order) return { column: 'created_date', ascending: false };
   const desc = order.startsWith('-');
@@ -60,7 +68,13 @@ function entity(tableName) {
     },
     async create(data) {
       const table = TABLE_MAP[tableName] || tableName;
-      const { data: row, error } = await supabase.from(table).insert(data).select().single();
+      const insertData = data != null && typeof data === 'object' && !Array.isArray(data)
+        ? { ...data }
+        : data;
+      if (insertData && typeof insertData === 'object' && insertData.id == null) {
+        insertData.id = newEntityId();
+      }
+      const { data: row, error } = await supabase.from(table).insert(insertData).select().single();
       if (error) throw error;
       return row;
     },
