@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -137,7 +137,7 @@ export default function SuperAdminDashboard() {
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-slate-600">Access restricted to Super Administrators</p>
@@ -148,8 +148,7 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-purple-50/30 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="space-y-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -255,6 +254,9 @@ export default function SuperAdminDashboard() {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>{editingOrg ? "Edit Organization" : "Create Organization"}</DialogTitle>
+              <DialogDescription>
+                {editingOrg ? "Update organization details." : "Create a new organization."}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -361,6 +363,9 @@ export default function SuperAdminDashboard() {
                 )}
                 {viewingOrg?.name}
               </DialogTitle>
+              <DialogDescription>
+                Manage funds and users for this organization.
+              </DialogDescription>
               <div className="flex items-center gap-2 mt-2">
                 <code className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">
                   {viewingOrg?.id}
@@ -471,7 +476,6 @@ export default function SuperAdminDashboard() {
             </Tabs>
           </DialogContent>
         </Dialog>
-      </div>
     </div>
   );
 }

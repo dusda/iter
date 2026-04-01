@@ -91,14 +91,15 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
     ...((isFundManager || permissions.access_rules) ? [{ name: "Routing Rules", icon: Settings, page: "Rules" }] : []),
     ...((isAdmin || permissions.access_users) ? [{ name: "Users", icon: Users, page: "Users" }] : []),
     ...((isAdmin || permissions.access_audit_log) ? [{ name: "Audit Log", icon: FileSearch, page: "AuditLog" }] : []),
+    ...(userRole === "super_admin" ? [{ name: "Super Admin", icon: Settings, page: "SuperAdminDashboard" }] : []),
     ...((isAdmin || permissions.access_settings) ? [{ name: "Settings", icon: Settings, page: "Settings" }] : []),
   ];
 
   // Advisors with individual assignments get simplified nav, other staff get full sidebar
   const navItems = (isStaff && !isAdvisor) ? staffNavItems : (isAdvisor ? advisorNavItems : studentNavItems);
 
-  // PublicHome and SuperAdminDashboard don't need layout
-  if (currentPageName === "PublicHome" || currentPageName === "SuperAdminDashboard") {
+  // PublicHome doesn't need layout
+  if (currentPageName === "PublicHome") {
     return children;
   }
 
