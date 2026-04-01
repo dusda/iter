@@ -231,10 +231,13 @@ const integrations = {
 
 /** Invite user by email (Supabase auth admin or stub) */
 async function inviteUser(email, _role) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Not authenticated');
   const { data, error } = await supabase.functions.invoke('invite-user', {
     body: { email },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
   });
   if (error) throw error;
   return data;
