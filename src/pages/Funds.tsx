@@ -42,32 +42,33 @@ const centsToNumber = (cents?: number | null) =>
   cents != null ? cents / 100 : 0;
 
 export default function Funds() {
-  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await api.auth.me();
-    setUser(currentUser);
-  };
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => api.auth.me(),
+  });
 
   const { data: funds = [], isLoading } = useQuery({
-    queryKey: ["allFunds"],
-    queryFn: () => api.entities.Fund.list("-created_date"),
+    queryKey: ["funds", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Fund.filter({ organization_id: user.organization_id }, "-created_date"),
   });
 
   const { data: requests = [] } = useQuery({
-    queryKey: ["allRequests"],
-    queryFn: () => api.entities.FundRequest.list(),
+    queryKey: ["fundRequests", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.FundRequest.filter({ organization_id: user.organization_id }),
   });
 
   const { data: disbursements = [] } = useQuery({
-    queryKey: ["allDisbursements"],
-    queryFn: () => api.entities.Disbursement.list(),
+    queryKey: ["disbursements", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Disbursement.filter({ organization_id: user.organization_id }),
   });
 
   const calculateBudgetStats = (fundId) => {
@@ -97,7 +98,7 @@ export default function Funds() {
 
   const canManageFunds = user?.app_role === "fund_manager" || user?.app_role === "admin";
 
-  if (!user) {
+  if (userLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <LoadingSpinner size="lg" />

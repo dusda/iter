@@ -242,7 +242,7 @@ export default function FundDetail() {
     });
 
     queryClient.invalidateQueries({ queryKey: ["fund", fundId] });
-    queryClient.invalidateQueries({ queryKey: ["allFunds"] });
+    queryClient.invalidateQueries({ queryKey: ["funds"] });
     setIsEditing(false);
     setSubmitting(false);
   };

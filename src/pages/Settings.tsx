@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/api/supabaseClient";
+import { toast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -40,6 +40,8 @@ export default function Settings() {
   });
   const [uploading, setUploading] = useState(false);
   const logoFileInputRef = useRef<HTMLInputElement | null>(null);
+  const lastSavedSnapshotRef = useRef<string>("");
+  const queuedSaveRef = useRef<typeof orgForm | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -93,6 +95,7 @@ export default function Settings() {
   useEffect(() => {
     if (!selectedOrganization) {
       setOrgForm({ name: "", logo: "", description: "", welcome_message: "" });
+      lastSavedSnapshotRef.current = "";
       return;
     }
     setOrgForm({
@@ -101,6 +104,13 @@ export default function Settings() {
       description: selectedOrganization.description || "",
       welcome_message: selectedOrganization.welcome_message || "",
     });
+    const snapshot = JSON.stringify({
+      name: selectedOrganization.name || "",
+      logo: selectedOrganization.logo || "",
+      description: selectedOrganization.description || "",
+      welcome_message: selectedOrganization.welcome_message || "",
+    });
+    lastSavedSnapshotRef.current = snapshot;
   }, [selectedOrganization]);
 
   const saveSettings = useMutation({
@@ -117,7 +127,25 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       queryClient.invalidateQueries();
-      alert("Organization saved successfully!");
+    },
+    onSettled: () => {
+      const queued = queuedSaveRef.current;
+      if (!queued) return;
+      if (saveSettings.isPending) return;
+      queuedSaveRef.current = null;
+      // Flush the latest queued save (if it's still different).
+      const snapshot = JSON.stringify(queued);
+      if (snapshot === lastSavedSnapshotRef.current) return;
+      saveSettings.mutate(queued, {
+        onSuccess: () => {
+          lastSavedSnapshotRef.current = snapshot;
+          toast({
+            title: "Saved",
+            description: `Organization updated at ${format(new Date(), "p")}.`,
+            className: "border-emerald-700 bg-emerald-600 text-white",
+          });
+        },
+      });
     },
   });
 
@@ -129,9 +157,18 @@ export default function Settings() {
       });
       return updated;
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, organizationId) => {
       await loadUser();
       queryClient.invalidateQueries();
+      const orgName =
+        organizations.find((o) => o.id === organizationId)?.name ||
+        availableOrganizations.find((o) => o.id === organizationId)?.name ||
+        "organization";
+      toast({
+        title: "Organization switched",
+        description: `Active organization is now ${orgName}.`,
+        className: "border-emerald-700 bg-emerald-600 text-white",
+      });
     },
   });
 
@@ -141,12 +178,49 @@ export default function Settings() {
 
     setUploading(true);
     const { file_url } = await api.integrations.Core.UploadFile({ file });
-    setOrgForm({ ...orgForm, logo: file_url });
+    const next = { ...orgForm, logo: file_url };
+    setOrgForm(next);
+    // Upload is a "done" event — save immediately.
+    if (user?.organization_id && isAdmin) {
+      const snapshot = JSON.stringify(next);
+      if (snapshot !== lastSavedSnapshotRef.current && !saveSettings.isPending) {
+        saveSettings.mutate(next, {
+          onSuccess: () => {
+            lastSavedSnapshotRef.current = snapshot;
+            toast({
+              title: "Saved",
+              description: `Organization updated at ${format(new Date(), "p")}.`,
+              className: "border-emerald-700 bg-emerald-600 text-white",
+            });
+          },
+        });
+      } else if (snapshot !== lastSavedSnapshotRef.current && saveSettings.isPending) {
+        queuedSaveRef.current = next;
+      }
+    }
     setUploading(false);
   };
+ 
+  const saveIfChanged = (next: typeof orgForm) => {
+    if (!user?.organization_id) return;
+    if (!isAdmin) return;
+    const snapshot = JSON.stringify(next);
+    if (snapshot === lastSavedSnapshotRef.current) return;
+    if (saveSettings.isPending) {
+      queuedSaveRef.current = next;
+      return;
+    }
 
-  const handleSave = () => {
-    saveSettings.mutate(orgForm);
+    saveSettings.mutate(next, {
+      onSuccess: () => {
+        lastSavedSnapshotRef.current = snapshot;
+        toast({
+          title: "Saved",
+          description: `Organization updated at ${format(new Date(), "p")}.`,
+          className: "border-emerald-700 bg-emerald-600 text-white",
+        });
+      },
+    });
   };
 
 
@@ -243,7 +317,10 @@ export default function Settings() {
                 <Label>Organization Name *</Label>
                 <Input
                   value={orgForm.name}
-                  onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+                  onChange={(e) => {
+                    setOrgForm({ ...orgForm, name: e.target.value });
+                  }}
+                  onBlur={(e) => saveIfChanged({ ...orgForm, name: e.target.value })}
                   placeholder="Acme University"
                   disabled={!user?.organization_id}
                 />
@@ -289,7 +366,11 @@ export default function Settings() {
                         variant="outline"
                         className="shrink-0 text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800"
                         disabled={uploading || !user?.organization_id || !orgForm.logo}
-                        onClick={() => setOrgForm({ ...orgForm, logo: "" })}
+                        onClick={() => {
+                          const next = { ...orgForm, logo: "" };
+                          setOrgForm(next);
+                          saveIfChanged(next);
+                        }}
                       >
                         Remove
                       </Button>
@@ -311,7 +392,10 @@ export default function Settings() {
                 <Textarea
                   rows={3}
                   value={orgForm.description}
-                  onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+                  onChange={(e) => {
+                    setOrgForm({ ...orgForm, description: e.target.value });
+                  }}
+                  onBlur={() => saveIfChanged(orgForm)}
                   placeholder="Brief description shown on the public page..."
                   disabled={!user?.organization_id}
                 />
@@ -321,21 +405,13 @@ export default function Settings() {
                 <Label>Welcome Message</Label>
                 <Input
                   value={orgForm.welcome_message}
-                  onChange={(e) => setOrgForm({ ...orgForm, welcome_message: e.target.value })}
+                  onChange={(e) => {
+                    setOrgForm({ ...orgForm, welcome_message: e.target.value });
+                  }}
+                  onBlur={() => saveIfChanged(orgForm)}
                   placeholder="Welcome! Request access to get started."
                   disabled={!user?.organization_id}
                 />
-              </div>
-
-              <div className="flex justify-end pt-4 border-t">
-                <Button
-                  onClick={handleSave}
-                  disabled={saveSettings.isPending || !user?.organization_id || !orgForm.name}
-                  className="bg-indigo-600 hover:bg-indigo-700"
-                >
-                  {saveSettings.isPending ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                  Save Settings
-                </Button>
               </div>
             </CardContent>
           </Card>

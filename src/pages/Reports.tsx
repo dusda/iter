@@ -60,37 +60,37 @@ type UsageByCategory = Record<
 type SpendByMonth = Record<string, number>;
 
 export default function Reports() {
-  const [user, setUser] = useState(null);
   const [selectedFund, setSelectedFund] = useState("all");
   const [dateRange, setDateRange] = useState("all");
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await api.auth.me();
-    setUser(currentUser);
-  };
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => api.auth.me(),
+  });
 
   const { data: requests = [] } = useQuery<ReportRequest[]>({
-    queryKey: ["allRequests"],
-    queryFn: () => api.entities.FundRequest.list(),
+    queryKey: ["fundRequests", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () => api.entities.FundRequest.filter({ organization_id: user.organization_id }),
   });
 
   const { data: funds = [] } = useQuery<ReportFund[]>({
-    queryKey: ["allFunds"],
-    queryFn: () => api.entities.Fund.list(),
+    queryKey: ["funds", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () => api.entities.Fund.filter({ organization_id: user.organization_id }),
   });
 
   const { data: disbursements = [] } = useQuery<ReportDisbursement[]>({
-    queryKey: ["allDisbursements"],
-    queryFn: () => api.entities.Disbursement.list("-paid_at"),
+    queryKey: ["disbursements", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Disbursement.filter({ organization_id: user.organization_id }, "-paid_at"),
   });
 
   const { data: reviews = [] } = useQuery<ReportReview[]>({
-    queryKey: ["allReviews"],
-    queryFn: () => api.entities.Review.list(),
+    queryKey: ["reviews", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () => api.entities.Review.filter({ organization_id: user.organization_id }),
   });
 
   // Filter funds based on user role
@@ -287,7 +287,7 @@ export default function Reports() {
     a.click();
   };
 
-  if (!user) {
+  if (userLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <LoadingSpinner size="lg" />

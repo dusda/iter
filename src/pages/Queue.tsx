@@ -40,7 +40,6 @@ import {
 import { format } from "date-fns";
 
 export default function Queue() {
-  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("my_assigned");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -49,28 +48,30 @@ export default function Queue() {
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await api.auth.me();
-    setUser(currentUser);
-  };
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => api.auth.me(),
+  });
 
   const { data: allRequests = [], isLoading } = useQuery({
-    queryKey: ["allRequests"],
-    queryFn: () => api.entities.FundRequest.list("-created_date"),
+    queryKey: ["fundRequests", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.FundRequest.filter({ organization_id: user.organization_id }, "-created_date"),
   });
 
   const { data: funds = [] } = useQuery({
-    queryKey: ["allFunds"],
-    queryFn: () => api.entities.Fund.list(),
+    queryKey: ["funds", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Fund.filter({ organization_id: user.organization_id }),
   });
 
   const { data: allReviews = [] } = useQuery({
-    queryKey: ["allReviews"],
-    queryFn: () => api.entities.Review.list(),
+    queryKey: ["reviews", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Review.filter({ organization_id: user.organization_id }),
   });
 
   // Calculate days since submission
@@ -132,7 +133,7 @@ export default function Queue() {
 
   const categories = ["Tuition/Fees", "Books/Supplies", "Housing", "Food", "Transportation", "Medical", "Technology", "Other"];
 
-  if (!user) {
+  if (userLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <LoadingSpinner size="lg" />

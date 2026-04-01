@@ -12,23 +12,20 @@ import { GitBranch, Plus, Settings, AlertCircle } from "lucide-react";
 import RuleBuilder from "@/components/rules/RuleBuilder";
 
 export default function Rules() {
-  const [user, setUser] = useState(null);
   const [selectedFundId, setSelectedFundId] = useState("");
   const [showBuilder, setShowBuilder] = useState(false);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    const currentUser = await api.auth.me();
-    setUser(currentUser);
-  };
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => api.auth.me(),
+  });
 
   const { data: funds = [] } = useQuery({
-    queryKey: ["allFunds"],
-    queryFn: () => api.entities.Fund.list("-created_date"),
+    queryKey: ["funds", user?.organization_id],
+    enabled: !!user?.organization_id,
+    queryFn: () =>
+      api.entities.Fund.filter({ organization_id: user.organization_id }, "-created_date"),
   });
 
   const { data: rules = [] } = useQuery({
@@ -39,7 +36,7 @@ export default function Rules() {
 
   const selectedFund = funds.find(f => f.id === selectedFundId);
 
-  if (!user) {
+  if (userLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <LoadingSpinner size="lg" />
