@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
     if (profileErr) {
       return json({ error: "Unable to verify permissions" }, req, { status: 500 });
     }
-    if (profile?.app_role !== "admin") {
+    if (profile?.app_role !== "admin" && profile?.app_role !== "super_admin") {
       return json({ error: "Forbidden" }, req, { status: 403 });
     }
 
