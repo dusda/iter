@@ -127,6 +127,30 @@ const dollarsToCents = (value: string) =>
 const centsToNumber = (cents?: number | null) =>
   cents != null ? cents / 100 : 0;
 
+const normalizeStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+    // Handle common Supabase/DB shapes: JSON-encoded array, or comma-separated string
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return Array.isArray(parsed)
+          ? parsed.filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+          : [];
+      } catch {
+        // fall through to CSV split
+      }
+    }
+    return trimmed
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
 export default function Apply() {
   const navigate = useNavigate();
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -633,9 +657,10 @@ export default function Apply() {
 
   // Application Form
   // Check category restrictions
-  const isCategoryAllowed = !selectedFund?.allowed_categories || 
-    selectedFund.allowed_categories.length === 0 ||
-    selectedFund.allowed_categories.includes(formData.intended_use_category);
+  const allowedCategories = normalizeStringArray(selectedFund?.allowed_categories);
+  const isCategoryAllowed =
+    allowedCategories.length === 0 ||
+    allowedCategories.includes(formData.intended_use_category);
 
   const isFormValid = 
     formData.student_full_name &&
@@ -797,15 +822,12 @@ export default function Apply() {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(selectedFund?.allowed_categories && selectedFund.allowed_categories.length > 0
-                      ? selectedFund.allowed_categories
-                      : USE_CATEGORIES
-                    ).map((cat) => (
+                    {(allowedCategories.length > 0 ? allowedCategories : USE_CATEGORIES).map((cat) => (
                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {selectedFund?.allowed_categories && selectedFund.allowed_categories.length > 0 && (
+                {allowedCategories.length > 0 && (
                   <p className="text-xs text-slate-500">
                     Only selected categories are allowed for this fund
                   </p>
