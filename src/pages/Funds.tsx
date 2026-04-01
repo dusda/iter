@@ -96,7 +96,10 @@ export default function Funds() {
     archived: funds.filter(f => f.status === "archived").length,
   };
 
-  const canManageFunds = user?.app_role === "fund_manager" || user?.app_role === "admin";
+  const canManageFunds =
+    user?.app_role === "fund_manager" ||
+    user?.app_role === "admin" ||
+    user?.app_role === "super_admin";
 
   if (userLoading || !user) {
     return (

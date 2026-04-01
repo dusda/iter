@@ -9,7 +9,7 @@ const ToastProvider = React.forwardRef<
 >(({ ...props }, ref) => (
   <div
     ref={ref}
-    className="fixed top-4 left-1/2 z-100 flex max-h-screen w-full -translate-x-1/2 flex-col gap-2 px-4 md:max-w-[520px]"
+    className="fixed bottom-4 left-1/2 z-100 flex max-h-screen w-full -translate-x-1/2 flex-col gap-2 px-4 md:top-4 md:bottom-auto md:max-w-[520px]"
     {...props}
   />
 ));
@@ -21,7 +21,7 @@ const ToastViewport = React.forwardRef<
 >(({ ...props }, ref) => (
   <div
     ref={ref}
-    className="fixed top-4 left-1/2 z-100 flex max-h-screen w-full -translate-x-1/2 flex-col gap-2 px-4 md:max-w-[520px]"
+    className="fixed bottom-4 left-1/2 z-100 flex max-h-screen w-full -translate-x-1/2 flex-col gap-2 px-4 md:top-4 md:bottom-auto md:max-w-[520px]"
     {...props}
   />
 ));

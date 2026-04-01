@@ -95,6 +95,8 @@ interface CurrentUser {
   full_name: string;
   email: string;
   phone?: string | null;
+  organization_id?: string | null;
+  app_role?: string | null;
 }
 
 const USE_CATEGORIES = [
@@ -168,9 +170,24 @@ export default function Apply() {
     }
   };
 
+  const { data: latestAccessRequest } = useQuery<any | null>({
+    queryKey: ["latestAccessRequest", user?.email],
+    enabled: !!user?.email && !user?.organization_id,
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const reqs = await api.entities.AccessRequest.filter({ email: user.email }, "-created_date", 1);
+      return reqs?.[0] || null;
+    },
+  });
+
+  const organizationIdForApply =
+    user?.organization_id ?? latestAccessRequest?.organization_id ?? null;
+
   const { data: funds = [], isLoading } = useQuery<FundForApply[]>({
-    queryKey: ["activeFunds"],
-    queryFn: () => api.entities.Fund.filter({ status: "active" }),
+    queryKey: ["activeFunds", organizationIdForApply],
+    enabled: !!organizationIdForApply,
+    queryFn: () =>
+      api.entities.Fund.filter({ status: "active", organization_id: organizationIdForApply }),
   });
 
   useEffect(() => {
@@ -178,6 +195,9 @@ export default function Apply() {
       const fund = funds.find(f => f.id === selectedFund.id);
       if (fund) {
         setSelectedFund(fund);
+      } else {
+        // URL param pointed at a fund outside this org (or unavailable)
+        setSelectedFund(null);
       }
     }
   }, [funds, selectedFund?.id]);
@@ -522,7 +542,13 @@ export default function Apply() {
           description="Select a fund to begin your application"
         />
 
-        {isLoading ? (
+        {!organizationIdForApply ? (
+          <EmptyState
+            icon={Wallet}
+            title="No organization selected"
+            description="To apply, you must be associated with an organization. If you recently requested access, wait for approval or switch your active organization in Settings."
+          />
+        ) : isLoading ? (
           <LoadingSpinner className="py-16" />
         ) : funds.length === 0 ? (
           <EmptyState
