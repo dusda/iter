@@ -6,11 +6,40 @@ type InviteUserBody = {
   redirectTo?: string;
 };
 
-function json(body: unknown, init: ResponseInit = {}) {
+function allowedOrigins(): string[] {
+  // If unset, we assume "local/dev" and allow any origin.
+  const raw = Deno.env.get("ALLOWED_ORIGINS")?.trim() ?? "";
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function isOriginAllowed(origin: string | null): boolean {
+  const allow = allowedOrigins();
+  if (allow.length === 0) return true; // local/dev default
+  if (!origin) return false;
+  return allow.includes(origin);
+}
+
+function corsHeaders(origin: string | null) {
+  const allow = allowedOrigins();
+  const allowOrigin = allow.length === 0 ? "*" : (origin ?? "");
+  return {
+    "access-control-allow-origin": allowOrigin,
+    "access-control-allow-methods": "POST, OPTIONS",
+    "access-control-allow-headers":
+      "authorization, x-client-info, apikey, content-type, accept, origin, referer, user-agent",
+    "access-control-max-age": "86400",
+    // Only add allow-credentials if you're also returning a non-* allow-origin and need cookies.
+    // "access-control-allow-credentials": "true",
+  };
+}
+
+function json(body: unknown, req: Request, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
     ...init,
     headers: {
       "content-type": "application/json",
+      ...corsHeaders(req.headers.get("origin")),
       ...(init.headers || {}),
     },
   });
@@ -18,23 +47,44 @@ function json(body: unknown, init: ResponseInit = {}) {
 
 Deno.serve(async (req) => {
   try {
+    const origin = req.headers.get("origin");
+
+    if (req.method === "OPTIONS") {
+      if (!isOriginAllowed(origin)) {
+        return new Response(null, { status: 403 });
+      }
+      return new Response(null, {
+        status: 200,
+        headers: {
+          ...corsHeaders(origin),
+        },
+      });
+    }
+
+    if (!isOriginAllowed(origin)) {
+      return json({ error: "CORS origin not allowed" }, req, { status: 403 });
+    }
+
     if (req.method !== "POST") {
-      return json({ error: "Method not allowed" }, { status: 405 });
+      return json({ error: "Method not allowed" }, req, { status: 405 });
     }
 
     const { email, redirectTo }: InviteUserBody = await req.json();
     if (!email || typeof email !== "string") {
-      return json({ error: "Missing email" }, { status: 400 });
+      return json({ error: "Missing email" }, req, { status: 400 });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !serviceRoleKey) {
-      return json({ error: "Server misconfigured" }, { status: 500 });
+      return json({ error: "Server misconfigured" }, req, { status: 500 });
     }
 
-    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-    const fallbackRedirect = origin ? `${origin.replace(/\/$/, "")}/login` : undefined;
+    const referer = req.headers.get("referer") || "";
+    const fallbackBase = origin || referer;
+    const fallbackRedirect = fallbackBase
+      ? `${fallbackBase.replace(/\/$/, "")}/login`
+      : undefined;
 
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false },
@@ -44,13 +94,17 @@ Deno.serve(async (req) => {
       redirectTo: redirectTo || fallbackRedirect,
     });
     if (error) {
-      return json({ error: error.message }, { status: 400 });
+      return json({ error: error.message }, req, { status: 400 });
     }
 
     // data.user may be null if already invited; still return success semantics
-    return json({ ok: true, user: data.user }, { status: 200 });
+    return json({ ok: true, user: data.user }, req, { status: 200 });
   } catch (e) {
-    return json({ error: (e as Error)?.message || "Unknown error" }, { status: 500 });
+    return json(
+      { error: (e as Error)?.message || "Unknown error" },
+      req,
+      { status: 500 },
+    );
   }
 });
 
