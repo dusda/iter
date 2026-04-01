@@ -20,6 +20,33 @@ export default function ResetPassword() {
 
     (async () => {
       try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get("code");
+        const type = url.searchParams.get("type");
+        const tokenHash = url.searchParams.get("token_hash") ?? url.searchParams.get("token");
+
+        // Establish a session from the recovery link (depends on the configured auth flow).
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash && type) {
+          const { error } = await supabase.auth.verifyOtp({
+            type: type as any,
+            token_hash: tokenHash,
+          });
+          if (error) throw error;
+        }
+
+        // Clean auth params from the URL after processing.
+        if (code || tokenHash || type) {
+          url.searchParams.delete("code");
+          url.searchParams.delete("token_hash");
+          url.searchParams.delete("token");
+          url.searchParams.delete("type");
+          url.searchParams.delete("next");
+          window.history.replaceState({}, "", url.toString());
+        }
+
         const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
         if (!isMounted) return;
