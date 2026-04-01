@@ -39,7 +39,12 @@ function parseOrder(order, tableName) {
   return { column, ascending: !desc };
 }
 
-async function query(tableName, { filter = {}, order, limit } = {}) {
+/**
+ * @param {string} tableName
+ * @param {{ filter?: Record<string, any>, order?: string, limit?: number }} [opts]
+ */
+async function query(tableName, opts = {}) {
+  const { filter = {}, order, limit } = opts;
   const table = TABLE_MAP[tableName] || tableName;
   let q = supabase.from(table).select('*');
   for (const [key, value] of Object.entries(filter)) {
@@ -140,7 +145,7 @@ function logout(redirectUrl) {
 
 /** Redirect to login (Supabase hosted or custom login page) */
 function redirectToLogin(returnUrl) {
-  const loginUrl = import.meta.env.VITE_SUPABASE_LOGIN_URL || '/login';
+  const loginUrl = (/** @type {any} */ (import.meta)).env?.VITE_SUPABASE_LOGIN_URL || '/login';
   const url = new URL(loginUrl, window.location.origin);
   url.searchParams.set('redirectTo', returnUrl || window.location.href);
   window.location.href = url.toString();
@@ -228,8 +233,11 @@ const integrations = {
 async function inviteUser(email, _role) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
-  // Supabase doesn't expose invite by email from client; would need Edge Function or backend
-  throw new Error('Invite not implemented: use Supabase Dashboard or backend');
+  const { data, error } = await supabase.functions.invoke('invite-user', {
+    body: { email },
+  });
+  if (error) throw error;
+  return data;
 }
 
 const users = {

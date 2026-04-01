@@ -185,11 +185,8 @@ export default function Users() {
       queryClient.invalidateQueries({ queryKey: ["accessRequests"] });
       const request = accessRequests.find(r => r.id === variables.id);
       if (request && variables.status === "approved") {
-        await api.integrations.Core.SendEmail({
-          to: request.email,
-          subject: "Access Request Approved",
-          body: `Dear ${request.full_name},\n\nYour access request has been approved! You can now sign in to submit fund applications.\n\nBest regards,\nStudent Funds Team`
-        });
+        // Create an auth invite so the user receives an account creation email.
+        await api.users.inviteUser(request.email, "student");
       }
     },
   });

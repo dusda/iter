@@ -1,3 +1,2 @@
 select *
-from public.profiles
-where email = 'dev@gotham.design'
+from public.organization

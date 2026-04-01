@@ -43,8 +43,13 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Public pages should not attempt to load an authenticated user.
+    if (currentPageName === "PublicHome") {
+      setLoading(false);
+      return;
+    }
     loadUser();
-  }, []);
+  }, [currentPageName]);
 
   const loadUser = async () => {
     try {

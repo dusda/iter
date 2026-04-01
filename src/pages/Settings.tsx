@@ -11,6 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Upload } from "lucide-react";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Settings() {
   const [user, setUser] = useState(null);
@@ -32,12 +39,46 @@ export default function Settings() {
     setUser(currentUser);
   };
 
+  const isAdmin = user?.app_role === "admin" || user?.app_role === "super_admin";
+  const isSuperAdmin = user?.app_role === "super_admin";
+
+  const { data: organizations = [] } = useQuery<any[]>({
+    queryKey: ["organizations"],
+    queryFn: () => api.entities.Organization.list("name"),
+    enabled: !!user,
+  });
+
+  const { data: approvedAccessRequests = [] } = useQuery<any[]>({
+    queryKey: ["approvedAccessRequests", user?.email],
+    queryFn: async () => {
+      if (!user?.email) return [];
+      return api.entities.AccessRequest.filter({ email: user.email, status: "approved" }, "-created_date");
+    },
+    enabled: !!user?.email && !isSuperAdmin,
+  });
+
+  const allowedOrganizationIds = React.useMemo(() => {
+    if (!user) return new Set<string>();
+    if (isSuperAdmin) return new Set<string>(organizations.map((o) => o.id));
+    const ids = new Set<string>();
+    if (user.organization_id) ids.add(user.organization_id);
+    for (const req of approvedAccessRequests) {
+      if (req?.organization_id) ids.add(req.organization_id);
+    }
+    return ids;
+  }, [approvedAccessRequests, isSuperAdmin, organizations, user]);
+
+  const availableOrganizations = isSuperAdmin
+    ? organizations
+    : organizations.filter((o) => allowedOrganizationIds.has(o.id));
+
   const { data: settings, isLoading } = useQuery({
     queryKey: ["appSettings"],
     queryFn: async () => {
       const allSettings = await api.entities.AppSettings.list();
       return allSettings[0];
     },
+    enabled: isAdmin,
   });
 
 
@@ -67,6 +108,20 @@ export default function Settings() {
     },
   });
 
+  const switchOrganization = useMutation({
+    mutationFn: async (organizationId: string) => {
+      const updated = await api.auth.updateMe({
+        organization_id: organizationId || null,
+        updated_at: new Date().toISOString(),
+      });
+      return updated;
+    },
+    onSuccess: async () => {
+      await loadUser();
+      queryClient.invalidateQueries();
+    },
+  });
+
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -91,14 +146,6 @@ export default function Settings() {
     );
   }
 
-  if (user.app_role !== "admin" && user.app_role !== "super_admin") {
-    return (
-      <div className="text-center py-16">
-        <p className="text-slate-500">Access restricted to administrators</p>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <PageHeader
@@ -113,6 +160,51 @@ export default function Settings() {
 
         {/* Organization Settings */}
         <TabsContent value="organization">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <CardHeader>
+              <CardTitle>Active Organization</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Organization</Label>
+                <Select
+                  value={user.organization_id || ""}
+                  onValueChange={(value) => switchOrganization.mutate(value)}
+                  disabled={switchOrganization.isPending || availableOrganizations.length === 0}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder={availableOrganizations.length ? "Select an organization" : "No organizations available"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableOrganizations.map((org) => (
+                      <SelectItem key={org.id} value={org.id}>
+                        {org.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!isSuperAdmin && availableOrganizations.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    No approved organizations found for your account yet.
+                  </p>
+                ) : null}
+              </div>
+              {switchOrganization.isPending ? (
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <LoadingSpinner size="sm" />
+                  Switching organization…
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {!isAdmin ? (
+            <div className="text-center py-10">
+              <p className="text-slate-500">Organization settings are restricted to administrators.</p>
+            </div>
+          ) : null}
+
+          {isAdmin ? (
           <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
             <CardHeader>
               <CardTitle>Organization Information</CardTitle>
@@ -187,6 +279,7 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+          ) : null}
         </TabsContent>
       </Tabs>
     </div>
