@@ -2,6 +2,7 @@ import React, { useState, useEffect, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { api } from "@/api/supabaseApi";
+import { appVersion } from "@/appVersion";
 import {
   GraduationCap,
   FileText,
@@ -243,6 +244,11 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <div className="px-3 py-2">
+                      <div className="text-xs font-medium text-slate-500">Fund Journey</div>
+                      <div className="text-xs text-slate-400">v{appVersion}</div>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -395,6 +401,9 @@ function UserDropdown({ user, handleLogout, fullWidth }: UserDropdownProps) {
         <div className="px-3 py-2">
           <p className="font-medium text-sm">{user?.full_name}</p>
           <p className="text-xs text-slate-500">{user?.email}</p>
+        </div>
+        <div className="px-3 py-2">
+          <div className="text-xs font-medium text-slate-500">Fund Journey v{appVersion}</div>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

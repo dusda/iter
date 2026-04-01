@@ -1,7 +1,7 @@
 {
   "name": "iterator-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.12",
   "type": "module",
   "engines": {
     "node": ">=24 <25"
