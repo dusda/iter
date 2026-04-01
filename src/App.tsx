@@ -36,7 +36,7 @@ const AuthenticatedApp = () => {
   const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const location = useLocation();
   const publicPaths = ['/', '/login', '/PublicHome'];
-  const isPublicPath = publicPaths.includes(location.pathname);
+  const isPublicPath = publicPaths.includes(location.pathname) || location.pathname.startsWith('/org/');
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -77,6 +77,11 @@ const AuthenticatedApp = () => {
             <MainPage />
           </LayoutWrapper>
         )
+      } />
+      <Route path="/org/:orgSlug" element={
+        <LayoutWrapper currentPageName="PublicHome">
+          <PublicHomePage />
+        </LayoutWrapper>
       } />
       <Route path="/Home" element={isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
       {Object.entries(Pages).map(([path, Page]) => (

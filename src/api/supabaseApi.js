@@ -172,10 +172,34 @@ const auth = {
 };
 
 /** File upload: Supabase Storage (bucket "uploads"). Returns { file_url }. Stubs if bucket missing. */
+function sanitizeStorageFilename(originalName) {
+  const name = String(originalName || 'file');
+  const lastDot = name.lastIndexOf('.');
+  const rawBase = lastDot > 0 ? name.slice(0, lastDot) : name;
+  const rawExt = lastDot > 0 ? name.slice(lastDot + 1) : '';
+
+  const base = rawBase
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9._-]/g, '-') // strip characters invalid in storage keys (e.g. [ ])
+    .replace(/-+/g, '-')
+    .replace(/^[._-]+|[._-]+$/g, '');
+
+  const ext = rawExt
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '')
+    .slice(0, 12);
+
+  const safeBase = base || 'file';
+  return ext ? `${safeBase}.${ext}` : safeBase;
+}
+
 async function uploadFile({ file }) {
   const bucket = 'uploads';
   try {
-    const name = `${Date.now()}-${file.name}`;
+    const name = `${Date.now()}-${sanitizeStorageFilename(file?.name)}`;
     const { data, error } = await supabase.storage.from(bucket).upload(name, file, { upsert: false });
     if (error) throw error;
     const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(data.path);

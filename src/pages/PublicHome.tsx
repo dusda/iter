@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -13,6 +13,8 @@ import { GraduationCap, LogIn, Send, CheckCircle } from "lucide-react";
 
 export default function PublicHome() {
   const navigate = useNavigate();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -21,11 +23,16 @@ export default function PublicHome() {
     reason: ""
   });
   const [submitted, setSubmitted] = useState(false);
-  const [orgSlug, setOrgSlug] = useState("");
+  const orgSlugFromPath = (params.orgSlug || "").trim();
+  const legacyOrgSlug = (searchParams.get("org") || "").trim();
+  const orgSlug = orgSlugFromPath || legacyOrgSlug;
 
+  // Back-compat: migrate old `?org=slug` links to `/org/slug`
   useEffect(() => {
-    setOrgSlug("test-org");
-  }, []);
+    if (!orgSlugFromPath && legacyOrgSlug) {
+      navigate(`/org/${encodeURIComponent(legacyOrgSlug)}`, { replace: true });
+    }
+  }, [legacyOrgSlug, navigate, orgSlugFromPath]);
 
   const { data: organization } = useQuery({
     queryKey: ["organization", orgSlug],
@@ -35,6 +42,15 @@ export default function PublicHome() {
       return orgs[0] || null;
     },
     enabled: !!orgSlug,
+  });
+
+  const { data: organizations = [], isLoading: isLoadingOrganizations } = useQuery<any[]>({
+    queryKey: ["organizations-public"],
+    queryFn: async () => {
+      const orgs = await api.entities.Organization.list("name");
+      return (orgs || []).filter((o) => o?.status !== "inactive");
+    },
+    enabled: !orgSlug,
   });
 
   const submitRequest = useMutation({
@@ -60,21 +76,105 @@ export default function PublicHome() {
 
   if (!orgSlug) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <Card className="max-w-md">
-          <CardContent className="pt-6 text-center">
-            <p className="text-slate-600 mb-4">Please provide an organization identifier</p>
-            <p className="text-sm text-slate-500">Add ?org=organization-slug to the URL</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30">
+        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="font-bold text-slate-800 text-lg">Select your organization</div>
+              <Button onClick={handleLogin} variant="outline">
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Welcome</h1>
+            <p className="mt-2 text-slate-600">
+              Choose your organization to request access.
+            </p>
+          </div>
+
+          {isLoadingOrganizations ? (
+            <div className="flex items-center justify-center py-20">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : organizations.length === 0 ? (
+            <Card className="max-w-xl">
+              <CardContent className="pt-6">
+                <p className="text-slate-700 font-medium">No organizations found.</p>
+                <p className="text-sm text-slate-500 mt-1">
+                  Ask an administrator to create an organization, or browse with `?org=your-org-slug`.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {organizations.map((org) => (
+                <button
+                  key={org.id}
+                  type="button"
+                  onClick={() => navigate(`/org/${encodeURIComponent(org.slug)}`)}
+                  className="text-left"
+                >
+                  <Card className="h-full bg-white/70 backdrop-blur-xs border-slate-200/50 shadow-sm hover:shadow-md transition-shadow">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        {org.logo ? (
+                          <img
+                            src={org.logo}
+                            alt={`${org.name} logo`}
+                            className="w-12 h-12 rounded-lg object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                            <GraduationCap className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-900 truncate">{org.name}</div>
+                          <div className="text-sm text-slate-600 mt-1 line-clamp-3">
+                            {org.description || "Apply for financial assistance to support your educational journey."}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </button>
+              ))}
+            </div>
+          )}
+        </main>
       </div>
     );
   }
 
   if (!organization) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center">
+            <p className="text-slate-700 font-medium mb-2">Organization not found</p>
+            <p className="text-sm text-slate-500 mb-4">
+              The organization slug <span className="font-mono">{orgSlug}</span> doesn’t match any organization.
+            </p>
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(`/`)}
+              >
+                Choose organization
+              </Button>
+              <Button type="button" onClick={handleLogin} className="bg-indigo-600 hover:bg-indigo-700">
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
