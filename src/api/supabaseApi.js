@@ -115,16 +115,35 @@ const entities = {
 async function getMe() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user) throw new Error('Not authenticated');
-  let { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-  if (!profile) {
-    const { data: inserted } = await supabase.from('profiles').insert({
+  // Use maybeSingle() to avoid 406 "Not Acceptable" when the row doesn't exist yet.
+  const { data: existingProfile, error: profileSelectError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (profileSelectError) throw profileSelectError;
+
+  // Ensure a profile row exists. Use upsert to avoid 409 conflicts in concurrent flows
+  // (e.g. triggers, hooks, or multiple tabs creating the profile simultaneously).
+  const { data: profile, error: profileUpsertError } = await supabase
+    .from('profiles')
+    .upsert({
       id: session.user.id,
-      email: session.user.email,
-      full_name: session.user.user_metadata?.full_name ?? session.user.email?.split('@')[0],
-      app_role: 'student',
-    }).select().single();
-    profile = inserted;
-  }
+      email: session.user.email ?? existingProfile?.email,
+      full_name:
+        existingProfile?.full_name ??
+        session.user.user_metadata?.full_name ??
+        session.user.email?.split('@')[0],
+      app_role: existingProfile?.app_role ?? 'student',
+      organization_id: existingProfile?.organization_id ?? null,
+      dashboard_permissions: existingProfile?.dashboard_permissions ?? {},
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'id' })
+    .select()
+    .single();
+
+  if (profileUpsertError) throw profileUpsertError;
   return {
     id: session.user.id,
     email: session.user.email ?? profile?.email,
@@ -234,7 +253,7 @@ async function inviteUser(email, _role) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error('Not authenticated');
   const { data, error } = await supabase.functions.invoke('invite-user', {
-    body: { email },
+    body: { email, redirectTo: `${window.location.origin}/accept-invite` },
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },

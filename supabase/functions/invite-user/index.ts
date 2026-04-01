@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
     const referer = req.headers.get("referer") || "";
     const fallbackBase = origin || referer;
     const fallbackRedirect = fallbackBase
-      ? `${fallbackBase.replace(/\/$/, "")}/login`
+      ? `${fallbackBase.replace(/\/$/, "")}/reset-password`
       : undefined;
 
     const admin = createClient(supabaseUrl, serviceRoleKey, {
