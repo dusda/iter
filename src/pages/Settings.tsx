@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Upload } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/api/supabaseClient";
 import {
   Select,
   SelectContent,
@@ -19,15 +20,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+function resolveLogoSrc(logoValue: string) {
+  const raw = String(logoValue || "").trim();
+  if (!raw) return null;
+  if (raw.startsWith("placeholder://")) return null;
+  if (/^(https?:|data:|blob:)/i.test(raw)) return raw;
+  // Treat as Supabase Storage key/path.
+  const { data } = supabase.storage.from("uploads").getPublicUrl(raw);
+  return data?.publicUrl || null;
+}
+
 export default function Settings() {
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({
-    organization_name: "",
-    organization_logo: "",
-    organization_description: "",
-    welcome_message: ""
+  const [orgForm, setOrgForm] = useState({
+    name: "",
+    logo: "",
+    description: "",
+    welcome_message: "",
   });
   const [uploading, setUploading] = useState(false);
+  const logoFileInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -41,6 +53,7 @@ export default function Settings() {
 
   const isAdmin = user?.app_role === "admin" || user?.app_role === "super_admin";
   const isSuperAdmin = user?.app_role === "super_admin";
+  const logoSrc = React.useMemo(() => resolveLogoSrc(orgForm.logo), [orgForm.logo]);
 
   const { data: organizations = [] } = useQuery<any[]>({
     queryKey: ["organizations"],
@@ -72,39 +85,39 @@ export default function Settings() {
     ? organizations
     : organizations.filter((o) => allowedOrganizationIds.has(o.id));
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["appSettings"],
-    queryFn: async () => {
-      const allSettings = await api.entities.AppSettings.list();
-      return allSettings[0];
-    },
-    enabled: isAdmin,
-  });
-
-
+  const selectedOrganization = React.useMemo(() => {
+    if (!user?.organization_id) return null;
+    return organizations.find((o) => o.id === user.organization_id) || null;
+  }, [organizations, user?.organization_id]);
 
   useEffect(() => {
-    if (settings) {
-      setFormData({
-        organization_name: settings.organization_name || "",
-        organization_logo: settings.organization_logo || "",
-        organization_description: settings.organization_description || "",
-        welcome_message: settings.welcome_message || ""
-      });
+    if (!selectedOrganization) {
+      setOrgForm({ name: "", logo: "", description: "", welcome_message: "" });
+      return;
     }
-  }, [settings]);
+    setOrgForm({
+      name: selectedOrganization.name || "",
+      logo: selectedOrganization.logo || "",
+      description: selectedOrganization.description || "",
+      welcome_message: selectedOrganization.welcome_message || "",
+    });
+  }, [selectedOrganization]);
 
   const saveSettings = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      if (settings) {
-        return api.entities.AppSettings.update(settings.id, data);
-      } else {
-        return api.entities.AppSettings.create({ ...data, is_singleton: true });
-      }
+    mutationFn: async (data: typeof orgForm) => {
+      if (!user?.organization_id) throw new Error("No organization selected");
+      return api.entities.Organization.update(user.organization_id, {
+        name: data.name,
+        logo: data.logo,
+        description: data.description,
+        welcome_message: data.welcome_message,
+        updated_date: new Date().toISOString(),
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["appSettings"] });
-      alert("Settings saved successfully!");
+      queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries();
+      alert("Organization saved successfully!");
     },
   });
 
@@ -128,12 +141,12 @@ export default function Settings() {
 
     setUploading(true);
     const { file_url } = await api.integrations.Core.UploadFile({ file });
-    setFormData({ ...formData, organization_logo: file_url });
+    setOrgForm({ ...orgForm, logo: file_url });
     setUploading(false);
   };
 
   const handleSave = () => {
-    saveSettings.mutate(formData);
+    saveSettings.mutate(orgForm);
   };
 
 
@@ -210,6 +223,11 @@ export default function Settings() {
               <CardTitle>Organization Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
+              {!user?.organization_id ? (
+                <div className="text-sm text-slate-500">
+                  Select an organization above to edit its settings.
+                </div>
+              ) : null}
               {user?.organization_id && (
                 <div className="space-y-2">
                   <Label>Organization ID</Label>
@@ -224,25 +242,65 @@ export default function Settings() {
               <div className="space-y-2">
                 <Label>Organization Name *</Label>
                 <Input
-                  value={formData.organization_name}
-                  onChange={(e) => setFormData({ ...formData, organization_name: e.target.value })}
+                  value={orgForm.name}
+                  onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
                   placeholder="Acme University"
+                  disabled={!user?.organization_id}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>Logo</Label>
                 <div className="flex items-center gap-4">
-                  {formData.organization_logo && (
-                    <img src={formData.organization_logo} alt="Logo" className="w-16 h-16 rounded-lg object-cover" />
-                  )}
+                  <div className="shrink-0">
+                    {logoSrc ? (
+                      <img
+                        src={logoSrc}
+                        alt="Organization logo"
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-xs text-slate-500">
+                        No logo
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1">
-                    <Input
+                    <input
+                      ref={logoFileInputRef}
                       type="file"
                       accept="image/*"
                       onChange={handleLogoUpload}
-                      disabled={uploading}
+                      disabled={uploading || !user?.organization_id}
+                      className="hidden"
                     />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 justify-start bg-white"
+                        disabled={uploading || !user?.organization_id}
+                        onClick={() => logoFileInputRef.current?.click()}
+                      >
+                        {orgForm.logo ? "Replace logo…" : "Choose logo…"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="shrink-0 text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800"
+                        disabled={uploading || !user?.organization_id || !orgForm.logo}
+                        onClick={() => setOrgForm({ ...orgForm, logo: "" })}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                    {uploading ? (
+                      <div className="mt-1 text-xs text-slate-500">Uploading…</div>
+                    ) : orgForm.logo?.startsWith("placeholder://") ? (
+                      <div className="mt-1 text-xs text-slate-500">
+                        Logo set (storage not configured in this environment)
+                      </div>
+                    ) : null}
                   </div>
                   {uploading && <LoadingSpinner size="sm" />}
                 </div>
@@ -252,25 +310,27 @@ export default function Settings() {
                 <Label>Description</Label>
                 <Textarea
                   rows={3}
-                  value={formData.organization_description}
-                  onChange={(e) => setFormData({ ...formData, organization_description: e.target.value })}
+                  value={orgForm.description}
+                  onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
                   placeholder="Brief description shown on the public page..."
+                  disabled={!user?.organization_id}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label>Welcome Message</Label>
                 <Input
-                  value={formData.welcome_message}
-                  onChange={(e) => setFormData({ ...formData, welcome_message: e.target.value })}
+                  value={orgForm.welcome_message}
+                  onChange={(e) => setOrgForm({ ...orgForm, welcome_message: e.target.value })}
                   placeholder="Welcome! Request access to get started."
+                  disabled={!user?.organization_id}
                 />
               </div>
 
               <div className="flex justify-end pt-4 border-t">
                 <Button
                   onClick={handleSave}
-                  disabled={saveSettings.isPending || !formData.organization_name}
+                  disabled={saveSettings.isPending || !user?.organization_id || !orgForm.name}
                   className="bg-indigo-600 hover:bg-indigo-700"
                 >
                   {saveSettings.isPending ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="w-4 h-4 mr-2" />}
