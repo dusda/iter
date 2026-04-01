@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import StatusBadge from "@/components/shared/StatusBadge";
-import { Building2, Plus, Pencil, Upload, Wallet, Users, Copy, Check } from "lucide-react";
+import { Building2, Plus, Pencil, Upload, Wallet, Users, Copy, Check, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function SuperAdminDashboard() {
@@ -74,6 +74,17 @@ export default function SuperAdminDashboard() {
     },
   });
 
+  const deleteOrganization = useMutation({
+    mutationFn: async (org: any) => {
+      // DB FKs are configured with ON DELETE CASCADE for org-related tables.
+      return api.entities.Organization.delete(org.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      setViewingOrg(null);
+    },
+  });
+
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -123,6 +134,13 @@ export default function SuperAdminDashboard() {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const formatDate = (value) => {
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "-";
+    return format(d, "MMM d, yyyy");
   };
 
   if (!user) {
@@ -238,6 +256,22 @@ export default function SuperAdminDashboard() {
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => setViewingOrg(org)}>
                             Manage
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            disabled={deleteOrganization.isPending}
+                            onClick={() => {
+                              const ok = window.confirm(
+                                `Delete organization "${org.name}"?\n\nThis will permanently delete all related funds, requests, reviews, disbursements, notifications, and audit logs. This cannot be undone.`
+                              );
+                              if (!ok) return;
+                              deleteOrganization.mutate(org);
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            Delete
                           </Button>
                         </div>
                       </TableCell>
@@ -429,7 +463,7 @@ export default function SuperAdminDashboard() {
                           </TableCell>
                           <TableCell className="text-sm">{fund.fund_owner_name || "-"}</TableCell>
                           <TableCell className="text-sm text-slate-500">
-                            {format(new Date(fund.created_date), "MMM d, yyyy")}
+                            {formatDate(fund.created_date)}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -465,7 +499,7 @@ export default function SuperAdminDashboard() {
                           </TableCell>
                           <TableCell className="text-sm text-slate-600">{u.student_id || "-"}</TableCell>
                           <TableCell className="text-sm text-slate-500">
-                            {format(new Date(u.created_date), "MMM d, yyyy")}
+                            {formatDate(u.created_date)}
                           </TableCell>
                         </TableRow>
                       ))}
