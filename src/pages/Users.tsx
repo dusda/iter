@@ -61,7 +61,7 @@ import {
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 
-type AppRole = "student" | "reviewer" | "advisor" | "approver" | "fund_manager" | "admin";
+type AppRole = "student" | "reviewer" | "advisor" | "approver" | "fund_manager" | "admin" | "super_admin";
 
 interface DashboardPermissions {
   view_stats?: boolean;
@@ -121,7 +121,8 @@ const roleColors: Record<AppRole, string> = {
   advisor: "bg-indigo-100 text-indigo-800 border-indigo-200",
   approver: "bg-purple-100 text-purple-800 border-purple-200",
   fund_manager: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  admin: "bg-rose-100 text-rose-800 border-rose-200"
+  admin: "bg-rose-100 text-rose-800 border-rose-200",
+  super_admin: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
 };
 
 const roleIcons: Record<AppRole, React.ComponentType<{ className?: string }>> = {
@@ -130,7 +131,8 @@ const roleIcons: Record<AppRole, React.ComponentType<{ className?: string }>> = 
   advisor: Shield,
   approver: Shield,
   fund_manager: UsersIcon,
-  admin: Shield
+  admin: Shield,
+  super_admin: Shield,
 };
 
 export default function Users() {
@@ -600,6 +602,7 @@ export default function Users() {
                   <SelectItem value="approver">Approver</SelectItem>
                   <SelectItem value="fund_manager">Fund Manager</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-slate-500">
@@ -663,6 +666,7 @@ export default function Users() {
                       <SelectItem value="approver">Approver</SelectItem>
                       <SelectItem value="fund_manager">Fund Manager</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="super_admin">Super Admin</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

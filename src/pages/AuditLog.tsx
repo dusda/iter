@@ -103,7 +103,7 @@ export default function AuditLog() {
     );
   }
 
-  if (user.app_role !== "admin" && user.app_role !== "fund_manager") {
+  if (user.app_role !== "admin" && user.app_role !== "super_admin" && user.app_role !== "fund_manager") {
     return (
       <div className="text-center py-16">
         <p className="text-slate-500">Access restricted to administrators and fund managers</p>

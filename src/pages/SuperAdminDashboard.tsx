@@ -133,7 +133,9 @@ export default function SuperAdminDashboard() {
     );
   }
 
-  if (!user.is_super_admin) {
+  const isSuperAdmin = user?.app_role === "super_admin" || user?.is_super_admin === true;
+
+  if (!isSuperAdmin) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Card className="max-w-md">

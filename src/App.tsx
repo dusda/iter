@@ -5,6 +5,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import NavigationTracker from "@/lib/NavigationTracker";
 import { pagesConfig } from "./pages.config";
 import {
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -29,10 +30,12 @@ const LayoutWrapper: React.FC<{ children: ReactNode; currentPageName: string }> 
     <Layout currentPageName={currentPageName}>{children}</Layout>
     : <>{children}</>;
 
+const PublicHomePage: React.ComponentType = Pages["PublicHome"] ?? (() => null);
+
 const AuthenticatedApp = () => {
   const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const location = useLocation();
-  const publicPaths = ['/login', '/PublicHome'];
+  const publicPaths = ['/', '/login', '/PublicHome'];
   const isPublicPath = publicPaths.includes(location.pathname);
 
   // Show loading spinner while checking app public settings or auth
@@ -65,10 +68,17 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
+        !isAuthenticated ? (
+          <LayoutWrapper currentPageName="PublicHome">
+            <PublicHomePage />
+          </LayoutWrapper>
+        ) : (
+          <LayoutWrapper currentPageName={mainPageKey}>
+            <MainPage />
+          </LayoutWrapper>
+        )
       } />
+      <Route path="/Home" element={isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}

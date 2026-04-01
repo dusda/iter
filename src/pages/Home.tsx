@@ -35,14 +35,14 @@ export default function Home() {
     
     // Redirect non-staff users to Apply page
     const userRole = currentUser?.app_role || "student";
-    const isStaff = ["reviewer", "approver", "fund_manager", "admin"].includes(userRole);
+    const isStaff = ["reviewer", "approver", "fund_manager", "admin", "super_admin"].includes(userRole);
     if (!isStaff) {
       navigate(createPageUrl("Apply"));
     }
   };
 
   const userRole = user?.app_role || "student";
-  const isStaff = ["reviewer", "approver", "fund_manager", "admin"].includes(userRole);
+  const isStaff = ["reviewer", "approver", "fund_manager", "admin", "super_admin"].includes(userRole);
 
   if (!user) {
     return (

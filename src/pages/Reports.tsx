@@ -94,14 +94,14 @@ export default function Reports() {
   });
 
   // Filter funds based on user role
-  const availableFunds = user?.app_role === "admin" 
+  const availableFunds = user?.app_role === "admin" || user?.app_role === "super_admin"
     ? funds 
     : funds.filter(f => f.fund_owner_id === user?.id);
 
   // Filter data
   const filteredRequests = requests.filter(r => {
     // Fund managers see only their funds (unless admin)
-    if (user?.app_role !== "admin") {
+    if (user?.app_role !== "admin" && user?.app_role !== "super_admin") {
       const isMyFund = availableFunds.some(f => f.id === r.fund_id);
       if (!isMyFund) return false;
     }
@@ -126,7 +126,7 @@ export default function Reports() {
   });
 
   const filteredDisbursements = disbursements.filter(d => {
-    if (user?.app_role !== "admin") {
+    if (user?.app_role !== "admin" && user?.app_role !== "super_admin") {
       const isMyFund = availableFunds.some(f => f.id === d.fund_id);
       if (!isMyFund) return false;
     }

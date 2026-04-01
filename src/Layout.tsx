@@ -66,9 +66,9 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   };
 
   const userRole = user?.app_role || "student";
-  const isStaff = ["reviewer", "approver", "advisor", "fund_manager", "admin"].includes(userRole);
+  const isStaff = ["reviewer", "approver", "advisor", "fund_manager", "admin", "super_admin"].includes(userRole);
   const isAdvisor = userRole === "advisor";
-  const isAdmin = userRole === "admin";
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
   const isFundManager = userRole === "fund_manager" || isAdmin;
   
   // Get dashboard permissions

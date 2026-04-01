@@ -91,7 +91,7 @@ export default function Settings() {
     );
   }
 
-  if (user.app_role !== "admin") {
+  if (user.app_role !== "admin" && user.app_role !== "super_admin") {
     return (
       <div className="text-center py-16">
         <p className="text-slate-500">Access restricted to administrators</p>
