@@ -6,6 +6,12 @@ type InviteUserBody = {
   redirectTo?: string;
 };
 
+function bearerToken(req: Request): string | null {
+  const auth = req.headers.get("authorization") || "";
+  const m = auth.match(/^Bearer\s+(.+)$/i);
+  return m?.[1] ?? null;
+}
+
 function allowedOrigins(): string[] {
   // If unset, we assume "local/dev" and allow any origin.
   const raw = Deno.env.get("ALLOWED_ORIGINS")?.trim() ?? "";
@@ -80,6 +86,11 @@ Deno.serve(async (req) => {
       return json({ error: "Server misconfigured" }, req, { status: 500 });
     }
 
+    const token = bearerToken(req);
+    if (!token) {
+      return json({ error: "Missing Authorization header" }, req, { status: 401 });
+    }
+
     const referer = req.headers.get("referer") || "";
     const fallbackBase = origin || referer;
     const fallbackRedirect = fallbackBase
@@ -89,6 +100,26 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false },
     });
+
+    // Validate caller token (do not trust client input).
+    const { data: userData, error: userErr } = await admin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return json({ error: "Invalid JWT" }, req, { status: 401 });
+    }
+
+    // Enforce RBAC: only admins can invite.
+    const { data: profile, error: profileErr } = await admin
+      .from("profiles")
+      .select("app_role")
+      .eq("id", userData.user.id)
+      .maybeSingle();
+
+    if (profileErr) {
+      return json({ error: "Unable to verify permissions" }, req, { status: 500 });
+    }
+    if (profile?.app_role !== "admin") {
+      return json({ error: "Forbidden" }, req, { status: 403 });
+    }
 
     const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
       redirectTo: redirectTo || fallbackRedirect,
