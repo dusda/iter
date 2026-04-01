@@ -14,6 +14,8 @@ import {
 } from "react-router-dom";
 import PageNotFound from "./lib/PageNotFound";
 import Login from "./pages/Login";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
 
@@ -35,7 +37,7 @@ const PublicHomePage: React.ComponentType = Pages["PublicHome"] ?? (() => null);
 const AuthenticatedApp = () => {
   const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const location = useLocation();
-  const publicPaths = ['/', '/login', '/PublicHome'];
+  const publicPaths = ['/', '/login', '/forgot-password', '/reset-password', '/PublicHome'];
   const isPublicPath = publicPaths.includes(location.pathname) || location.pathname.startsWith('/org/');
 
   // Show loading spinner while checking app public settings or auth
@@ -67,6 +69,8 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/" element={
         !isAuthenticated ? (
           <LayoutWrapper currentPageName="PublicHome">

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,11 @@ export default function Login() {
                 autoComplete="current-password"
                 className="mt-1"
               />
+            </div>
+            <div className="-mt-2 flex justify-end">
+              <Button variant="link" size="sm" asChild className="px-0">
+                <Link to="/forgot-password">Forgot password?</Link>
+              </Button>
             </div>
             {error && (
               <p className="text-sm text-red-600">{error}</p>

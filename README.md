@@ -52,8 +52,8 @@ Start the local Supabase services:
 Key local endpoints:
 
 - **Postgres**: `localhost:54322`
-- **Supabase API gateway**: `http://127.0.0.1:54321`
-- **Studio**: `http://127.0.0.1:54323`
+- **Supabase API gateway**: `http://localhost:54321`
+- **Studio**: `http://localhost:54323`
 
 Stop and remove local Supabase containers + volumes (equivalent to `docker compose down -v`):
 
@@ -109,8 +109,8 @@ Then open:
 
 The dev server proxies API calls to local services:
 
-- `http://localhost:5173/auth/v1/*` -> `http://127.0.0.1:54321/auth/v1/*`
-- `http://localhost:5173/rest/v1/*` -> `http://127.0.0.1:54321/rest/v1/*`
+- `http://localhost:5173/auth/v1/*` -> `http://localhost:54321/auth/v1/*`
+- `http://localhost:5173/rest/v1/*` -> `http://localhost:54321/rest/v1/*`
 
 ---
 
