@@ -170,6 +170,22 @@ function redirectToLogin(returnUrl) {
   window.location.href = url.toString();
 }
 
+/**
+ * Change password for the signed-in user (email/password accounts).
+ * Verifies current password, then updates via GoTrue.
+ */
+async function changePassword({ currentPassword, newPassword }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) throw new Error('Not authenticated');
+  const { error: signError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  });
+  if (signError) throw signError;
+  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+  if (updateError) throw updateError;
+}
+
 /** Update current user profile */
 async function updateMe(data) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -193,6 +209,7 @@ const auth = {
   logout,
   redirectToLogin,
   updateMe,
+  changePassword,
 };
 
 /** File upload: Supabase Storage (bucket "uploads"). Returns { file_url }. Stubs if bucket missing. */

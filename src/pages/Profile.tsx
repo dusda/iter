@@ -14,8 +14,10 @@ import {
   GraduationCap,
   Shield,
   Save,
-  CheckCircle
+  CheckCircle,
+  KeyRound
 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -25,6 +27,10 @@ export default function Profile() {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -49,6 +55,52 @@ export default function Profile() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 8) {
+      toast({
+        title: "Password too short",
+        description: "Use at least 8 characters.",
+        variant: "warning",
+      });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast({
+        title: "Passwords don’t match",
+        description: "Please re-enter your new password.",
+        variant: "warning",
+      });
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      await api.auth.changePassword({
+        currentPassword,
+        newPassword,
+      });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      toast({
+        title: "Password updated",
+        description: "Your password has been changed.",
+      });
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string"
+          ? (err as { message: string }).message
+          : "Couldn’t update your password.";
+      toast({
+        title: "Couldn’t change password",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setPasswordSaving(false);
+    }
   };
 
   const roleColors = {
@@ -177,6 +229,65 @@ export default function Profile() {
               Save Changes
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Change password */}
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRound className="w-5 h-5 text-slate-500" />
+            Change password
+          </CardTitle>
+          <CardDescription>
+            Enter your current password, then choose a new one (at least 8 characters).
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+            <div className="space-y-2">
+              <Label htmlFor="profile-current-password">Current password</Label>
+              <Input
+                id="profile-current-password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-new-password">New password</Label>
+              <Input
+                id="profile-new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-confirm-new-password">Confirm new password</Label>
+              <Input
+                id="profile-confirm-new-password"
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={passwordSaving || !currentPassword || !newPassword || !confirmNewPassword}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              {passwordSaving ? (
+                <LoadingSpinner size="sm" className="mr-2" />
+              ) : (
+                <KeyRound className="w-4 h-4 mr-2" />
+              )}
+              Update password
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
