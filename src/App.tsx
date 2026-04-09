@@ -19,14 +19,14 @@ import ResetPassword from "@/pages/ResetPassword";
 import AcceptInvite from "@/pages/AcceptInvite";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import { isStaffAppRole } from "@/utils";
 
-const { Pages, Layout, mainPage } = pagesConfig as {
+const { Pages, Layout } = pagesConfig as {
   Pages: Record<string, React.ComponentType>;
   Layout?: React.ComponentType<{ currentPageName: string; children: ReactNode }>;
-  mainPage?: string;
 };
-const mainPageKey = mainPage ?? Object.keys(Pages)[0];
-const MainPage: React.ComponentType = mainPageKey ? Pages[mainPageKey] : () => null;
+const HomePageComponent = Pages.Home;
+const MyRequestsPageComponent = Pages.MyRequests;
 
 const LayoutWrapper: React.FC<{ children: ReactNode; currentPageName: string }> = ({ children, currentPageName }) =>
   Layout ?
@@ -36,7 +36,7 @@ const LayoutWrapper: React.FC<{ children: ReactNode; currentPageName: string }> 
 const PublicHomePage: React.ComponentType = Pages["PublicHome"] ?? (() => null);
 
 const AuthenticatedApp = () => {
-  const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const location = useLocation();
   const publicPaths = ['/', '/login', '/forgot-password', '/reset-password', '/accept-invite', '/PublicHome'];
   const isPublicPath = publicPaths.includes(location.pathname) || location.pathname.startsWith('/org/');
@@ -78,9 +78,13 @@ const AuthenticatedApp = () => {
           <LayoutWrapper currentPageName="PublicHome">
             <PublicHomePage />
           </LayoutWrapper>
+        ) : isStaffAppRole(user?.app_role) ? (
+          <LayoutWrapper currentPageName="Home">
+            <HomePageComponent />
+          </LayoutWrapper>
         ) : (
-          <LayoutWrapper currentPageName={mainPageKey}>
-            <MainPage />
+          <LayoutWrapper currentPageName="MyRequests">
+            <MyRequestsPageComponent />
           </LayoutWrapper>
         )
       } />
@@ -90,6 +94,9 @@ const AuthenticatedApp = () => {
         </LayoutWrapper>
       } />
       <Route path="/Home" element={isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
+      {isAuthenticated && user && !isStaffAppRole(user.app_role) ? (
+        <Route path="/MyRequests" element={<Navigate to="/" replace />} />
+      ) : null}
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}

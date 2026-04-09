@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { createPageUrl, isStaffAppRole } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
@@ -33,16 +33,12 @@ export default function Home() {
     const currentUser = await api.auth.me();
     setUser(currentUser);
     
-    // Redirect non-staff users to Apply page
-    const userRole = currentUser?.app_role || "student";
-    const isStaff = ["reviewer", "approver", "advisor", "fund_manager", "admin", "super_admin"].includes(userRole);
-    if (!isStaff) {
-      navigate(createPageUrl("Apply"));
+    if (!isStaffAppRole(currentUser?.app_role)) {
+      navigate(createPageUrl("MyRequests"));
     }
   };
 
-  const userRole = user?.app_role || "student";
-  const isStaff = ["reviewer", "approver", "advisor", "fund_manager", "admin", "super_admin"].includes(userRole);
+  const isStaff = isStaffAppRole(user?.app_role);
 
   if (!user) {
     return (

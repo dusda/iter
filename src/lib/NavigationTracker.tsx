@@ -3,12 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { api } from '@/api/supabaseApi';
 import { pagesConfig } from '@/pages.config';
+import { isStaffAppRole } from '@/utils';
 
 export default function NavigationTracker() {
     const location = useLocation();
-    const { isAuthenticated } = useAuth();
-    const { Pages, mainPage } = pagesConfig;
-    const mainPageKey = mainPage ?? Object.keys(Pages)[0];
+    const { isAuthenticated, user } = useAuth();
+    const { Pages } = pagesConfig;
 
     // Log user activity when navigating to a page
     useEffect(() => {
@@ -17,7 +17,7 @@ export default function NavigationTracker() {
         let pageName;
 
         if (pathname === '/' || pathname === '') {
-            pageName = mainPageKey;
+            pageName = isStaffAppRole(user?.app_role) ? "Home" : "MyRequests";
         } else {
             // Remove leading slash and get the first segment
             const pathSegment = pathname.replace(/^\//, '').split('/')[0];
@@ -36,7 +36,7 @@ export default function NavigationTracker() {
                 // Silently fail - logging shouldn't break the app
             });
         }
-    }, [location, isAuthenticated, Pages, mainPageKey]);
+    }, [location, isAuthenticated, Pages, user?.app_role]);
 
     return null;
 }

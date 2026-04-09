@@ -1,6 +1,6 @@
 import React, { useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createPageUrl } from "./utils";
+import { createPageUrl, isStaffAppRole } from "./utils";
 import { api } from "@/api/supabaseApi";
 import { appVersion } from "@/appVersion";
 import { useQuery } from "@tanstack/react-query";
@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   };
 
   const userRole = user?.app_role || "student";
-  const isStaff = ["reviewer", "approver", "advisor", "fund_manager", "admin", "super_admin"].includes(userRole);
+  const isStaff = isStaffAppRole(user?.app_role);
   const isAdvisor = userRole === "advisor";
   const isAdmin = userRole === "admin" || userRole === "super_admin";
   const isFundManager = userRole === "fund_manager" || isAdmin;
