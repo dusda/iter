@@ -111,6 +111,24 @@ const entities = {
   User: entity('User'),
 };
 
+/** Roles we accept from auth user_metadata (set by invite edge function). */
+const PROFILE_APP_ROLES = new Set([
+  'student',
+  'reviewer',
+  'advisor',
+  'approver',
+  'fund_manager',
+  'admin',
+  'super_admin',
+]);
+
+function appRoleFromUserMetadata(userMetadata) {
+  if (!userMetadata || typeof userMetadata !== 'object') return null;
+  const r = userMetadata.app_role;
+  if (typeof r === 'string' && PROFILE_APP_ROLES.has(r)) return r;
+  return null;
+}
+
 /** Get current user: auth user + profile (organization_id, app_role, etc.) */
 async function getMe() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -124,6 +142,10 @@ async function getMe() {
 
   if (profileSelectError) throw profileSelectError;
 
+  const roleFromInviteMeta = appRoleFromUserMetadata(session.user.user_metadata);
+  const resolvedAppRole =
+    existingProfile?.app_role ?? roleFromInviteMeta ?? 'student';
+
   // Ensure a profile row exists. Use upsert to avoid 409 conflicts in concurrent flows
   // (e.g. triggers, hooks, or multiple tabs creating the profile simultaneously).
   const { data: profile, error: profileUpsertError } = await supabase
@@ -135,7 +157,7 @@ async function getMe() {
         existingProfile?.full_name ??
         session.user.user_metadata?.full_name ??
         session.user.email?.split('@')[0],
-      app_role: existingProfile?.app_role ?? 'student',
+      app_role: resolvedAppRole,
       organization_id: existingProfile?.organization_id ?? null,
       dashboard_permissions: existingProfile?.dashboard_permissions ?? {},
       updated_at: new Date().toISOString(),
@@ -265,12 +287,35 @@ const integrations = {
   },
 };
 
-/** Invite user by email (Supabase auth admin or stub) */
-async function inviteUser(email, _role) {
+/**
+ * Invite user by email (Edge Function + auth admin).
+ * @param {string} email
+ * @param {{ app_role?: string, appRole?: string, organization_id?: string | null } | string} [roleOrOptions]
+ *        Legacy: second arg string 'admin' | 'user' maps to app roles admin / student.
+ */
+async function inviteUser(email, roleOrOptions) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error('Not authenticated');
+  let app_role = 'student';
+  let organization_id = null;
+  if (typeof roleOrOptions === 'string') {
+    app_role = roleOrOptions === 'admin' ? 'admin' : 'student';
+  } else if (
+    roleOrOptions &&
+    typeof roleOrOptions === 'object' &&
+    !Array.isArray(roleOrOptions)
+  ) {
+    const raw = roleOrOptions.app_role ?? roleOrOptions.appRole;
+    if (typeof raw === 'string' && raw.length > 0) app_role = raw;
+    if (roleOrOptions.organization_id != null) organization_id = roleOrOptions.organization_id;
+  }
   const { data, error } = await supabase.functions.invoke('invite-user', {
-    body: { email, redirectTo: `${window.location.origin}/accept-invite` },
+    body: {
+      email,
+      redirectTo: `${window.location.origin}/accept-invite`,
+      app_role,
+      organization_id: organization_id ?? null,
+    },
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },

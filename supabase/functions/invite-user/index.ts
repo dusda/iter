@@ -4,7 +4,23 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 type InviteUserBody = {
   email: string;
   redirectTo?: string;
+  /** Optional; super admins may set target org. Non–super-admins must match their own org if sent. */
+  organization_id?: string | null;
+  /** App role to store on profiles when the invited auth user exists (default student). */
+  app_role?: string | null;
+  /** Alias for clients that send camelCase. */
+  appRole?: string | null;
 };
+
+const ALLOWED_INVITE_ROLES = new Set([
+  "student",
+  "reviewer",
+  "advisor",
+  "approver",
+  "fund_manager",
+  "admin",
+  "super_admin",
+]);
 
 function bearerToken(req: Request): string | null {
   const auth = req.headers.get("authorization") || "";
@@ -75,7 +91,20 @@ Deno.serve(async (req) => {
       return json({ error: "Method not allowed" }, req, { status: 405 });
     }
 
-    const { email, redirectTo }: InviteUserBody = await req.json();
+    const body: InviteUserBody = await req.json();
+    const {
+      email,
+      redirectTo,
+      organization_id: bodyOrganizationId,
+      app_role: bodyAppRoleSnake,
+      appRole: bodyAppRoleCamel,
+    } = body;
+    const bodyAppRoleRaw =
+      typeof bodyAppRoleSnake === "string"
+        ? bodyAppRoleSnake
+        : typeof bodyAppRoleCamel === "string"
+          ? bodyAppRoleCamel
+          : null;
     if (!email || typeof email !== "string") {
       return json({ error: "Missing email" }, req, { status: 400 });
     }
@@ -110,7 +139,7 @@ Deno.serve(async (req) => {
     // Enforce RBAC: only admins can invite.
     const { data: profile, error: profileErr } = await admin
       .from("profiles")
-      .select("app_role")
+      .select("app_role, organization_id")
       .eq("id", userData.user.id)
       .maybeSingle();
 
@@ -121,15 +150,96 @@ Deno.serve(async (req) => {
       return json({ error: "Forbidden" }, req, { status: 403 });
     }
 
+    const trimmedBodyOrg =
+      typeof bodyOrganizationId === "string" && bodyOrganizationId.trim().length > 0
+        ? bodyOrganizationId.trim()
+        : null;
+
+    let targetOrgId: string | null = null;
+    if (profile.app_role === "super_admin") {
+      if (trimmedBodyOrg) {
+        const { data: orgRow, error: orgErr } = await admin
+          .from("organization")
+          .select("id")
+          .eq("id", trimmedBodyOrg)
+          .maybeSingle();
+        if (orgErr) {
+          return json({ error: "Unable to verify organization" }, req, { status: 500 });
+        }
+        if (!orgRow) {
+          return json({ error: "Invalid organization" }, req, { status: 400 });
+        }
+        targetOrgId = trimmedBodyOrg;
+      } else {
+        targetOrgId = profile.organization_id ?? null;
+      }
+    } else {
+      targetOrgId = profile.organization_id ?? null;
+      if (trimmedBodyOrg && trimmedBodyOrg !== targetOrgId) {
+        return json({ error: "Forbidden" }, req, { status: 403 });
+      }
+    }
+
+    if (!targetOrgId) {
+      return json(
+        {
+          error:
+            "Missing organization for invite. Select an active organization or pass organization_id (super admins).",
+        },
+        req,
+        { status: 400 },
+      );
+    }
+
+    const trimmedRole = bodyAppRoleRaw?.trim() ?? "";
+    let inviteAppRole = ALLOWED_INVITE_ROLES.has(trimmedRole) ? trimmedRole : "student";
+    if (inviteAppRole === "super_admin" && profile.app_role !== "super_admin") {
+      return json({ error: "Forbidden" }, req, { status: 403 });
+    }
+
     const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
       redirectTo: redirectTo || fallbackRedirect,
+      data: { app_role: inviteAppRole },
     });
     if (error) {
       return json({ error: error.message }, req, { status: 400 });
     }
 
-    // data.user may be null if already invited; still return success semantics
-    return json({ ok: true, user: data.user }, req, { status: 200 });
+    const invited = data.user;
+    if (invited?.id) {
+      const { data: existingProfile } = await admin
+        .from("profiles")
+        .select("full_name, phone, dashboard_permissions")
+        .eq("id", invited.id)
+        .maybeSingle();
+
+      const emailNorm = invited.email ?? email.trim().toLowerCase();
+      const { error: upsertErr } = await admin.from("profiles").upsert(
+        {
+          id: invited.id,
+          email: emailNorm,
+          full_name:
+            existingProfile?.full_name ??
+            (typeof emailNorm === "string" ? emailNorm.split("@")[0] : null),
+          phone: existingProfile?.phone ?? null,
+          organization_id: targetOrgId,
+          app_role: inviteAppRole,
+          dashboard_permissions: existingProfile?.dashboard_permissions ?? {},
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      );
+      if (upsertErr) {
+        return json(
+          { error: upsertErr.message || "Failed to link user to organization" },
+          req,
+          { status: 500 },
+        );
+      }
+    }
+
+    // invited may be null in edge cases; profile link requires invited.id above
+    return json({ ok: true, user: invited }, req, { status: 200 });
   } catch (e) {
     return json(
       { error: (e as Error)?.message || "Unknown error" },

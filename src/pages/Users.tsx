@@ -186,7 +186,10 @@ export default function Users() {
       const request = accessRequests.find(r => r.id === variables.id);
       if (request && variables.status === "approved") {
         // Create an auth invite so the user receives an account creation email.
-        await api.users.inviteUser(request.email, "student");
+        await api.users.inviteUser(request.email, {
+          app_role: "student",
+          organization_id: request.organization_id,
+        });
       }
     },
   });
@@ -211,11 +214,10 @@ export default function Users() {
 
   const handleInvite = async () => {
     setSubmitting(true);
-    await api.users.inviteUser(inviteEmail, inviteRole === "admin" ? "admin" : "user");
-    
-    // Note: The invited user's app_role will need to be set after they accept
-    // For now we track the intended role
-    
+    await api.users.inviteUser(inviteEmail, {
+      app_role: inviteRole,
+      organization_id: currentUser.organization_id ?? undefined,
+    });
     setShowInviteModal(false);
     setInviteEmail("");
     setInviteRole("student");
@@ -603,7 +605,7 @@ export default function Users() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-slate-500">
-                Note: The user's role will be set after they accept the invitation.
+                They will be added to your organization when the invitation is sent.
               </p>
             </div>
           </div>
