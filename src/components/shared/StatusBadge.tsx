@@ -12,6 +12,7 @@ const statusStyles = {
   Closed: "bg-slate-100 text-slate-600 border-slate-200",
   Pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
   active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  invited: "bg-sky-50 text-sky-800 border-sky-200",
   inactive: "bg-slate-100 text-slate-600 border-slate-200",
   archived: "bg-slate-100 text-slate-500 border-slate-200",
 };

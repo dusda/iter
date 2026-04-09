@@ -97,9 +97,11 @@ export default function AcceptInvite() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
+      await supabase.auth.signOut();
+
       toast({
         title: "Welcome!",
-        description: "Your password is set. You can now sign in.",
+        description: "Your password is set. Sign in with your email and password.",
       });
       navigate("/login", { replace: true });
     } catch (err: any) {

@@ -21,8 +21,19 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: signData, error: err } = await supabase.auth.signInWithPassword({ email, password });
       if (err) throw err;
+      const uid = signData?.user?.id;
+      if (uid) {
+        const { error: profileErr } = await supabase
+          .from("profiles")
+          .update({ status: "active", updated_at: new Date().toISOString() })
+          .eq("id", uid)
+          .eq("status", "invited");
+        if (profileErr) {
+          console.warn("Could not mark profile active after login:", profileErr.message);
+        }
+      }
       navigate(redirectTo, { replace: true });
       window.location.reload();
     } catch (err) {

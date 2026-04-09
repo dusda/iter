@@ -209,11 +209,18 @@ Deno.serve(async (req) => {
     if (invited?.id) {
       const { data: existingProfile } = await admin
         .from("profiles")
-        .select("full_name, phone, dashboard_permissions")
+        .select("full_name, phone, dashboard_permissions, status")
         .eq("id", invited.id)
         .maybeSingle();
 
       const emailNorm = invited.email ?? email.trim().toLowerCase();
+      const prevStatus = existingProfile?.status ?? null;
+      const keepLifecycleStatus =
+        prevStatus === "active" ||
+        prevStatus === "inactive" ||
+        prevStatus === "pending";
+      const profileStatus = keepLifecycleStatus ? prevStatus : "invited";
+
       const { error: upsertErr } = await admin.from("profiles").upsert(
         {
           id: invited.id,
@@ -225,6 +232,7 @@ Deno.serve(async (req) => {
           organization_id: targetOrgId,
           app_role: inviteAppRole,
           dashboard_permissions: existingProfile?.dashboard_permissions ?? {},
+          status: profileStatus,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" },

@@ -146,6 +146,12 @@ async function getMe() {
   const resolvedAppRole =
     existingProfile?.app_role ?? roleFromInviteMeta ?? 'student';
 
+  // Invited users become active once they have a real session (first app load after sign-in).
+  const resolvedStatus =
+    existingProfile?.status === 'invited'
+      ? 'active'
+      : (existingProfile?.status ?? 'active');
+
   // Ensure a profile row exists. Use upsert to avoid 409 conflicts in concurrent flows
   // (e.g. triggers, hooks, or multiple tabs creating the profile simultaneously).
   const { data: profile, error: profileUpsertError } = await supabase
@@ -160,6 +166,7 @@ async function getMe() {
       app_role: resolvedAppRole,
       organization_id: existingProfile?.organization_id ?? null,
       dashboard_permissions: existingProfile?.dashboard_permissions ?? {},
+      status: resolvedStatus,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'id' })
     .select()
@@ -173,6 +180,7 @@ async function getMe() {
     phone: profile?.phone ?? session.user.phone,
     organization_id: profile?.organization_id ?? null,
     app_role: profile?.app_role ?? 'student',
+    status: profile?.status ?? 'active',
     dashboard_permissions: profile?.dashboard_permissions ?? {},
   };
 }
@@ -212,7 +220,7 @@ async function changePassword({ currentPassword, newPassword }) {
 async function updateMe(data) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
-  const { data: profile, error } = await supabase.from('profiles').upsert({
+  const row = {
     id: user.id,
     email: data.email ?? user.email,
     full_name: data.full_name,
@@ -221,7 +229,9 @@ async function updateMe(data) {
     app_role: data.app_role,
     dashboard_permissions: data.dashboard_permissions,
     updated_at: new Date().toISOString(),
-  }, { onConflict: 'id' }).select().single();
+  };
+  if (data.status !== undefined) row.status = data.status;
+  const { data: profile, error } = await supabase.from('profiles').upsert(row, { onConflict: 'id' }).select().single();
   if (error) throw error;
   return { ...user, ...profile };
 }
