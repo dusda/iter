@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
@@ -107,6 +107,10 @@ export default function Funds() {
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  if (user.app_role === "reviewer") {
+    return <Navigate to={createPageUrl("Home")} replace />;
   }
 
   return (

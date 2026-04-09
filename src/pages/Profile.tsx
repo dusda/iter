@@ -18,10 +18,13 @@ import {
   KeyRound
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Profile() {
+  const { checkAppState } = useAuth();
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
+    full_name: "",
     phone: "",
     school_id: ""
   });
@@ -40,21 +43,46 @@ export default function Profile() {
     const currentUser = await api.auth.me();
     setUser(currentUser);
     setFormData({
+      full_name: currentUser.full_name || "",
       phone: currentUser.phone || "",
       school_id: currentUser.school_id || ""
     });
   };
 
   const handleSave = async () => {
+    const trimmedName = formData.full_name.trim();
+    if (!trimmedName) {
+      toast({
+        title: "Name required",
+        description: "Please enter your full name.",
+        variant: "warning",
+      });
+      return;
+    }
     setSaving(true);
-    await api.auth.updateMe({
-      phone: formData.phone,
-      school_id: formData.school_id
-    });
-    await loadUser();
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      await api.auth.updateMe({
+        full_name: trimmedName,
+        phone: formData.phone,
+        school_id: formData.school_id
+      });
+      await loadUser();
+      await checkAppState();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string"
+          ? (err as { message: string }).message
+          : "Couldn’t save your profile.";
+      toast({
+        title: "Couldn’t save changes",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -165,11 +193,12 @@ export default function Profile() {
                 Full Name
               </Label>
               <Input
-                value={user.full_name || ""}
-                disabled
-                className="bg-slate-50"
+                id="profile-full-name"
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                placeholder="Your full name"
+                autoComplete="name"
               />
-              <p className="text-xs text-slate-500">Contact admin to change your name</p>
             </div>
 
             <div className="space-y-2">

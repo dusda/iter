@@ -88,6 +88,9 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   const isAdvisor = userRole === "advisor";
   const isAdmin = userRole === "admin" || userRole === "super_admin";
   const isFundManager = userRole === "fund_manager" || isAdmin;
+  const permissions = user?.dashboard_permissions || {};
+  const isReviewer = userRole === "reviewer";
+  const showFundsInNav = !isReviewer && permissions.access_funds !== false;
 
   const { data: latestAccessRequest } = useQuery<any | null>({
     queryKey: ["latestAccessRequest", user?.email],
@@ -112,26 +115,23 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   });
 
   const orgDisplayName = activeOrganization?.name || "Student Funds";
-  
-  // Get dashboard permissions
-  const permissions = user?.dashboard_permissions || {};
 
   const studentNavItems = [
-    { name: "Apply for Fund", icon: PlusCircle, page: "Apply" },
     { name: "My Requests", icon: FileText, page: "MyRequests" },
+    { name: "Apply for Fund", icon: PlusCircle, page: "Apply" },
   ];
 
   const advisorNavItems = [
     { name: "Dashboard", icon: Home, page: "Home" },
     { name: "Assigned Applications", icon: FileText, page: "AdvisorQueue" },
     ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
-    ...(permissions.access_funds !== false ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
+    ...(showFundsInNav ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
   ];
 
   const staffNavItems = [
     { name: "Dashboard", icon: Home, page: "Home" },
     ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
-    ...(permissions.access_funds !== false ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
+    ...(showFundsInNav ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
     ...(permissions.access_reports !== false ? [{ name: "Reports", icon: BarChart3, page: "Reports" }] : []),
     ...((isFundManager || permissions.access_rules) ? [{ name: "Routing Rules", icon: Settings, page: "Rules" }] : []),
     ...((isAdmin || permissions.access_users) ? [{ name: "Users", icon: Users, page: "Users" }] : []),

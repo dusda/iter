@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -96,6 +96,7 @@ interface CurrentUser {
   id: string;
   full_name: string;
   organization_id: string;
+  app_role?: string;
 }
 
 const USE_CATEGORIES = [
@@ -268,6 +269,10 @@ export default function FundDetail() {
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  if (user.app_role === "reviewer") {
+    return <Navigate to={createPageUrl("Home")} replace />;
   }
 
   if (!fund) {

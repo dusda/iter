@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import PageHeader from "@/components/shared/PageHeader";
 import { DollarSign, Save, CheckCircle, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 type ApplicationFieldConfig = {
@@ -44,6 +43,7 @@ interface CurrentUser {
   id: string;
   full_name: string;
   organization_id: string;
+  app_role?: string;
 }
 
 const USE_CATEGORIES = [
@@ -159,6 +159,10 @@ export default function CreateFund() {
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  if (user.app_role === "reviewer") {
+    return <Navigate to={createPageUrl("Home")} replace />;
   }
 
   return (
