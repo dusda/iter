@@ -122,7 +122,8 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
   ];
 
   const advisorNavItems = [
-    { name: "My Assigned Applications", icon: FileText, page: "AdvisorQueue" },
+    { name: "Dashboard", icon: Home, page: "Home" },
+    { name: "Assigned Applications", icon: FileText, page: "AdvisorQueue" },
     ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
     ...(permissions.access_funds !== false ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
   ];

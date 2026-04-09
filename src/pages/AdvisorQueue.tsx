@@ -76,7 +76,7 @@ export default function AdvisorQueue() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="My Assigned Applications"
+        title="Assigned Applications"
         description="Review and manage applications assigned to you"
       />
 
