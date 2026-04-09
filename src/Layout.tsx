@@ -121,15 +121,9 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
     { name: "Apply for Fund", icon: PlusCircle, page: "Apply" },
   ];
 
-  const advisorNavItems = [
-    { name: "Dashboard", icon: Home, page: "Home" },
-    { name: "Assigned Applications", icon: FileText, page: "AdvisorQueue" },
-    ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
-    ...(showFundsInNav ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
-  ];
-
   const staffNavItems = [
     { name: "Dashboard", icon: Home, page: "Home" },
+    ...(isAdvisor ? [{ name: "Assigned Applications", icon: FileText, page: "AdvisorQueue" }] : []),
     ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
     ...(showFundsInNav ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
     ...(permissions.access_reports !== false ? [{ name: "Reports", icon: BarChart3, page: "Reports" }] : []),
@@ -140,7 +134,7 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
     ...((isAdmin || permissions.access_settings) ? [{ name: "Settings", icon: Settings, page: "Settings" }] : []),
   ];
 
-  const navItems = isStaff ? (isAdvisor ? advisorNavItems : staffNavItems) : studentNavItems;
+  const navItems = isStaff ? staffNavItems : studentNavItems;
   const sidebarLogoHref = createPageUrl(navItems[0]?.page ?? "Home");
 
   // PublicHome doesn't need layout
