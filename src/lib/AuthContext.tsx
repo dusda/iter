@@ -47,7 +47,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     checkAppState();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      // Tab focus triggers Supabase token auto-refresh; re-running full check would
+      // flip loading flags and blank the UI with the global spinner.
+      if (event === "TOKEN_REFRESHED") return;
       checkAppState();
     });
     return () => subscription?.unsubscribe();
@@ -55,7 +58,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAppState = async (): Promise<void> => {
     try {
-      setIsLoadingPublicSettings(true);
       setAuthError(null);
       const {
         data: { session },
