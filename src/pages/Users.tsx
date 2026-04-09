@@ -62,6 +62,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "@/components/ui/use-toast";
 
 type AppRole = "student" | "reviewer" | "advisor" | "approver" | "fund_manager" | "admin" | "super_admin";
 
@@ -116,6 +117,11 @@ interface UserSummary {
   created_date: string;
   dashboard_permissions?: DashboardPermissions;
   student_id?: string | null;
+}
+
+/** True if the actor may change another user’s profile (role, permissions, etc.). */
+function actorMayEditUser(actorRole: string | null | undefined, target: UserSummary): boolean {
+  return appRoleRank(target.app_role) <= appRoleRank(actorRole);
 }
 
 interface AccessRequestRow {
@@ -272,6 +278,7 @@ export default function Users() {
   };
 
   const openEditModal = (user: UserSummary) => {
+    if (!currentUser || !actorMayEditUser(currentUser.app_role, user)) return;
     setEditingUser(user);
     setShowEditModal(true);
   };
@@ -280,16 +287,22 @@ export default function Users() {
     newRole: AppRole | null,
     permissions?: DashboardPermissions
   ) => {
-    if (!editingUser) return;
+    if (!editingUser || !currentUser) return;
+    if (!actorMayEditUser(currentUser.app_role, editingUser)) {
+      toast({
+        title: "Cannot edit this user",
+        description: "You cannot change users whose role is above your own.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSubmitting(true);
     try {
       const actorRole = currentUser.app_role || "student";
       const initialRole = (editingUser.app_role || "student") as AppRole;
       let roleToSave: AppRole = (newRole || "student") as AppRole;
 
-      if (appRoleRank(initialRole) > appRoleRank(actorRole)) {
-        roleToSave = initialRole;
-      } else if (appRoleRank(roleToSave) > appRoleRank(actorRole)) {
+      if (appRoleRank(roleToSave) > appRoleRank(actorRole)) {
         roleToSave = APP_ROLE_ORDER[appRoleRank(actorRole)];
       }
 
@@ -429,9 +442,11 @@ export default function Users() {
                           <p className="text-sm text-slate-500">{user.email}</p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => openEditModal(user)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      {actorMayEditUser(currentUser.app_role, user) && (
+                        <Button variant="ghost" size="sm" onClick={() => openEditModal(user)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                       <Badge variant="outline" className={roleColors[user.app_role] || roleColors.student}>
@@ -495,18 +510,22 @@ export default function Users() {
                           {safeFormatDate(user.created_date)}
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditModal(user)}>
-                                <Edit className="w-4 h-4 mr-2" /> Edit User
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          {actorMayEditUser(currentUser.app_role, user) ? (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => openEditModal(user)}>
+                                  <Edit className="w-4 h-4 mr-2" /> Edit User
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : (
+                            <span className="text-slate-300 text-sm">—</span>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -666,17 +685,19 @@ export default function Users() {
               <p className="mt-2 text-2xl font-bold tracking-tight text-indigo-950 wrap-break-word">
                 {inviteTargetOrganization?.name ?? "Loading organization…"}
               </p>
-              <p className="mt-3 text-sm leading-snug text-indigo-900/85">
-                This is your currently selected organization. They will join this one. To invite elsewhere,
-                switch organization in{" "}
-                <Link
-                  to={createPageUrl("Settings")}
-                  className="font-semibold text-indigo-800 underline underline-offset-2 hover:text-indigo-950"
-                >
-                  Settings
-                </Link>
-                .
-              </p>
+              {(currentUser.app_role === "admin" || currentUser.app_role === "super_admin") && (
+                <p className="mt-3 text-sm leading-snug text-indigo-900/85">
+                  This is your currently selected organization. They will join this one. To invite elsewhere,
+                  switch organization in{" "}
+                  <Link
+                    to={createPageUrl("Settings")}
+                    className="font-semibold text-indigo-800 underline underline-offset-2 hover:text-indigo-950"
+                  >
+                    Settings
+                  </Link>
+                  .
+                </p>
+              )}
             </div>
           ) : (
             <div
@@ -764,34 +785,23 @@ export default function Users() {
                 </div>
                 <div className="space-y-2">
                   <Label>Role</Label>
-                  {appRoleRank(editingUser.app_role) > appRoleRank(currentUser.app_role) ? (
-                    <>
-                      <p className="text-sm font-medium capitalize py-2 px-3 rounded-md border bg-slate-50">
-                        {(editingUser.app_role || "student").replace(/_/g, " ")}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        You cannot change this user&apos;s role — it is above your own level.
-                      </p>
-                    </>
-                  ) : (
-                    <Select
-                      value={editingUser.app_role || "student"}
-                      onValueChange={(value) =>
-                        setEditingUser({ ...editingUser, app_role: value as AppRole })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {rolesActorMayAssign.map((role) => (
-                          <SelectItem key={role} value={role}>
-                            {formatRoleOption(role)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  <Select
+                    value={editingUser.app_role || "student"}
+                    onValueChange={(value) =>
+                      setEditingUser({ ...editingUser, app_role: value as AppRole })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rolesActorMayAssign.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {formatRoleOption(role)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </TabsContent>
               

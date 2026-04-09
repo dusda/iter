@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid JWT" }, req, { status: 401 });
     }
 
-    // Enforce RBAC: only admins can invite.
+    // Enforce RBAC: org admins, super admins, and fund managers may invite (role rank caps invited role below).
     const { data: profile, error: profileErr } = await admin
       .from("profiles")
       .select("app_role, organization_id")
@@ -161,7 +161,11 @@ Deno.serve(async (req) => {
     if (profileErr) {
       return json({ error: "Unable to verify permissions" }, req, { status: 500 });
     }
-    if (profile?.app_role !== "admin" && profile?.app_role !== "super_admin") {
+    const inviterMayInvite =
+      profile?.app_role === "admin" ||
+      profile?.app_role === "super_admin" ||
+      profile?.app_role === "fund_manager";
+    if (!inviterMayInvite) {
       return json({ error: "Forbidden" }, req, { status: 403 });
     }
 
@@ -206,6 +210,24 @@ Deno.serve(async (req) => {
       );
     }
 
+    const emailNormForLookup = email.trim().toLowerCase();
+    const { data: profileByEmail, error: profileByEmailErr } = await admin
+      .from("profiles")
+      .select("app_role")
+      .eq("email", emailNormForLookup)
+      .maybeSingle();
+    if (profileByEmailErr) {
+      return json({ error: "Unable to verify permissions" }, req, { status: 500 });
+    }
+    if (profileByEmail) {
+      const er =
+        typeof profileByEmail.app_role === "string" ? profileByEmail.app_role.trim() : "";
+      const existingRole = ALLOWED_INVITE_ROLES.has(er) ? er : "student";
+      if (inviteRoleRank(existingRole) > inviteRoleRank(inviterRole)) {
+        return json({ error: "Forbidden" }, req, { status: 403 });
+      }
+    }
+
     const trimmedRole = bodyAppRoleRaw?.trim() ?? "";
     let inviteAppRole = ALLOWED_INVITE_ROLES.has(trimmedRole) ? trimmedRole : "student";
     const inviterRole = profile.app_role ?? "student";
@@ -225,9 +247,22 @@ Deno.serve(async (req) => {
     if (invited?.id) {
       const { data: existingProfile } = await admin
         .from("profiles")
-        .select("full_name, phone, dashboard_permissions, status")
+        .select("full_name, phone, dashboard_permissions, status, app_role")
         .eq("id", invited.id)
         .maybeSingle();
+
+      if (existingProfile) {
+        const existingRoleRaw =
+          typeof existingProfile.app_role === "string"
+            ? existingProfile.app_role.trim()
+            : "";
+        const existingRole = ALLOWED_INVITE_ROLES.has(existingRoleRaw)
+          ? existingRoleRaw
+          : "student";
+        if (inviteRoleRank(existingRole) > inviteRoleRank(inviterRole)) {
+          return json({ error: "Forbidden" }, req, { status: 403 });
+        }
+      }
 
       const emailNorm = invited.email ?? email.trim().toLowerCase();
       const prevStatus = existingProfile?.status ?? null;
