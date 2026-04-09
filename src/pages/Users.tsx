@@ -278,7 +278,6 @@ export default function Users() {
 
   const handleUpdateUser = async (
     newRole: AppRole | null,
-    newStatus: string | null,
     permissions?: DashboardPermissions
   ) => {
     if (!editingUser) return;
@@ -296,7 +295,6 @@ export default function Users() {
 
       await api.entities.User.update(editingUser.id, {
         app_role: roleToSave,
-        status: newStatus,
         dashboard_permissions: permissions,
       });
 
@@ -746,7 +744,7 @@ export default function Users() {
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
-              Update user role, status, and permissions.
+              Update user role and permissions.
             </DialogDescription>
           </DialogHeader>
           {editingUser && (
@@ -794,23 +792,6 @@ export default function Users() {
                       </SelectContent>
                     </Select>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select
-                    value={editingUser.status || "active"}
-                    onValueChange={(value) => setEditingUser({ ...editingUser, status: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="invited">Invited</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </TabsContent>
               
@@ -939,7 +920,7 @@ export default function Users() {
               Cancel
             </Button>
             <Button
-              onClick={() => handleUpdateUser(editingUser.app_role, editingUser.status, editingUser.dashboard_permissions)}
+              onClick={() => handleUpdateUser(editingUser.app_role, editingUser.dashboard_permissions)}
               disabled={submitting}
               className="bg-indigo-600 hover:bg-indigo-700"
             >
