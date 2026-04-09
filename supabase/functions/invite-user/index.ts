@@ -22,6 +22,21 @@ const ALLOWED_INVITE_ROLES = new Set([
   "super_admin",
 ]);
 
+const ROLE_ORDER = [
+  "student",
+  "reviewer",
+  "advisor",
+  "approver",
+  "fund_manager",
+  "admin",
+  "super_admin",
+] as const;
+
+function inviteRoleRank(role: string): number {
+  const i = ROLE_ORDER.indexOf(role as (typeof ROLE_ORDER)[number]);
+  return i >= 0 ? i : 0;
+}
+
 function bearerToken(req: Request): string | null {
   const auth = req.headers.get("authorization") || "";
   const m = auth.match(/^Bearer\s+(.+)$/i);
@@ -193,7 +208,8 @@ Deno.serve(async (req) => {
 
     const trimmedRole = bodyAppRoleRaw?.trim() ?? "";
     let inviteAppRole = ALLOWED_INVITE_ROLES.has(trimmedRole) ? trimmedRole : "student";
-    if (inviteAppRole === "super_admin" && profile.app_role !== "super_admin") {
+    const inviterRole = profile.app_role ?? "student";
+    if (inviteRoleRank(inviteAppRole) > inviteRoleRank(inviterRole)) {
       return json({ error: "Forbidden" }, req, { status: 403 });
     }
 

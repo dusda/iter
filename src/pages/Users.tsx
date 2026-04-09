@@ -63,6 +63,32 @@ import { useMutation } from "@tanstack/react-query";
 
 type AppRole = "student" | "reviewer" | "advisor" | "approver" | "fund_manager" | "admin" | "super_admin";
 
+/** Lowest → highest privilege; used to cap role assignment to the editor’s own level. */
+const APP_ROLE_ORDER: AppRole[] = [
+  "student",
+  "reviewer",
+  "advisor",
+  "approver",
+  "fund_manager",
+  "admin",
+  "super_admin",
+];
+
+function appRoleRank(role: string | null | undefined): number {
+  const r = (role || "student") as AppRole;
+  const i = APP_ROLE_ORDER.indexOf(r);
+  return i >= 0 ? i : 0;
+}
+
+function assignableAppRoles(actorRole: string | null | undefined): AppRole[] {
+  const max = appRoleRank(actorRole);
+  return APP_ROLE_ORDER.slice(0, max + 1);
+}
+
+function formatRoleOption(role: AppRole): string {
+  return role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface DashboardPermissions {
   view_stats?: boolean;
   view_pending_requests?: boolean;
@@ -142,7 +168,7 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
+  const [editingUser, setEditingUser] = useState<UserSummary | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("student");
   const [submitting, setSubmitting] = useState(false);
@@ -214,8 +240,12 @@ export default function Users() {
 
   const handleInvite = async () => {
     setSubmitting(true);
+    const allowed = assignableAppRoles(currentUser.app_role);
+    const roleToInvite = allowed.includes(inviteRole as AppRole)
+      ? inviteRole
+      : allowed[allowed.length - 1] ?? "student";
     await api.users.inviteUser(inviteEmail, {
-      app_role: inviteRole,
+      app_role: roleToInvite,
       organization_id: currentUser.organization_id ?? undefined,
     });
     setShowInviteModal(false);
@@ -235,20 +265,31 @@ export default function Users() {
     newStatus: string | null,
     permissions?: DashboardPermissions
   ) => {
-    setSubmitting(true);
-    
     if (!editingUser) return;
+    setSubmitting(true);
+    try {
+      const actorRole = currentUser.app_role || "student";
+      const initialRole = (editingUser.app_role || "student") as AppRole;
+      let roleToSave: AppRole = (newRole || "student") as AppRole;
 
-    await api.entities.User.update(editingUser.id, {
-      app_role: newRole,
-      status: newStatus,
-      dashboard_permissions: permissions,
-    });
+      if (appRoleRank(initialRole) > appRoleRank(actorRole)) {
+        roleToSave = initialRole;
+      } else if (appRoleRank(roleToSave) > appRoleRank(actorRole)) {
+        roleToSave = APP_ROLE_ORDER[appRoleRank(actorRole)];
+      }
 
-    queryClient.invalidateQueries({ queryKey: ["allUsers"] });
-    setShowEditModal(false);
-    setEditingUser(null);
-    setSubmitting(false);
+      await api.entities.User.update(editingUser.id, {
+        app_role: roleToSave,
+        status: newStatus,
+        dashboard_permissions: permissions,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["allUsers"] });
+      setShowEditModal(false);
+      setEditingUser(null);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const togglePermission = (key: keyof DashboardPermissions | string) => {
@@ -272,6 +313,7 @@ export default function Users() {
   }
 
   const pendingCount = accessRequests.filter(r => r.status === "pending").length;
+  const rolesActorMayAssign = assignableAppRoles(currentUser.app_role);
 
   return (
     <div className="space-y-6">
@@ -281,7 +323,11 @@ export default function Users() {
         actions={
           activeTab === "users" && (
             <Button
-              onClick={() => setShowInviteModal(true)}
+              onClick={() => {
+                setInviteEmail("");
+                setInviteRole("student");
+                setShowInviteModal(true);
+              }}
               className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -590,18 +636,23 @@ export default function Users() {
             </div>
             <div className="space-y-2">
               <Label>Role</Label>
-              <Select value={inviteRole} onValueChange={setInviteRole}>
+              <Select
+                value={
+                  rolesActorMayAssign.includes(inviteRole as AppRole)
+                    ? inviteRole
+                    : rolesActorMayAssign[rolesActorMayAssign.length - 1] ?? "student"
+                }
+                onValueChange={setInviteRole}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="reviewer">Reviewer</SelectItem>
-                  <SelectItem value="advisor">Advisor</SelectItem>
-                  <SelectItem value="approver">Approver</SelectItem>
-                  <SelectItem value="fund_manager">Fund Manager</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  {rolesActorMayAssign.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {formatRoleOption(role)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-slate-500">
@@ -651,23 +702,34 @@ export default function Users() {
                 </div>
                 <div className="space-y-2">
                   <Label>Role</Label>
-                  <Select
-                    value={editingUser.app_role || "student"}
-                    onValueChange={(value) => setEditingUser({ ...editingUser, app_role: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="reviewer">Reviewer</SelectItem>
-                      <SelectItem value="advisor">Advisor</SelectItem>
-                      <SelectItem value="approver">Approver</SelectItem>
-                      <SelectItem value="fund_manager">Fund Manager</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="super_admin">Super Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {appRoleRank(editingUser.app_role) > appRoleRank(currentUser.app_role) ? (
+                    <>
+                      <p className="text-sm font-medium capitalize py-2 px-3 rounded-md border bg-slate-50">
+                        {(editingUser.app_role || "student").replace(/_/g, " ")}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        You cannot change this user&apos;s role — it is above your own level.
+                      </p>
+                    </>
+                  ) : (
+                    <Select
+                      value={editingUser.app_role || "student"}
+                      onValueChange={(value) =>
+                        setEditingUser({ ...editingUser, app_role: value as AppRole })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rolesActorMayAssign.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {formatRoleOption(role)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Status</Label>
