@@ -38,6 +38,22 @@ interface LayoutProps {
   currentPageName: string;
 }
 
+/** Sidebar highlight: match section roots to their detail/sub-pages */
+function isSidebarNavActive(itemPage: string, currentPageName: string): boolean {
+  switch (itemPage) {
+    case "MyRequests":
+      return currentPageName === "MyRequests" || currentPageName === "RequestDetail";
+    case "AdvisorQueue":
+      return currentPageName === "AdvisorQueue" || currentPageName === "AdvisorRequestDetail";
+    case "Queue":
+      return currentPageName === "Queue" || currentPageName === "ReviewRequest";
+    case "Funds":
+      return currentPageName === "Funds" || currentPageName === "FundDetail" || currentPageName === "CreateFund";
+    default:
+      return currentPageName === itemPage;
+  }
+}
+
 export default function Layout({ children, currentPageName }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
@@ -107,6 +123,8 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
 
   const advisorNavItems = [
     { name: "My Assigned Applications", icon: FileText, page: "AdvisorQueue" },
+    ...(permissions.access_queue !== false ? [{ name: "Review Queue", icon: ClipboardList, page: "Queue" }] : []),
+    ...(permissions.access_funds !== false ? [{ name: "Funds", icon: Wallet, page: "Funds" }] : []),
   ];
 
   const staffNavItems = [
@@ -121,8 +139,8 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
     ...((isAdmin || permissions.access_settings) ? [{ name: "Settings", icon: Settings, page: "Settings" }] : []),
   ];
 
-  // Advisors with individual assignments get simplified nav, other staff get full sidebar
-  const navItems = (isStaff && !isAdvisor) ? staffNavItems : (isAdvisor ? advisorNavItems : studentNavItems);
+  const navItems = isStaff ? (isAdvisor ? advisorNavItems : staffNavItems) : studentNavItems;
+  const sidebarLogoHref = createPageUrl(navItems[0]?.page ?? "Home");
 
   // PublicHome doesn't need layout
   if (isPublic) {
@@ -140,165 +158,6 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
     );
   }
 
-  // Student and Advisor layout - top navigation only
-  if (!isStaff || isAdvisor) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30">
-        {/* Top Navigation */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo */}
-              <Link to={createPageUrl(isAdvisor ? "AdvisorQueue" : "Apply")} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20 overflow-hidden bg-linear-to-br from-indigo-600 to-violet-600">
-                  {activeOrganization?.logo ? (
-                    <img
-                      src={activeOrganization.logo}
-                      alt={`${activeOrganization?.name || "Organization"} logo`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <GraduationCap className="w-5 h-5 text-white" />
-                  )}
-                </div>
-                <div className="hidden sm:block leading-tight">
-                  <div className="font-bold text-slate-800 text-lg truncate max-w-[320px]">
-                    {orgDisplayName}
-                  </div>
-                </div>
-              </Link>
-
-              {/* Main Navigation */}
-              <nav className="hidden md:flex items-center gap-1">
-                {isAdvisor ? (
-                  <Link to={createPageUrl("AdvisorQueue")}>
-                    <Button
-                      variant="ghost"
-                      className={`${
-                        currentPageName === "AdvisorQueue" || currentPageName === "AdvisorRequestDetail"
-                          ? "bg-indigo-50 text-indigo-700"
-                          : "text-slate-600 hover:text-slate-900"
-                      }`}
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      My Assigned Applications
-                    </Button>
-                  </Link>
-                ) : (
-                  <>
-                    <Link to={createPageUrl("Apply")}>
-                      <Button
-                        variant="ghost"
-                        className={`${
-                          currentPageName === "Apply"
-                            ? "bg-indigo-50 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-900"
-                        }`}
-                      >
-                        <PlusCircle className="w-4 h-4 mr-2" />
-                        Apply
-                      </Button>
-                    </Link>
-                    <Link to={createPageUrl("MyRequests")}>
-                      <Button
-                        variant="ghost"
-                        className={`${
-                          currentPageName === "MyRequests" || currentPageName === "RequestDetail"
-                            ? "bg-indigo-50 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-900"
-                        }`}
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        My Requests
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </nav>
-
-              {/* Right Side - Notifications + Profile */}
-              <div className="flex items-center gap-2">
-                {user && <NotificationBell user={user} />}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-auto p-2 hover:bg-slate-100 rounded-xl">
-                      <Avatar className="h-8 w-8 border-2 border-indigo-100">
-                        <AvatarFallback className="bg-linear-to-br from-indigo-100 to-violet-100 text-indigo-700 font-semibold text-sm">
-                          {user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="px-3 py-2">
-                      <p className="font-medium text-sm">{user?.full_name}</p>
-                      <p className="text-xs text-slate-500">{user?.email}</p>
-                    </div>
-                    <DropdownMenuSeparator />
-                    {isAdvisor ? (
-                      <DropdownMenuItem asChild className="md:hidden">
-                        <Link to={createPageUrl("AdvisorQueue")} className="cursor-pointer">
-                          <FileText className="w-4 h-4 mr-2" />
-                          My Assigned Applications
-                        </Link>
-                      </DropdownMenuItem>
-                    ) : (
-                      <>
-                        <DropdownMenuItem asChild className="md:hidden">
-                          <Link to={createPageUrl("Apply")} className="cursor-pointer">
-                            <PlusCircle className="w-4 h-4 mr-2" />
-                            Apply
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="md:hidden">
-                          <Link to={createPageUrl("MyRequests")} className="cursor-pointer">
-                            <FileText className="w-4 h-4 mr-2" />
-                            My Requests
-                          </Link>
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    <DropdownMenuSeparator className="md:hidden" />
-                    <DropdownMenuItem asChild>
-                      <Link to={createPageUrl("Notifications")} className="cursor-pointer">
-                        <Bell className="w-4 h-4 mr-2" />
-                        Notifications
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to={createPageUrl("Profile")} className="cursor-pointer">
-                        <UserIcon className="w-4 h-4 mr-2" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <div className="px-3 py-2">
-                      <div className="text-xs font-medium text-slate-500">Fund Journey</div>
-                      <div className="text-xs text-slate-400">v{appVersion}</div>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="min-h-screen pt-16">
-          <div className="p-4 md:p-8 max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Staff layout - sidebar navigation
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30">
       {/* Mobile Header */}
@@ -354,7 +213,7 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-slate-100">
-            <div className="flex items-center gap-3">
+            <Link to={sidebarLogoHref} className="flex items-center gap-3 rounded-xl outline-offset-2 hover:opacity-90 transition-opacity">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 overflow-hidden bg-linear-to-br from-indigo-600 to-violet-600">
                 {activeOrganization?.logo ? (
                   <img
@@ -371,16 +230,16 @@ export default function Layout({ children, currentPageName }: LayoutProps) {
                   {orgDisplayName}
                 </h1>
                 <p className="text-xs text-slate-500">
-                  <span className="block capitalize">{userRole} Portal</span>
+                  <span className="block capitalize">{userRole.replace(/_/g, " ")} Portal</span>
                 </p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
-              const isActive = currentPageName === item.page;
+              const isActive = isSidebarNavActive(item.page, currentPageName);
               return (
                 <Link
                   key={item.page}
@@ -462,6 +321,12 @@ function UserDropdown({ user, handleLogout, fullWidth }: UserDropdownProps) {
           <div className="text-xs font-medium text-slate-500">Fund Journey v{appVersion}</div>
         </div>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to={createPageUrl("Notifications")} className="cursor-pointer">
+            <Bell className="w-4 h-4 mr-2" />
+            Notifications
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to={createPageUrl("Profile")} className="cursor-pointer">
             <UserIcon className="w-4 h-4 mr-2" />
