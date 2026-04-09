@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
@@ -56,7 +58,7 @@ import {
   Settings as SettingsIcon,
   Check,
   X,
-  ClipboardList
+  ClipboardList,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
@@ -198,6 +200,20 @@ export default function Users() {
       ) as Promise<AccessRequestRow[]>;
     },
     enabled: !!currentUser?.organization_id,
+  });
+
+  const { data: inviteTargetOrganization, isPending: inviteOrgLoading } = useQuery<{
+    name?: string;
+    logo?: string | null;
+  } | null>({
+    queryKey: ["activeOrganization", currentUser?.organization_id],
+    enabled: !!currentUser?.organization_id,
+    queryFn: async ({ queryKey }) => {
+      const id = queryKey[1] as string | undefined;
+      if (!id) return null;
+      const orgs = await api.entities.Organization.filter({ id }, undefined, 1);
+      return orgs?.[0] ?? null;
+    },
   });
 
   const updateAccessRequest = useMutation({
@@ -617,13 +633,61 @@ export default function Users() {
 
       {/* Invite Modal */}
       <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Invite User</DialogTitle>
             <DialogDescription>
               Send an invitation to join the platform.
             </DialogDescription>
           </DialogHeader>
+          {currentUser?.organization_id ? (
+            <div className="rounded-xl border-2 border-indigo-200 bg-linear-to-br from-indigo-50 to-violet-50 px-5 py-5 text-center shadow-sm">
+              <div className="flex flex-col items-center gap-3">
+                {inviteOrgLoading ? (
+                  <div
+                    className="w-14 h-14 rounded-xl bg-indigo-200/50 animate-pulse shrink-0"
+                    aria-hidden
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 overflow-hidden bg-linear-to-br from-indigo-600 to-violet-600 shrink-0">
+                    {inviteTargetOrganization?.logo ? (
+                      <img
+                        src={inviteTargetOrganization.logo}
+                        alt={`${inviteTargetOrganization?.name || "Organization"} logo`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <GraduationCap className="w-8 h-8 text-white" aria-hidden />
+                    )}
+                  </div>
+                )}
+                <div className="text-sm font-semibold uppercase tracking-wide text-indigo-800">
+                  You are inviting to
+                </div>
+              </div>
+              <p className="mt-2 text-2xl font-bold tracking-tight text-indigo-950 wrap-break-word">
+                {inviteTargetOrganization?.name ?? "Loading organization…"}
+              </p>
+              <p className="mt-3 text-sm leading-snug text-indigo-900/85">
+                This is your currently selected organization. They will join this one. To invite elsewhere,
+                switch organization in{" "}
+                <Link
+                  to={createPageUrl("Settings")}
+                  className="font-semibold text-indigo-800 underline underline-offset-2 hover:text-indigo-950"
+                >
+                  Settings
+                </Link>
+                .
+              </p>
+            </div>
+          ) : (
+            <div
+              className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-sm font-medium text-amber-950"
+              role="alert"
+            >
+              No organization is selected. Choose an organization in Settings before sending invitations.
+            </div>
+          )}
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Email Address *</Label>
