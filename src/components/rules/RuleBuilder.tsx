@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { toast } from "@/components/ui/use-toast";
 import { Save, Trash2, X, CheckCircle } from "lucide-react";
 
 const USE_CATEGORIES = [
@@ -31,6 +32,8 @@ const USE_CATEGORIES = [
 interface RuleBuilderProps {
   fundId: string;
   fundName: string;
+  /** Required for inserts; should match the fund's organization. */
+  organizationId: string | null | undefined;
   rule?: any;
   existingSteps: number;
   onClose: () => void;
@@ -39,6 +42,7 @@ interface RuleBuilderProps {
 export default function RuleBuilder({
   fundId,
   fundName,
+  organizationId,
   rule,
   existingSteps,
   onClose,
@@ -100,7 +104,19 @@ export default function RuleBuilder({
 
     const currentUser = await api.auth.me();
 
+    const orgId = organizationId ?? rule?.organization_id;
+    if (!orgId) {
+      setSubmitting(false);
+      toast({
+        title: "Cannot save rule",
+        description: "Organization is missing. Reload the page or contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const ruleData = {
+      organization_id: orgId,
       fund_id: fundId,
       fund_name: fundName,
       step_order: parseInt(formData.step_order),
@@ -120,6 +136,7 @@ export default function RuleBuilder({
     if (rule) {
       await api.entities.RoutingRule.update(rule.id, ruleData);
       await api.entities.AuditLog.create({
+        organization_id: orgId,
         actor_user_id: currentUser.id,
         actor_name: currentUser.full_name,
         action_type: "RULE_UPDATED",
@@ -134,6 +151,7 @@ export default function RuleBuilder({
     } else {
       const newRule = await api.entities.RoutingRule.create(ruleData);
       await api.entities.AuditLog.create({
+        organization_id: orgId,
         actor_user_id: currentUser.id,
         actor_name: currentUser.full_name,
         action_type: "RULE_CREATED",
@@ -153,26 +171,40 @@ export default function RuleBuilder({
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this rule?")) return;
+    const orgId = organizationId ?? rule?.organization_id;
+    if (!orgId) {
+      toast({
+        title: "Cannot delete rule",
+        description: "Organization is missing. Reload the page or contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setDeleting(true);
-    
-    const currentUser = await api.auth.me();
-    
-    await api.entities.AuditLog.create({
-      actor_user_id: currentUser.id,
-      actor_name: currentUser.full_name,
-      action_type: "RULE_DELETED",
-      entity_type: "RoutingRule",
-      entity_id: rule.id,
-      details: JSON.stringify({ 
-        fund_name: fundName,
-        step_name: rule.step_name,
-        step_order: rule.step_order
-      })
-    });
-    
-    await api.entities.RoutingRule.delete(rule.id);
-    setDeleting(false);
-    onClose();
+
+    try {
+      const currentUser = await api.auth.me();
+
+      await api.entities.AuditLog.create({
+        organization_id: orgId,
+        actor_user_id: currentUser.id,
+        actor_name: currentUser.full_name,
+        action_type: "RULE_DELETED",
+        entity_type: "RoutingRule",
+        entity_id: rule.id,
+        details: JSON.stringify({
+          fund_name: fundName,
+          step_name: rule.step_name,
+          step_order: rule.step_order
+        })
+      });
+
+      await api.entities.RoutingRule.delete(rule.id);
+      onClose();
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -404,7 +436,11 @@ export default function RuleBuilder({
             </Button>
             <Button
               onClick={handleSave}
-              disabled={submitting || !formData.step_name}
+              disabled={
+                submitting ||
+                !formData.step_name ||
+                !(organizationId ?? rule?.organization_id)
+              }
               className="bg-indigo-600 hover:bg-indigo-700"
             >
               {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="w-4 h-4 mr-2" />}

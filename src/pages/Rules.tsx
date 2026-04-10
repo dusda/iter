@@ -219,6 +219,7 @@ export default function Rules() {
         <RuleBuilder
           fundId={selectedFundId}
           fundName={selectedFund?.fund_name}
+          organizationId={selectedFund?.organization_id ?? user.organization_id}
           rule={typeof showBuilder === "object" ? showBuilder : null}
           existingSteps={rules.length}
           onClose={() => {

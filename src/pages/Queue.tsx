@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
@@ -39,9 +39,23 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
+/** Matches dashboard “pending” list — requests that may still need staff attention. */
+const ORG_PENDING_STATUSES = ["Submitted", "In Review", "Needs Info"];
+
+/**
+ * Default tab: routing uses `role_reviewer` etc., never `role_super_admin`, and many funds have no `fund_owner_id`,
+ * so role_queue / “my funds” are often empty for admins and fund managers. Org-wide pending aligns with the dashboard.
+ */
+function defaultQueueViewMode(appRole: string | undefined | null): string {
+  if (appRole === "fund_manager" || appRole === "admin" || appRole === "super_admin") {
+    return "all_org_pending";
+  }
+  return "role_queue";
+}
+
 export default function Queue() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState("my_assigned");
+  const [viewModeUserPick, setViewModeUserPick] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [fundFilter, setFundFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -74,6 +88,10 @@ export default function Queue() {
       api.entities.Review.filter({ organization_id: user.organization_id }),
   });
 
+  const viewMode = user
+    ? viewModeUserPick ?? defaultQueueViewMode(user.app_role)
+    : "role_queue";
+
   // Calculate days since submission
   const getDaysSince = (date) => {
     if (!date) return 0;
@@ -87,7 +105,9 @@ export default function Queue() {
 
     let requests = [...allRequests];
 
-    if (viewMode === "my_assigned") {
+    if (viewMode === "all_org_pending") {
+      requests = requests.filter((r) => ORG_PENDING_STATUSES.includes(r.status));
+    } else if (viewMode === "my_assigned") {
       // Show requests where user has a pending review assigned
       const userReviews = allReviews.filter(r => 
         r.reviewer_user_id === user.id && r.decision === "Pending"
@@ -141,7 +161,8 @@ export default function Queue() {
     );
   }
 
-  const isFundManager = user?.app_role === "fund_manager" || user?.app_role === "admin";
+  const elevatedQueueAccess =
+    user.app_role === "fund_manager" || user.app_role === "admin" || user.app_role === "super_admin";
 
   return (
     <div className="space-y-6">
@@ -151,15 +172,23 @@ export default function Queue() {
       />
 
       {/* View Mode Tabs */}
-      <Tabs value={viewMode} onValueChange={setViewMode}>
-        <TabsList className="bg-white/70 border">
+      <Tabs value={viewMode} onValueChange={setViewModeUserPick}>
+        <TabsList className="bg-white/70 border flex-wrap h-auto gap-1 py-1">
+          {elevatedQueueAccess && (
+            <TabsTrigger
+              value="all_org_pending"
+              className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
+            >
+              All pending
+            </TabsTrigger>
+          )}
           <TabsTrigger value="my_assigned" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             My Assigned
           </TabsTrigger>
           <TabsTrigger value="role_queue" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">
             Role Queue
           </TabsTrigger>
-          {isFundManager && (
+          {elevatedQueueAccess && (
             <TabsTrigger value="my_funds" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
               All for My Funds
             </TabsTrigger>

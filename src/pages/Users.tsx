@@ -59,6 +59,7 @@ import {
   Check,
   X,
   ClipboardList,
+  Building2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
@@ -142,6 +143,11 @@ interface CurrentUser extends UserSummary {
   app_role: AppRole;
 }
 
+interface OrganizationOption {
+  id: string;
+  name: string;
+}
+
 const safeFormatDate = (value?: string | null, dateFormat: string = "MMM d, yyyy") => {
   if (!value) return "—";
   const date = new Date(value);
@@ -206,6 +212,15 @@ export default function Users() {
       ) as Promise<AccessRequestRow[]>;
     },
     enabled: !!currentUser?.organization_id,
+  });
+
+  const canReassignOrganization =
+    currentUser?.app_role === "admin" || currentUser?.app_role === "super_admin";
+
+  const { data: organizations = [], isPending: organizationsLoading } = useQuery<OrganizationOption[]>({
+    queryKey: ["organizations"],
+    queryFn: () => api.entities.Organization.list("name") as Promise<OrganizationOption[]>,
+    enabled: !!currentUser && canReassignOrganization,
   });
 
   const { data: inviteTargetOrganization, isPending: inviteOrgLoading } = useQuery<{
@@ -306,10 +321,23 @@ export default function Users() {
         roleToSave = APP_ROLE_ORDER[appRoleRank(actorRole)];
       }
 
-      await api.entities.User.update(editingUser.id, {
+      const payload: {
+        app_role: AppRole;
+        dashboard_permissions?: DashboardPermissions;
+        organization_id?: string;
+      } = {
         app_role: roleToSave,
         dashboard_permissions: permissions,
-      });
+      };
+
+      if (canReassignOrganization) {
+        const oid = editingUser.organization_id;
+        if (oid != null && oid !== "") {
+          payload.organization_id = oid;
+        }
+      }
+
+      await api.entities.User.update(editingUser.id, payload);
 
       queryClient.invalidateQueries({ queryKey: ["allUsers"] });
       setShowEditModal(false);
@@ -803,6 +831,49 @@ export default function Users() {
                     </SelectContent>
                   </Select>
                 </div>
+                {canReassignOrganization && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-slate-500" aria-hidden />
+                      Organization
+                    </Label>
+                    {organizationsLoading ? (
+                      <p className="text-sm text-slate-500">Loading organizations…</p>
+                    ) : (
+                      <Select
+                        value={editingUser.organization_id ?? undefined}
+                        onValueChange={(value) =>
+                          setEditingUser({
+                            ...editingUser,
+                            organization_id: value,
+                          })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select organization" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editingUser.organization_id &&
+                            !organizations.some((o) => o.id === editingUser.organization_id) && (
+                              <SelectItem value={editingUser.organization_id}>
+                                {editingUser.organization_id} (not in list)
+                              </SelectItem>
+                            )}
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <p className="text-xs text-slate-500">
+                      {currentUser.app_role === "super_admin"
+                        ? "Assign this user to any organization."
+                        : "Move this user to another organization. They will lose access to this org’s data."}
+                    </p>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="permissions" className="space-y-4 pt-4">
