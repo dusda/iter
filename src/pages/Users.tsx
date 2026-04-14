@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
@@ -193,6 +193,7 @@ export default function Users() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
   const [accessRequestsPage, setAccessRequestsPage] = useState(1);
+  const usersPageTopRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadUser();
@@ -370,6 +371,25 @@ export default function Users() {
     } as UserSummary);
   };
 
+  const scrollUsersPageToTop = () => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const behavior: ScrollBehavior = prefersReduced ? "auto" : "smooth";
+    const apply = () => {
+      usersPageTopRef.current?.scrollIntoView({ behavior, block: "start" });
+      const root = document.scrollingElement ?? document.documentElement;
+      root.scrollTo({ top: 0, left: 0, behavior });
+      window.scrollTo({ top: 0, left: 0, behavior });
+      if (root !== document.body) {
+        document.body.scrollTo({ top: 0, left: 0, behavior });
+      }
+    };
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(apply, 0);
+      });
+    });
+  };
+
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -396,8 +416,70 @@ export default function Users() {
   );
   const showAccessRequestPagination = accessRequests.length > ACCESS_REQUESTS_PAGE_SIZE;
 
+  const renderAccessRequestsPager = (variant: "top" | "bottom") => {
+    if (!showAccessRequestPagination) return null;
+    const borderClass =
+      variant === "top"
+        ? "pb-4 mb-4 border-b border-slate-200/60"
+        : "pt-4 mt-4 border-t border-slate-200/60";
+    const navLabel =
+      variant === "top"
+        ? "Access requests pagination, top of list"
+        : "Access requests pagination, end of list";
+    return (
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${borderClass}`}
+      >
+        <p className="text-sm text-slate-500 sm:order-1">
+          Showing{" "}
+          <span className="font-medium text-slate-700 tabular-nums">
+            {accessRequestRangeStart + 1}–{accessRequestRangeEnd}
+          </span>{" "}
+          of{" "}
+          <span className="font-medium text-slate-700 tabular-nums">{accessRequests.length}</span>
+        </p>
+        <nav
+          className="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:order-2"
+          aria-label={navLabel}
+        >
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1 cursor-pointer"
+            onClick={() => {
+              setAccessRequestsPage((p) => Math.max(1, p - 1));
+              scrollUsersPageToTop();
+            }}
+            disabled={accessRequestsPage <= 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <span className="flex h-9 min-w-22 items-center justify-center px-2 text-sm text-slate-600 tabular-nums">
+            Page {accessRequestsPage} of {accessRequestTotalPages}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1 cursor-pointer"
+            onClick={() => {
+              setAccessRequestsPage((p) => Math.min(accessRequestTotalPages, p + 1));
+              scrollUsersPageToTop();
+            }}
+            disabled={accessRequestsPage >= accessRequestTotalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </nav>
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-6">
+    <div ref={usersPageTopRef} className="space-y-6 scroll-mt-20 lg:scroll-mt-4">
       <PageHeader
         title="User Management"
         description="Manage users, roles, and access requests"
@@ -603,6 +685,7 @@ export default function Users() {
             />
           ) : (
             <>
+            {renderAccessRequestsPager("top")}
             <div className="space-y-4">
               {paginatedAccessRequests.map((request) => {
                 const initial = (request.full_name || request.email || "?").trim().charAt(0).toUpperCase();
@@ -712,54 +795,7 @@ export default function Users() {
                 );
               })}
             </div>
-            {showAccessRequestPagination && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 mt-4 border-t border-slate-200/60">
-                <p className="text-sm text-slate-500 sm:order-1">
-                  Showing{" "}
-                  <span className="font-medium text-slate-700 tabular-nums">
-                    {accessRequestRangeStart + 1}–{accessRequestRangeEnd}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-medium text-slate-700 tabular-nums">{accessRequests.length}</span>
-                </p>
-                <nav
-                  className="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:order-2"
-                  aria-label="Access requests pagination"
-                >
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => {
-                      setAccessRequestsPage((p) => Math.max(1, p - 1));
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    disabled={accessRequestsPage <= 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  <span className="flex h-9 min-w-22 items-center justify-center px-2 text-sm text-slate-600 tabular-nums">
-                    Page {accessRequestsPage} of {accessRequestTotalPages}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => {
-                      setAccessRequestsPage((p) => Math.min(accessRequestTotalPages, p + 1));
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    disabled={accessRequestsPage >= accessRequestTotalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </nav>
-              </div>
-            )}
+            {renderAccessRequestsPager("bottom")}
             </>
           )}
         </TabsContent>
