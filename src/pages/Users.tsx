@@ -731,7 +731,10 @@ export default function Users() {
                     variant="outline"
                     size="sm"
                     className="gap-1"
-                    onClick={() => setAccessRequestsPage((p) => Math.max(1, p - 1))}
+                    onClick={() => {
+                      setAccessRequestsPage((p) => Math.max(1, p - 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     disabled={accessRequestsPage <= 1}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -745,9 +748,10 @@ export default function Users() {
                     variant="outline"
                     size="sm"
                     className="gap-1"
-                    onClick={() =>
-                      setAccessRequestsPage((p) => Math.min(accessRequestTotalPages, p + 1))
-                    }
+                    onClick={() => {
+                      setAccessRequestsPage((p) => Math.min(accessRequestTotalPages, p + 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     disabled={accessRequestsPage >= accessRequestTotalPages}
                   >
                     Next
