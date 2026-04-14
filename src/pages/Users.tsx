@@ -61,12 +61,16 @@ import {
   ClipboardList,
   Building2,
   MessageSquare,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 
 type AppRole = "student" | "reviewer" | "advisor" | "approver" | "fund_manager" | "admin" | "super_admin";
+
+const ACCESS_REQUESTS_PAGE_SIZE = 10;
 
 /** Lowest → highest privilege; used to cap role assignment to the editor’s own level. */
 const APP_ROLE_ORDER: AppRole[] = [
@@ -188,6 +192,7 @@ export default function Users() {
   const [inviteRole, setInviteRole] = useState("student");
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
+  const [accessRequestsPage, setAccessRequestsPage] = useState(1);
 
   useEffect(() => {
     loadUser();
@@ -214,6 +219,11 @@ export default function Users() {
     },
     enabled: !!currentUser?.organization_id,
   });
+
+  useEffect(() => {
+    const pages = Math.max(1, Math.ceil(accessRequests.length / ACCESS_REQUESTS_PAGE_SIZE));
+    setAccessRequestsPage((p) => Math.min(Math.max(1, p), pages));
+  }, [accessRequests.length]);
 
   const canReassignOrganization =
     currentUser?.app_role === "admin" || currentUser?.app_role === "super_admin";
@@ -370,6 +380,21 @@ export default function Users() {
 
   const pendingCount = accessRequests.filter(r => r.status === "pending").length;
   const rolesActorMayAssign = assignableAppRoles(currentUser.app_role);
+
+  const accessRequestTotalPages = Math.max(
+    1,
+    Math.ceil(accessRequests.length / ACCESS_REQUESTS_PAGE_SIZE)
+  );
+  const accessRequestRangeStart = (accessRequestsPage - 1) * ACCESS_REQUESTS_PAGE_SIZE;
+  const accessRequestRangeEnd = Math.min(
+    accessRequestRangeStart + ACCESS_REQUESTS_PAGE_SIZE,
+    accessRequests.length
+  );
+  const paginatedAccessRequests = accessRequests.slice(
+    accessRequestRangeStart,
+    accessRequestRangeStart + ACCESS_REQUESTS_PAGE_SIZE
+  );
+  const showAccessRequestPagination = accessRequests.length > ACCESS_REQUESTS_PAGE_SIZE;
 
   return (
     <div className="space-y-6">
@@ -568,129 +593,171 @@ export default function Users() {
         </TabsContent>
 
         <TabsContent value="access" className="mt-4">
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
-            <CardContent className="p-4 sm:p-6">
-              {loadingRequests ? (
-                <LoadingSpinner className="py-16" />
-              ) : accessRequests.length === 0 ? (
-                <EmptyState
-                  icon={Mail}
-                  title="No Access Requests"
-                  description="No students have requested access yet."
-                />
-              ) : (
-                <div className="space-y-4">
-                  {accessRequests.map((request) => {
-                    const initial = (request.full_name || request.email || "?").trim().charAt(0).toUpperCase();
-                    const borderAccent =
-                      request.status === "pending"
-                        ? "border-l-indigo-500"
-                        : request.status === "approved"
-                          ? "border-l-emerald-400"
-                          : "border-l-slate-300";
-                    return (
-                      <article
-                        key={request.id}
-                        className={`rounded-xl border border-slate-200/80 bg-white/90 shadow-sm border-l-4 ${borderAccent} overflow-hidden`}
-                      >
-                        <div className="p-4 sm:p-5 space-y-4">
-                          <div className="flex gap-3 sm:gap-4">
-                            <div
-                              className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-white font-semibold text-sm sm:text-base flex items-center justify-center shadow-inner"
-                              aria-hidden
-                            >
-                              {initial}
-                            </div>
-                            <div className="min-w-0 flex-1 space-y-1">
-                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                                <div className="min-w-0">
-                                  <h3 className="font-semibold text-slate-900 leading-snug">
-                                    {request.full_name || "Unnamed applicant"}
-                                  </h3>
-                                  <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
-                                    <Mail className="w-3.5 h-3.5 shrink-0" />
-                                    <span className="truncate">{request.email}</span>
-                                  </p>
-                                  {request.phone && (
-                                    <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
-                                      <Phone className="w-3.5 h-3.5 shrink-0" />
-                                      {request.phone}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                                  <StatusBadge status={request.status} />
-                                  <time
-                                    className="text-xs text-slate-400 tabular-nums"
-                                    dateTime={request.created_date}
-                                    title={request.created_date}
-                                  >
-                                    {safeFormatDate(request.created_date, "MMM d, yyyy 'at' h:mm a")}
-                                  </time>
-                                </div>
-                              </div>
-                              {request.student_id && (
-                                <p className="text-xs text-slate-500">
-                                  Student ID: <span className="font-mono text-slate-600">{request.student_id}</span>
+          {loadingRequests ? (
+            <LoadingSpinner className="py-16" />
+          ) : accessRequests.length === 0 ? (
+            <EmptyState
+              icon={Mail}
+              title="No Access Requests"
+              description="No students have requested access yet."
+            />
+          ) : (
+            <>
+            <div className="space-y-4">
+              {paginatedAccessRequests.map((request) => {
+                const initial = (request.full_name || request.email || "?").trim().charAt(0).toUpperCase();
+                const borderAccent =
+                  request.status === "pending"
+                    ? "border-l-indigo-500"
+                    : request.status === "approved"
+                      ? "border-l-emerald-400"
+                      : "border-l-slate-300";
+                return (
+                  <article
+                    key={request.id}
+                    className={`rounded-xl border border-slate-200/80 bg-white/90 shadow-sm border-l-4 ${borderAccent} overflow-hidden`}
+                  >
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <div className="flex gap-3 sm:gap-4">
+                        <div
+                          className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-white font-semibold text-sm sm:text-base flex items-center justify-center shadow-inner"
+                          aria-hidden
+                        >
+                          {initial}
+                        </div>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-slate-900 leading-snug">
+                                {request.full_name || "Unnamed applicant"}
+                              </h3>
+                              <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                <Mail className="w-3.5 h-3.5 shrink-0" />
+                                <span className="truncate">{request.email}</span>
+                              </p>
+                              {request.phone && (
+                                <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                  <Phone className="w-3.5 h-3.5 shrink-0" />
+                                  {request.phone}
                                 </p>
                               )}
                             </div>
-                          </div>
-
-                          <div className="pl-0 sm:pl-13 space-y-2">
-                            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                              <MessageSquare className="w-3.5 h-3.5" />
-                              Reason
-                            </div>
-                            <div className="rounded-lg bg-slate-50/90 border border-slate-100 px-4 py-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-word min-h-12">
-                              {request.reason?.trim() ? request.reason : (
-                                <span className="text-slate-400 italic">No reason provided.</span>
-                              )}
+                            <div className="flex flex-wrap items-center gap-2 shrink-0">
+                              <StatusBadge status={request.status} />
+                              <time
+                                className="text-xs text-slate-400 tabular-nums"
+                                dateTime={request.created_date}
+                                title={request.created_date}
+                              >
+                                {safeFormatDate(request.created_date, "MMM d, yyyy 'at' h:mm a")}
+                              </time>
                             </div>
                           </div>
-
-                          {request.status === "pending" ? (
-                            <div className="pl-0 sm:pl-13 flex flex-col sm:flex-row gap-2 sm:justify-end">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-green-300 text-green-700 hover:bg-green-50 sm:min-w-28"
-                                onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
-                                disabled={updateAccessRequest.isPending}
-                              >
-                                <Check className="w-3.5 h-3.5 mr-1.5" /> Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-red-300 text-red-700 hover:bg-red-50 sm:min-w-28"
-                                onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
-                                disabled={updateAccessRequest.isPending}
-                              >
-                                <X className="w-3.5 h-3.5 mr-1.5" /> Deny
-                              </Button>
-                            </div>
-                          ) : (
-                            (request.reviewed_by || request.reviewed_at) && (
-                              <div className="pl-0 sm:pl-13 text-sm text-slate-500 border-t border-slate-100 pt-3">
-                                {request.reviewed_by && <span>Reviewed by {request.reviewed_by}</span>}
-                                {request.reviewed_by && request.reviewed_at && <span className="text-slate-300 mx-1.5">·</span>}
-                                {request.reviewed_at && (
-                                  <time dateTime={request.reviewed_at}>
-                                    {safeFormatDate(request.reviewed_at, "MMM d, yyyy 'at' h:mm a")}
-                                  </time>
-                                )}
-                              </div>
-                            )
+                          {request.student_id && (
+                            <p className="text-xs text-slate-500">
+                              Student ID: <span className="font-mono text-slate-600">{request.student_id}</span>
+                            </p>
                           )}
                         </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      </div>
+
+                      <div className="pl-0 sm:pl-13 space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Reason
+                        </div>
+                        <div className="rounded-lg bg-slate-50/90 border border-slate-100 px-4 py-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-word min-h-12">
+                          {request.reason?.trim() ? request.reason : (
+                            <span className="text-slate-400 italic">No reason provided.</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {request.status === "pending" ? (
+                        <div className="pl-0 sm:pl-13 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-300 text-green-700 hover:bg-green-50 sm:min-w-28"
+                            onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
+                            disabled={updateAccessRequest.isPending}
+                          >
+                            <Check className="w-3.5 h-3.5 mr-1.5" /> Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-300 text-red-700 hover:bg-red-50 sm:min-w-28"
+                            onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
+                            disabled={updateAccessRequest.isPending}
+                          >
+                            <X className="w-3.5 h-3.5 mr-1.5" /> Deny
+                          </Button>
+                        </div>
+                      ) : (
+                        (request.reviewed_by || request.reviewed_at) && (
+                          <div className="pl-0 sm:pl-13 text-sm text-slate-500 border-t border-slate-100 pt-3">
+                            {request.reviewed_by && <span>Reviewed by {request.reviewed_by}</span>}
+                            {request.reviewed_by && request.reviewed_at && <span className="text-slate-300 mx-1.5">·</span>}
+                            {request.reviewed_at && (
+                              <time dateTime={request.reviewed_at}>
+                                {safeFormatDate(request.reviewed_at, "MMM d, yyyy 'at' h:mm a")}
+                              </time>
+                            )}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            {showAccessRequestPagination && (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 mt-4 border-t border-slate-200/60">
+                <p className="text-sm text-slate-500 sm:order-1">
+                  Showing{" "}
+                  <span className="font-medium text-slate-700 tabular-nums">
+                    {accessRequestRangeStart + 1}–{accessRequestRangeEnd}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-slate-700 tabular-nums">{accessRequests.length}</span>
+                </p>
+                <nav
+                  className="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:order-2"
+                  aria-label="Access requests pagination"
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => setAccessRequestsPage((p) => Math.max(1, p - 1))}
+                    disabled={accessRequestsPage <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <span className="flex h-9 min-w-22 items-center justify-center px-2 text-sm text-slate-600 tabular-nums">
+                    Page {accessRequestsPage} of {accessRequestTotalPages}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() =>
+                      setAccessRequestsPage((p) => Math.min(accessRequestTotalPages, p + 1))
+                    }
+                    disabled={accessRequestsPage >= accessRequestTotalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </nav>
+              </div>
+            )}
+            </>
+          )}
         </TabsContent>
       </Tabs>
 
