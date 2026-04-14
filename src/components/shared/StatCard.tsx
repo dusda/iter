@@ -65,7 +65,7 @@ export default function StatCard({
       }
       role={interactive ? "button" : undefined}
       tabIndex={interactive ? 0 : undefined}
-      aria-label={interactive ? (ariaLabel ?? `${title}: ${value}. Press to toggle details.`) : undefined}
+      aria-label={interactive ? (ariaLabel ?? `${title}: ${value}.`) : undefined}
       aria-expanded={interactive ? ariaExpanded : undefined}
     >
       <div className="flex items-start justify-between">

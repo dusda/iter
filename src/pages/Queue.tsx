@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
@@ -44,7 +44,8 @@ const ORG_PENDING_STATUSES = ["Submitted", "In Review", "Needs Info"];
 
 /**
  * Default tab: routing uses `role_reviewer` etc., never `role_super_admin`, and many funds have no `fund_owner_id`,
- * so role_queue / “my funds” are often empty for admins and fund managers. Org-wide pending aligns with the dashboard.
+ * so role_queue can be empty for some roles. Org-wide pending aligns with the dashboard.
+ * “All for My Funds” for elevated roles uses every fund in the org (fund_owner_id is often unset).
  */
 function defaultQueueViewMode(appRole: string | undefined | null): string {
   if (appRole === "fund_manager" || appRole === "admin" || appRole === "super_admin") {
@@ -54,6 +55,8 @@ function defaultQueueViewMode(appRole: string | undefined | null): string {
 }
 
 export default function Queue() {
+  const [searchParams] = useSearchParams();
+  const appliedQueryDefaults = useRef(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewModeUserPick, setViewModeUserPick] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -102,6 +105,20 @@ export default function Queue() {
       ? "role_queue"
       : viewModeUserPick ?? defaultQueueViewMode(user.app_role);
 
+  useEffect(() => {
+    if (!user || appliedQueryDefaults.current) return;
+    appliedQueryDefaults.current = true;
+    if (!showQueueTabs) return;
+    const view = searchParams.get("view");
+    const status = searchParams.get("status");
+    if (view === "my_funds" || view === "all_org_pending" || view === "role_queue") {
+      setViewModeUserPick(view);
+    }
+    if (status && status !== "all") {
+      setStatusFilter(status);
+    }
+  }, [user, showQueueTabs, searchParams]);
+
   // Calculate days since submission
   const getDaysSince = (date) => {
     if (!date) return 0;
@@ -127,10 +144,8 @@ export default function Queue() {
       const queueRequestIds = roleReviews.map(r => r.fund_request_id);
       requests = requests.filter(r => queueRequestIds.includes(r.id));
     } else if (queueViewMode === "my_funds") {
-      // Show requests for funds owned by this user
-      const myFunds = funds.filter(f => f.fund_owner_id === user.id);
-      const myFundIds = myFunds.map(f => f.id);
-      requests = requests.filter(r => myFundIds.includes(r.fund_id));
+      const myFundIds = funds.map((f) => f.id);
+      requests = requests.filter((r) => myFundIds.includes(r.fund_id));
     }
 
     return requests;
