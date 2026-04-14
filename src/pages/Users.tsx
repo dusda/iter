@@ -63,6 +63,7 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  Copy,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
@@ -193,7 +194,9 @@ export default function Users() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
   const [accessRequestsPage, setAccessRequestsPage] = useState(1);
+  const [copiedOrgLink, setCopiedOrgLink] = useState(false);
   const usersPageTopRef = useRef<HTMLDivElement>(null);
+  const copiedOrgLinkTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     loadUser();
@@ -226,6 +229,14 @@ export default function Users() {
     setAccessRequestsPage((p) => Math.min(Math.max(1, p), pages));
   }, [accessRequests.length]);
 
+  useEffect(() => {
+    return () => {
+      if (copiedOrgLinkTimerRef.current !== null) {
+        window.clearTimeout(copiedOrgLinkTimerRef.current);
+      }
+    };
+  }, []);
+
   const canReassignOrganization =
     currentUser?.app_role === "admin" || currentUser?.app_role === "super_admin";
 
@@ -237,6 +248,7 @@ export default function Users() {
 
   const { data: inviteTargetOrganization, isPending: inviteOrgLoading } = useQuery<{
     name?: string;
+    slug?: string | null;
     logo?: string | null;
   } | null>({
     queryKey: ["activeOrganization", currentUser?.organization_id],
@@ -485,17 +497,57 @@ export default function Users() {
         description="Manage users, roles, and access requests"
         actions={
           activeTab === "users" && (
-            <Button
-              onClick={() => {
-                setInviteEmail("");
-                setInviteRole("student");
-                setShowInviteModal(true);
-              }}
-              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Invite User
-            </Button>
+            <>
+              {currentUser.organization_id &&
+                inviteTargetOrganization?.slug?.trim() &&
+                !inviteOrgLoading && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`cursor-pointer shrink-0 transition-all duration-300 ${
+                      copiedOrgLink
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
+                        : ""
+                    }`}
+                    onClick={async () => {
+                      const slug = inviteTargetOrganization.slug!.trim();
+                      const path = `/org/${encodeURIComponent(slug)}`;
+                      const href = `${window.location.origin}${path}`;
+                      try {
+                        await navigator.clipboard.writeText(href);
+                        setCopiedOrgLink(true);
+                        if (copiedOrgLinkTimerRef.current !== null) {
+                          window.clearTimeout(copiedOrgLinkTimerRef.current);
+                        }
+                        copiedOrgLinkTimerRef.current = window.setTimeout(() => {
+                          setCopiedOrgLink(false);
+                          copiedOrgLinkTimerRef.current = null;
+                        }, 1600);
+                      } catch {
+                        setCopiedOrgLink(false);
+                      }
+                    }}
+                  >
+                    {copiedOrgLink ? (
+                      <Check className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in-90" />
+                    ) : (
+                      <Copy className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:fade-in-50" />
+                    )}
+                    {copiedOrgLink ? "Copied!" : "Copy Link"}
+                  </Button>
+                )}
+              <Button
+                onClick={() => {
+                  setInviteEmail("");
+                  setInviteRole("student");
+                  setShowInviteModal(true);
+                }}
+                className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite User
+              </Button>
+            </>
           )
         }
       />
