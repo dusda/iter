@@ -60,6 +60,7 @@ import {
   X,
   ClipboardList,
   Building2,
+  MessageSquare,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
@@ -568,7 +569,7 @@ export default function Users() {
 
         <TabsContent value="access" className="mt-4">
           <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
-            <CardContent className="p-0">
+            <CardContent className="p-4 sm:p-6">
               {loadingRequests ? (
                 <LoadingSpinner className="py-16" />
               ) : accessRequests.length === 0 ? (
@@ -578,98 +579,115 @@ export default function Users() {
                   description="No students have requested access yet."
                 />
               ) : (
-                <>
-                  {/* Mobile */}
-                  <div className="md:hidden divide-y">
-                    {accessRequests.map((request) => (
-                      <div key={request.id} className="p-4 space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-semibold text-slate-800">{request.full_name}</p>
-                            <p className="text-sm text-slate-500">{request.email}</p>
-                            {request.phone && <p className="text-sm text-slate-500">{request.phone}</p>}
-                          </div>
-                          <StatusBadge status={request.status} />
-                        </div>
-                        {request.reason && <p className="text-sm text-slate-600">{request.reason}</p>}
-                        <p className="text-xs text-slate-400">{safeFormatDate(request.created_date)}</p>
-                        {request.status === "pending" && (
-                          <div className="flex gap-2 pt-1">
-                            <Button size="sm" variant="outline" className="flex-1 border-green-300 text-green-700 hover:bg-green-50"
-                              onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
-                              disabled={updateAccessRequest.isPending}>
-                              <Check className="w-3 h-3 mr-1" /> Approve
-                            </Button>
-                            <Button size="sm" variant="outline" className="flex-1 border-red-300 text-red-700 hover:bg-red-50"
-                              onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
-                              disabled={updateAccessRequest.isPending}>
-                              <X className="w-3 h-3 mr-1" /> Deny
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Desktop */}
-                  <div className="hidden md:block overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-slate-50/50">
-                          <TableHead>Student</TableHead>
-                          <TableHead>Contact</TableHead>
-                          <TableHead>Student ID</TableHead>
-                          <TableHead>Reason</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {accessRequests.map((request) => (
-                          <TableRow key={request.id} className="hover:bg-slate-50/50">
-                            <TableCell className="font-medium">{request.full_name}</TableCell>
-                            <TableCell>
-                              <div className="text-sm">
-                                <p>{request.email}</p>
-                                {request.phone && <p className="text-slate-500">{request.phone}</p>}
+                <div className="space-y-4">
+                  {accessRequests.map((request) => {
+                    const initial = (request.full_name || request.email || "?").trim().charAt(0).toUpperCase();
+                    const borderAccent =
+                      request.status === "pending"
+                        ? "border-l-indigo-500"
+                        : request.status === "approved"
+                          ? "border-l-emerald-400"
+                          : "border-l-slate-300";
+                    return (
+                      <article
+                        key={request.id}
+                        className={`rounded-xl border border-slate-200/80 bg-white/90 shadow-sm border-l-4 ${borderAccent} overflow-hidden`}
+                      >
+                        <div className="p-4 sm:p-5 space-y-4">
+                          <div className="flex gap-3 sm:gap-4">
+                            <div
+                              className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-white font-semibold text-sm sm:text-base flex items-center justify-center shadow-inner"
+                              aria-hidden
+                            >
+                              {initial}
+                            </div>
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                                <div className="min-w-0">
+                                  <h3 className="font-semibold text-slate-900 leading-snug">
+                                    {request.full_name || "Unnamed applicant"}
+                                  </h3>
+                                  <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                    <Mail className="w-3.5 h-3.5 shrink-0" />
+                                    <span className="truncate">{request.email}</span>
+                                  </p>
+                                  {request.phone && (
+                                    <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                      <Phone className="w-3.5 h-3.5 shrink-0" />
+                                      {request.phone}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                  <StatusBadge status={request.status} />
+                                  <time
+                                    className="text-xs text-slate-400 tabular-nums"
+                                    dateTime={request.created_date}
+                                    title={request.created_date}
+                                  >
+                                    {safeFormatDate(request.created_date, "MMM d, yyyy 'at' h:mm a")}
+                                  </time>
+                                </div>
                               </div>
-                            </TableCell>
-                            <TableCell>{request.student_id || "-"}</TableCell>
-                            <TableCell className="max-w-xs">
-                              <p className="text-sm text-slate-600 line-clamp-2">{request.reason}</p>
-                            </TableCell>
-                            <TableCell className="text-sm text-slate-500">
-                              {safeFormatDate(request.created_date)}
-                            </TableCell>
-                            <TableCell>
-                              <StatusBadge status={request.status} />
-                            </TableCell>
-                            <TableCell>
-                              {request.status === "pending" ? (
-                                <div className="flex gap-2">
-                                  <Button size="sm" variant="outline" className="border-green-300 text-green-700 hover:bg-green-50"
-                                    onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
-                                    disabled={updateAccessRequest.isPending}>
-                                    <Check className="w-3 h-3 mr-1" /> Approve
-                                  </Button>
-                                  <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50"
-                                    onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
-                                    disabled={updateAccessRequest.isPending}>
-                                    <X className="w-3 h-3 mr-1" /> Deny
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="text-sm text-slate-500">
-                                  {request.reviewed_by && <p>By {request.reviewed_by}</p>}
-                                </div>
+                              {request.student_id && (
+                                <p className="text-xs text-slate-500">
+                                  Student ID: <span className="font-mono text-slate-600">{request.student_id}</span>
+                                </p>
                               )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </>
+                            </div>
+                          </div>
+
+                          <div className="pl-0 sm:pl-13 space-y-2">
+                            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              Reason
+                            </div>
+                            <div className="rounded-lg bg-slate-50/90 border border-slate-100 px-4 py-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-word min-h-12">
+                              {request.reason?.trim() ? request.reason : (
+                                <span className="text-slate-400 italic">No reason provided.</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {request.status === "pending" ? (
+                            <div className="pl-0 sm:pl-13 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-green-300 text-green-700 hover:bg-green-50 sm:min-w-28"
+                                onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
+                                disabled={updateAccessRequest.isPending}
+                              >
+                                <Check className="w-3.5 h-3.5 mr-1.5" /> Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-red-300 text-red-700 hover:bg-red-50 sm:min-w-28"
+                                onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
+                                disabled={updateAccessRequest.isPending}
+                              >
+                                <X className="w-3.5 h-3.5 mr-1.5" /> Deny
+                              </Button>
+                            </div>
+                          ) : (
+                            (request.reviewed_by || request.reviewed_at) && (
+                              <div className="pl-0 sm:pl-13 text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                {request.reviewed_by && <span>Reviewed by {request.reviewed_by}</span>}
+                                {request.reviewed_by && request.reviewed_at && <span className="text-slate-300 mx-1.5">·</span>}
+                                {request.reviewed_at && (
+                                  <time dateTime={request.reviewed_at}>
+                                    {safeFormatDate(request.reviewed_at, "MMM d, yyyy 'at' h:mm a")}
+                                  </time>
+                                )}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
               )}
             </CardContent>
           </Card>
