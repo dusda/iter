@@ -48,7 +48,11 @@ export default function PublicHome() {
     queryKey: ["organizations-public"],
     queryFn: async () => {
       const orgs = await api.entities.Organization.list("name");
-      return (orgs || []).filter((o) => o?.status !== "inactive");
+      return (orgs || []).filter(
+        (o) =>
+          o?.status !== "inactive" &&
+          o?.listing_visibility !== "unlisted"
+      );
     },
     enabled: !orgSlug,
   });

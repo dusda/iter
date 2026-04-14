@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +36,8 @@ export default function SuperAdminDashboard() {
     logo: "",
     description: "",
     welcome_message: "",
-    status: "active"
+    status: "active",
+    listing_visibility: "public" as "public" | "unlisted",
   });
   const queryClient = useQueryClient();
 
@@ -69,6 +77,7 @@ export default function SuperAdminDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["organizations-public"] });
       setShowDialog(false);
       resetForm();
     },
@@ -81,6 +90,7 @@ export default function SuperAdminDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      queryClient.invalidateQueries({ queryKey: ["organizations-public"] });
       setViewingOrg(null);
     },
   });
@@ -114,7 +124,9 @@ export default function SuperAdminDashboard() {
       logo: org.logo || "",
       description: org.description || "",
       welcome_message: org.welcome_message || "",
-      status: org.status
+      status: org.status,
+      listing_visibility:
+        org.listing_visibility === "unlisted" ? "unlisted" : "public",
     });
     setShowDialog(true);
   };
@@ -126,7 +138,8 @@ export default function SuperAdminDashboard() {
       logo: "",
       description: "",
       welcome_message: "",
-      status: "active"
+      status: "active",
+      listing_visibility: "public",
     });
   };
 
@@ -206,6 +219,7 @@ export default function SuperAdminDashboard() {
                     <TableHead>Slug</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Directory</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -244,6 +258,11 @@ export default function SuperAdminDashboard() {
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={org.status} />
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-normal">
+                          {org.listing_visibility === "unlisted" ? "Unlisted" : "Public"}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-slate-500">
                         {new Date(org.created_date).toLocaleDateString()}
@@ -351,6 +370,27 @@ export default function SuperAdminDashboard() {
                   onChange={(e) => setFormData({ ...formData, welcome_message: e.target.value })}
                   placeholder="Welcome! Request access to get started."
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Anonymous home directory</Label>
+                <Select
+                  value={formData.listing_visibility}
+                  onValueChange={(value: "public" | "unlisted") =>
+                    setFormData({ ...formData, listing_visibility: value })
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public — listed on the welcome page</SelectItem>
+                    <SelectItem value="unlisted">Unlisted — direct link only</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-slate-500">
+                  Unlisted organizations do not appear in the public organization picker; share the org URL for access requests.
+                </p>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t">

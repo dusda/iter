@@ -37,6 +37,7 @@ export default function Settings() {
     logo: "",
     description: "",
     welcome_message: "",
+    listing_visibility: "public" as "public" | "unlisted",
   });
   const [uploading, setUploading] = useState(false);
   const logoFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -94,7 +95,13 @@ export default function Settings() {
 
   useEffect(() => {
     if (!selectedOrganization) {
-      setOrgForm({ name: "", logo: "", description: "", welcome_message: "" });
+      setOrgForm({
+        name: "",
+        logo: "",
+        description: "",
+        welcome_message: "",
+        listing_visibility: "public",
+      });
       lastSavedSnapshotRef.current = "";
       return;
     }
@@ -103,12 +110,16 @@ export default function Settings() {
       logo: selectedOrganization.logo || "",
       description: selectedOrganization.description || "",
       welcome_message: selectedOrganization.welcome_message || "",
+      listing_visibility:
+        selectedOrganization.listing_visibility === "unlisted" ? "unlisted" : "public",
     });
     const snapshot = JSON.stringify({
       name: selectedOrganization.name || "",
       logo: selectedOrganization.logo || "",
       description: selectedOrganization.description || "",
       welcome_message: selectedOrganization.welcome_message || "",
+      listing_visibility:
+        selectedOrganization.listing_visibility === "unlisted" ? "unlisted" : "public",
     });
     lastSavedSnapshotRef.current = snapshot;
   }, [selectedOrganization]);
@@ -121,6 +132,7 @@ export default function Settings() {
         logo: data.logo,
         description: data.description,
         welcome_message: data.welcome_message,
+        listing_visibility: data.listing_visibility,
         updated_date: new Date().toISOString(),
       });
     },
@@ -412,6 +424,30 @@ export default function Settings() {
                   placeholder="Welcome! Request access to get started."
                   disabled={!user?.organization_id}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Anonymous home directory</Label>
+                <Select
+                  value={orgForm.listing_visibility}
+                  onValueChange={(value: "public" | "unlisted") => {
+                    const next = { ...orgForm, listing_visibility: value };
+                    setOrgForm(next);
+                    saveIfChanged(next);
+                  }}
+                  disabled={!user?.organization_id}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public — listed on the welcome page</SelectItem>
+                    <SelectItem value="unlisted">Unlisted — direct link only</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-slate-500">
+                  Unlisted organizations are hidden from the public organization list; share your org link for access requests.
+                </p>
               </div>
             </CardContent>
           </Card>
