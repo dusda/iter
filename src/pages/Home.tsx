@@ -53,8 +53,19 @@ export default function Home() {
 
 
 
+function dollarsFromCents(cents: number | null | undefined) {
+  if (cents == null || Number.isNaN(Number(cents))) return "0";
+  return (Number(cents) / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}
+
 function StaffDashboard({ user }) {
   const permissions = user?.dashboard_permissions || {};
+  const [showApprovedRequests, setShowApprovedRequests] = useState(false);
+
+  const canExpandApprovedList = ["fund_manager", "admin", "super_admin"].includes(user.app_role);
   
   const { data: allRequests = [], isLoading } = useQuery({
     queryKey: ["allRequests", user?.organization_id],
@@ -85,6 +96,14 @@ function StaffDashboard({ user }) {
     .filter(r => ["Submitted", "In Review", "Needs Info"].includes(r.status))
     .slice(0, 5);
 
+  const approvedRequests = allRequests
+    .filter((r) => r.status === "Approved")
+    .sort(
+      (a, b) =>
+        new Date(b.updated_date || b.created_date || 0).getTime() -
+        new Date(a.updated_date || a.created_date || 0).getTime()
+    );
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -113,6 +132,13 @@ function StaffDashboard({ user }) {
             value={stats.approved}
             icon={CheckCircle}
             color="emerald"
+            {...(canExpandApprovedList
+              ? {
+                  onClick: () => setShowApprovedRequests((open) => !open),
+                  "aria-expanded": showApprovedRequests,
+                  "aria-label": `Approved requests: ${stats.approved}. Show or hide list.`,
+                }
+              : {})}
           />
           <StatCard
             title="Total Disbursed"
@@ -127,6 +153,51 @@ function StaffDashboard({ user }) {
             color="blue"
           />
         </div>
+      )}
+
+      {canExpandApprovedList && showApprovedRequests && permissions.view_stats !== false && (
+        <Card className="bg-white/70 backdrop-blur-xs border border-emerald-200/70">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-lg font-semibold text-emerald-900">Approved requests</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setShowApprovedRequests(false)}>
+              Close
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <LoadingSpinner className="py-8" />
+            ) : approvedRequests.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                <CheckCircle className="w-10 h-10 mx-auto mb-2 text-emerald-200" />
+                <p>No approved requests yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {approvedRequests.map((request) => (
+                  <Link
+                    key={request.id}
+                    to={createPageUrl(`ReviewRequest?id=${request.id}`)}
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-emerald-50/80 transition-colors group border border-transparent hover:border-emerald-200"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-mono text-xs text-slate-500">{request.request_id}</p>
+                      <p className="font-medium text-slate-800 truncate group-hover:text-emerald-800">
+                        {request.student_full_name}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {request.fund_name} • ${dollarsFromCents(request.requested_amount)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <StatusBadge status={request.status} />
+                      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-700" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">

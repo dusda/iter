@@ -1,5 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 type StatCardColor =
   | "indigo"
@@ -16,6 +17,10 @@ export interface StatCardProps {
   trend?: string;
   trendUp?: boolean;
   color?: StatCardColor;
+  /** When set, the card is focusable and acts as a control (keyboard: Enter / Space). */
+  onClick?: () => void;
+  "aria-label"?: string;
+  "aria-expanded"?: boolean;
 }
 
 export default function StatCard({
@@ -25,7 +30,12 @@ export default function StatCard({
   trend,
   trendUp,
   color = "indigo",
+  onClick,
+  "aria-label": ariaLabel,
+  "aria-expanded": ariaExpanded,
 }: StatCardProps) {
+  const interactive = typeof onClick === "function";
+
   const colorClasses: Record<StatCardColor, string> = {
     indigo: "from-indigo-500 to-indigo-600 shadow-indigo-500/25",
     violet: "from-violet-500 to-violet-600 shadow-violet-500/25",
@@ -36,7 +46,28 @@ export default function StatCard({
   };
 
   return (
-    <Card className="p-6 bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-lg transition-all duration-300">
+    <Card
+      className={cn(
+        "p-6 bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-lg transition-all duration-300",
+        interactive &&
+          "cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+      )}
+      onClick={interactive ? onClick : undefined}
+      onKeyDown={
+        interactive
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-label={interactive ? (ariaLabel ?? `${title}: ${value}. Press to toggle details.`) : undefined}
+      aria-expanded={interactive ? ariaExpanded : undefined}
+    >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-slate-500">{title}</p>
