@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { api } from "@/api/supabaseApi";
-import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { toast } from "@/components/ui/use-toast";
+import { normalizeStringArray } from "@/utils";
 import { Save, Trash2, X, CheckCircle } from "lucide-react";
 
 const USE_CATEGORIES = [
@@ -50,40 +50,22 @@ export default function RuleBuilder({
   const [formData, setFormData] = useState({
     step_order: rule?.step_order || existingSteps + 1,
     step_name: rule?.step_name || "",
-    assigned_to_type: rule?.assigned_to_type || "role_queue",
     assigned_role: rule?.assigned_role || "reviewer",
-    assigned_user_ids: rule?.assigned_user_ids || [],
-    assigned_user_names: rule?.assigned_user_names || [],
-    min_amount: rule?.min_amount?.toString() || "",
-    max_amount: rule?.max_amount?.toString() || "",
-    applicable_categories: rule?.applicable_categories || [],
+    min_amount:
+      rule?.min_amount != null && rule.min_amount !== ""
+        ? String(Number(rule.min_amount) / 100)
+        : "",
+    max_amount:
+      rule?.max_amount != null && rule.max_amount !== ""
+        ? String(Number(rule.max_amount) / 100)
+        : "",
+    applicable_categories: normalizeStringArray(rule?.applicable_categories),
     sla_target_days: rule?.sla_target_days?.toString() || "",
     permissions: rule?.permissions || "approve_deny",
     is_active: rule?.is_active ?? true,
   });
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
-  const { data: users = [] } = useQuery({
-    queryKey: ["allUsers"],
-    queryFn: () => api.entities.User.list(),
-  });
-
-  const toggleUser = (userId: string, userName: string) => {
-    if (formData.assigned_user_ids.includes(userId)) {
-      setFormData({
-        ...formData,
-        assigned_user_ids: formData.assigned_user_ids.filter(id => id !== userId),
-        assigned_user_names: formData.assigned_user_names.filter(name => name !== userName)
-      });
-    } else {
-      setFormData({
-        ...formData,
-        assigned_user_ids: [...formData.assigned_user_ids, userId],
-        assigned_user_names: [...formData.assigned_user_names, userName]
-      });
-    }
-  };
 
   const toggleCategory = (category: string) => {
     if (formData.applicable_categories.includes(category)) {
@@ -121,12 +103,12 @@ export default function RuleBuilder({
       fund_name: fundName,
       step_order: parseInt(formData.step_order),
       step_name: formData.step_name,
-      assigned_to_type: formData.assigned_to_type,
-      assigned_role: formData.assigned_to_type === "role_queue" ? formData.assigned_role : null,
-      assigned_user_ids: formData.assigned_to_type === "specific_users" ? formData.assigned_user_ids : null,
-      assigned_user_names: formData.assigned_to_type === "specific_users" ? formData.assigned_user_names : null,
-      min_amount: formData.min_amount ? parseFloat(formData.min_amount) : null,
-      max_amount: formData.max_amount ? parseFloat(formData.max_amount) : null,
+      assigned_to_type: "role_queue",
+      assigned_role: formData.assigned_role,
+      assigned_user_ids: null,
+      assigned_user_names: null,
+      min_amount: formData.min_amount ? Math.round(parseFloat(formData.min_amount) * 100) : null,
+      max_amount: formData.max_amount ? Math.round(parseFloat(formData.max_amount) * 100) : null,
       applicable_categories: formData.applicable_categories.length > 0 ? formData.applicable_categories : null,
       sla_target_days: formData.sla_target_days ? parseInt(formData.sla_target_days) : null,
       permissions: formData.permissions,
@@ -241,84 +223,26 @@ export default function RuleBuilder({
             </div>
           </div>
 
-          {/* Assignment */}
+          {/* Role queue: any org member with this app role may complete the step */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Assignment</h3>
-            
+            <h3 className="font-semibold text-slate-800">Role queue</h3>
             <div className="space-y-2">
-              <Label>Assign To *</Label>
+              <Label>Role *</Label>
               <Select
-                value={formData.assigned_to_type}
-                onValueChange={(value) => setFormData({ 
-                  ...formData, 
-                  assigned_to_type: value,
-                  assigned_user_ids: [],
-                  assigned_user_names: []
-                })}
+                value={formData.assigned_role}
+                onValueChange={(value) => setFormData({ ...formData, assigned_role: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="role_queue">Role Queue</SelectItem>
-                  <SelectItem value="specific_users">Specific Users</SelectItem>
+                  <SelectItem value="reviewer">Reviewer</SelectItem>
+                  <SelectItem value="approver">Approver</SelectItem>
+                  <SelectItem value="fund_manager">Fund Manager</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            {formData.assigned_to_type === "role_queue" && (
-              <div className="space-y-2">
-                <Label>Role *</Label>
-                <Select
-                  value={formData.assigned_role}
-                  onValueChange={(value) => setFormData({ ...formData, assigned_role: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reviewer">Reviewer</SelectItem>
-                    <SelectItem value="approver">Approver</SelectItem>
-                    <SelectItem value="fund_manager">Fund Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {formData.assigned_to_type === "specific_users" && (
-              <div className="space-y-2">
-                <Label>Select Users *</Label>
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-lg">
-                  {users.map((user) => (
-                    <Button
-                      key={user.id}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={`justify-start ${
-                        formData.assigned_user_ids.includes(user.id)
-                          ? "bg-indigo-50 border-indigo-300 text-indigo-700"
-                          : ""
-                      }`}
-                      onClick={() => toggleUser(user.id, user.full_name)}
-                    >
-                      {formData.assigned_user_ids.includes(user.id) ? (
-                        <CheckCircle className="w-3 h-3 mr-2" />
-                      ) : (
-                        <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300" />
-                      )}
-                      <span className="text-xs truncate">{user.full_name}</span>
-                    </Button>
-                  ))}
-                </div>
-                {formData.assigned_user_ids.length > 0 && (
-                  <p className="text-xs text-slate-500">
-                    {formData.assigned_user_ids.length} user(s) selected
-                  </p>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Conditions */}

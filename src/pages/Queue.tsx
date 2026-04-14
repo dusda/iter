@@ -88,9 +88,19 @@ export default function Queue() {
       api.entities.Review.filter({ organization_id: user.organization_id }),
   });
 
-  const viewMode = user
-    ? viewModeUserPick ?? defaultQueueViewMode(user.app_role)
-    : "role_queue";
+  const elevatedQueueAccess =
+    !!user &&
+    (user.app_role === "fund_manager" ||
+      user.app_role === "admin" ||
+      user.app_role === "super_admin");
+
+  /** Non-elevated roles only get Role Queue — no need for a one-option tab strip */
+  const showQueueTabs = elevatedQueueAccess;
+
+  const queueViewMode =
+    !user || !showQueueTabs
+      ? "role_queue"
+      : viewModeUserPick ?? defaultQueueViewMode(user.app_role);
 
   // Calculate days since submission
   const getDaysSince = (date) => {
@@ -105,23 +115,18 @@ export default function Queue() {
 
     let requests = [...allRequests];
 
-    if (viewMode === "all_org_pending") {
+    if (queueViewMode === "all_org_pending") {
       requests = requests.filter((r) => ORG_PENDING_STATUSES.includes(r.status));
-    } else if (viewMode === "my_assigned") {
-      // Show requests where user has a pending review assigned
-      const userReviews = allReviews.filter(r => 
-        r.reviewer_user_id === user.id && r.decision === "Pending"
-      );
-      const assignedRequestIds = userReviews.map(r => r.fund_request_id);
-      requests = requests.filter(r => assignedRequestIds.includes(r.id));
-    } else if (viewMode === "role_queue") {
-      // Show requests for user's role queue
-      const roleReviews = allReviews.filter(r => 
-        r.reviewer_user_id === `role_${user.app_role}` && r.decision === "Pending"
+    } else if (queueViewMode === "role_queue") {
+      // Role queue plus legacy rows where this user was named on the review (before per-user assignment was removed)
+      const roleReviews = allReviews.filter(
+        (r) =>
+          r.decision === "Pending" &&
+          (r.reviewer_user_id === `role_${user.app_role}` || r.reviewer_user_id === user.id)
       );
       const queueRequestIds = roleReviews.map(r => r.fund_request_id);
       requests = requests.filter(r => queueRequestIds.includes(r.id));
-    } else if (viewMode === "my_funds") {
+    } else if (queueViewMode === "my_funds") {
       // Show requests for funds owned by this user
       const myFunds = funds.filter(f => f.fund_owner_id === user.id);
       const myFundIds = myFunds.map(f => f.id);
@@ -161,9 +166,6 @@ export default function Queue() {
     );
   }
 
-  const elevatedQueueAccess =
-    user.app_role === "fund_manager" || user.app_role === "admin" || user.app_role === "super_admin";
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -171,30 +173,24 @@ export default function Queue() {
         description="Review and process fund requests"
       />
 
-      {/* View Mode Tabs */}
-      <Tabs value={viewMode} onValueChange={setViewModeUserPick}>
-        <TabsList className="bg-white/70 border flex-wrap h-auto gap-1 py-1">
-          {elevatedQueueAccess && (
+      {showQueueTabs && (
+        <Tabs value={queueViewMode} onValueChange={setViewModeUserPick}>
+          <TabsList className="bg-white/70 border flex-wrap h-auto gap-1 py-1">
             <TabsTrigger
               value="all_org_pending"
               className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
             >
               All pending
             </TabsTrigger>
-          )}
-          <TabsTrigger value="my_assigned" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
-            My Assigned
-          </TabsTrigger>
-          <TabsTrigger value="role_queue" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">
-            Role Queue
-          </TabsTrigger>
-          {elevatedQueueAccess && (
+            <TabsTrigger value="role_queue" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">
+              Role Queue
+            </TabsTrigger>
             <TabsTrigger value="my_funds" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
               All for My Funds
             </TabsTrigger>
-          )}
-        </TabsList>
-      </Tabs>
+          </TabsList>
+        </Tabs>
+      )}
 
       {/* Filters */}
       <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">

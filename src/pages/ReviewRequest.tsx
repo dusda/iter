@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { applicableRoutingRulesForRequest } from "@/lib/applicableRoutingRules";
 import { api } from "@/api/supabaseApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
@@ -27,6 +28,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/components/ui/use-toast";
 import AttachmentList from "@/components/shared/AttachmentList";
 import {
   ArrowLeft,
@@ -59,6 +62,7 @@ export default function ReviewRequest() {
   const [reviewComments, setReviewComments] = useState("");
   const [decision, setDecision] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [regeneratingWorkflow, setRegeneratingWorkflow] = useState(false);
   const [showDisbursementModal, setShowDisbursementModal] = useState(false);
   const [disbursementData, setDisbursementData] = useState({
     amount_paid: "",
@@ -387,6 +391,83 @@ export default function ReviewRequest() {
     );
   }
 
+  const canRegenerateWorkflow =
+    reviews.length === 0 &&
+    user.organization_id === request.organization_id &&
+    ["fund_manager", "admin", "super_admin"].includes(user.app_role) &&
+    ["Submitted", "In Review"].includes(request.status);
+
+  const handleRegenerateWorkflow = async () => {
+    if (!canRegenerateWorkflow) return;
+    setRegeneratingWorkflow(true);
+    try {
+      const rules = await api.entities.RoutingRule.filter(
+        { fund_id: request.fund_id, is_active: true },
+        "step_order"
+      );
+      const applicableRules = applicableRoutingRulesForRequest(
+        rules,
+        Number(request.requested_amount) || 0,
+        request.intended_use_category || ""
+      );
+      if (applicableRules.length === 0) {
+        toast({
+          title: "No matching rules",
+          description:
+            "No active routing steps match this request’s amount and category. Check Rules for this fund.",
+          variant: "destructive",
+        });
+        return;
+      }
+      for (const rule of applicableRules) {
+        const role = rule.assigned_role || "reviewer";
+        await api.entities.Review.create({
+          organization_id: request.organization_id,
+          fund_request_id: request.id,
+          reviewer_user_id: `role_${role}`,
+          reviewer_name: `${role} Queue`,
+          step_name: rule.step_name,
+          step_order: rule.step_order,
+          decision: "Pending",
+          comments: "",
+          permissions: rule.permissions,
+          sla_target_days: rule.sla_target_days,
+        });
+      }
+      await api.entities.FundRequest.update(request.id, {
+        status: "In Review",
+        current_step: applicableRules[0].step_name,
+        current_step_order: applicableRules[0].step_order,
+      });
+      await api.entities.AuditLog.create({
+        organization_id: request.organization_id,
+        actor_user_id: user.id,
+        actor_name: user.full_name,
+        action_type: "WORKFLOW_REVIEWS_REGENERATED",
+        entity_type: "FundRequest",
+        entity_id: request.id,
+        details: JSON.stringify({ step_count: applicableRules.length }),
+      });
+      toast({
+        title: "Workflow created",
+        description: `${applicableRules.length} review step(s) were added.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["reviews", requestId] });
+      queryClient.invalidateQueries({ queryKey: ["fundRequest", requestId] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", user.organization_id] });
+      queryClient.invalidateQueries({ queryKey: ["fundRequests", user.organization_id] });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Failed to regenerate",
+        description: e instanceof Error ? e.message : "Try again or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setRegeneratingWorkflow(false);
+    }
+  };
+
   // Check if current user can review this request
   const currentReview = reviews.find(r => 
     (r.reviewer_user_id === user.id || r.reviewer_user_id === `role_${user.app_role}`) &&
@@ -506,7 +587,33 @@ export default function ReviewRequest() {
             </CardHeader>
             <CardContent>
               {reviews.length === 0 ? (
-                <p className="text-slate-500 text-center py-4">No workflow configured</p>
+                <div className="space-y-4 py-2">
+                  <p className="text-slate-500 text-center">No workflow configured</p>
+                  {canRegenerateWorkflow && (
+                    <Alert className="border-amber-200 bg-amber-50">
+                      <AlertCircle className="h-4 w-4 text-amber-700" />
+                      <AlertDescription className="text-amber-950 text-sm space-y-3 sm:space-y-0">
+                        <p>
+                          Create pending review steps from this fund&apos;s active routing rules (for
+                          example after fixing rules or a submit-time bug).
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-amber-300 bg-white hover:bg-amber-100"
+                          disabled={regeneratingWorkflow}
+                          onClick={() => void handleRegenerateWorkflow()}
+                        >
+                          {regeneratingWorkflow ? (
+                            <LoadingSpinner size="sm" className="mr-2" />
+                          ) : null}
+                          Regenerate workflow reviews
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((review, index) => {

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { GitBranch, Plus, Settings, AlertCircle } from "lucide-react";
 import RuleBuilder from "@/components/rules/RuleBuilder";
+import { normalizeStringArray } from "@/utils";
 
 export default function Rules() {
   const [selectedFundId, setSelectedFundId] = useState("");
@@ -115,7 +116,9 @@ export default function Rules() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {rules.map((rule, index) => (
+                {rules.map((rule, index) => {
+                  const ruleCategories = normalizeStringArray(rule.applicable_categories);
+                  return (
                   <div key={rule.id} className="relative">
                     {/* Step Card */}
                     <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -138,33 +141,32 @@ export default function Rules() {
 
                         <div className="grid md:grid-cols-2 gap-3 text-sm">
                           <div>
-                            <span className="text-slate-500">Assignment:</span>
+                            <span className="text-slate-500">Role queue:</span>
                             <p className="font-medium">
-                              {rule.assigned_to_type === "specific_users" && 
-                                `Specific Users: ${rule.assigned_user_names?.join(", ") || "None"}`}
-                              {rule.assigned_to_type === "role_queue" && 
-                                `Role Queue: ${rule.assigned_role}`}
-                              {rule.assigned_to_type === "by_category" && 
-                                "By Category"}
+                              {rule.assigned_to_type === "by_category"
+                                ? "By category (legacy)"
+                                : (rule.assigned_role || "reviewer")}
                             </p>
                           </div>
 
-                          {(rule.min_amount || rule.max_amount) && (
+                          {(rule.min_amount != null || rule.max_amount != null) && (
                             <div>
                               <span className="text-slate-500">Amount Range:</span>
                               <p className="font-medium">
-                                {rule.min_amount && `≥ $${rule.min_amount.toLocaleString()}`}
-                                {rule.min_amount && rule.max_amount && " - "}
-                                {rule.max_amount && `≤ $${rule.max_amount.toLocaleString()}`}
+                                {rule.min_amount != null &&
+                                  `≥ $${(Number(rule.min_amount) / 100).toLocaleString()}`}
+                                {rule.min_amount != null && rule.max_amount != null && " - "}
+                                {rule.max_amount != null &&
+                                  `≤ $${(Number(rule.max_amount) / 100).toLocaleString()}`}
                               </p>
                             </div>
                           )}
 
-                          {rule.applicable_categories && rule.applicable_categories.length > 0 && (
+                          {ruleCategories.length > 0 && (
                             <div>
                               <span className="text-slate-500">Categories:</span>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                {rule.applicable_categories.map(cat => (
+                                {ruleCategories.map((cat) => (
                                   <Badge key={cat} variant="outline" className="text-xs">
                                     {cat}
                                   </Badge>
@@ -199,7 +201,8 @@ export default function Rules() {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           )}

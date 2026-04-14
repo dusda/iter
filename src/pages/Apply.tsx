@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { createPageUrl, normalizeStringArray } from "@/utils";
+import { applicableRoutingRulesForRequest } from "@/lib/applicableRoutingRules";
 import { api } from "@/api/supabaseApi";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/shared/PageHeader";
@@ -126,30 +127,6 @@ const dollarsToCents = (value: string) =>
 
 const centsToNumber = (cents?: number | null) =>
   cents != null ? cents / 100 : 0;
-
-const normalizeStringArray = (value: unknown): string[] => {
-  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) return [];
-    // Handle common Supabase/DB shapes: JSON-encoded array, or comma-separated string
-    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        return Array.isArray(parsed)
-          ? parsed.filter((v): v is string => typeof v === "string" && v.trim().length > 0)
-          : [];
-      } catch {
-        // fall through to CSV split
-      }
-    }
-    return trimmed
-      .split(",")
-      .map(s => s.trim())
-      .filter(Boolean);
-  }
-  return [];
-};
 
 export default function Apply() {
   const navigate = useNavigate();
@@ -472,53 +449,27 @@ export default function Apply() {
       is_active: true 
     }, "step_order");
 
-    // Filter rules based on conditions
-    const applicableRules = rules.filter(rule => {
-      const amountCents = dollarsToCents(formData.requested_amount);
-      const amountMatch = 
-        (!rule.min_amount || amountCents >= rule.min_amount) &&
-        (!rule.max_amount || amountCents <= rule.max_amount);
-      
-      const categoryMatch = 
-        !rule.applicable_categories || 
-        rule.applicable_categories.length === 0 ||
-        rule.applicable_categories.includes(formData.intended_use_category);
-      
-      return amountMatch && categoryMatch;
-    });
+    const applicableRules = applicableRoutingRulesForRequest(
+      rules,
+      dollarsToCents(formData.requested_amount),
+      formData.intended_use_category
+    );
 
-    // Create review records for applicable steps
+    // Create one pending review per workflow step (role queue; any user with that role may act)
     for (const rule of applicableRules) {
-      // Determine reviewers based on assignment type
-      let reviewerIds = [];
-      let reviewerNames = [];
-
-      if (rule.assigned_to_type === "specific_users") {
-        reviewerIds = rule.assigned_user_ids || [];
-        reviewerNames = rule.assigned_user_names || [];
-      } else if (rule.assigned_to_type === "role_queue") {
-        // For role queue, create one review per role (to be picked up by any user with that role)
-        reviewerIds = ["role_" + rule.assigned_role];
-        reviewerNames = [rule.assigned_role + " Queue"];
-      }
-
-      // Create one review record per reviewer or one for the queue
-      if (reviewerIds.length > 0) {
-        for (let i = 0; i < reviewerIds.length; i++) {
-          await api.entities.Review.create({
-            organization_id: selectedFund.organization_id,
-            fund_request_id: newRequest.id,
-            reviewer_user_id: reviewerIds[i],
-            reviewer_name: reviewerNames[i] || "Reviewer",
-            step_name: rule.step_name,
-            step_order: rule.step_order,
-            decision: "Pending",
-            comments: "",
-            permissions: rule.permissions,
-            sla_target_days: rule.sla_target_days
-          });
-        }
-      }
+      const role = rule.assigned_role || "reviewer";
+      await api.entities.Review.create({
+        organization_id: selectedFund.organization_id,
+        fund_request_id: newRequest.id,
+        reviewer_user_id: `role_${role}`,
+        reviewer_name: `${role} Queue`,
+        step_name: rule.step_name,
+        step_order: rule.step_order,
+        decision: "Pending",
+        comments: "",
+        permissions: rule.permissions,
+        sla_target_days: rule.sla_target_days
+      });
     }
 
     // Update request with current step info if there are rules
