@@ -301,7 +301,7 @@ export default function Reports() {
         title="Reports & Analytics"
         description="Track fund usage and disbursements"
         actions={
-          <Button onClick={exportToCSV} className="bg-emerald-600 hover:bg-emerald-700">
+          <Button onClick={exportToCSV} className="bg-emerald-600 hover:bg-emerald-700 text-white">
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>

@@ -248,7 +248,7 @@ export default function Profile() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {saving ? (
                 <LoadingSpinner size="sm" className="mr-2" />
@@ -307,7 +307,7 @@ export default function Profile() {
             <Button
               type="submit"
               disabled={passwordSaving || !currentPassword || !newPassword || !confirmNewPassword}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {passwordSaving ? (
                 <LoadingSpinner size="sm" className="mr-2" />

@@ -190,7 +190,7 @@ export default function SuperAdminDashboard() {
               </h1>
               <p className="mt-1 text-slate-500 dark:text-slate-400">Manage organizations and system-wide settings</p>
             </div>
-            <Button onClick={openCreateDialog} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={openCreateDialog} className="bg-purple-600 hover:bg-purple-700 text-white">
               <Plus className="w-4 h-4 mr-2" />
               Create Organization
             </Button>
@@ -397,7 +397,7 @@ export default function SuperAdminDashboard() {
                 <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={saveOrganization.isPending} className="bg-purple-600 hover:bg-purple-700">
+                <Button type="submit" disabled={saveOrganization.isPending} className="bg-purple-600 hover:bg-purple-700 text-white">
                   {saveOrganization.isPending ? <LoadingSpinner size="sm" className="mr-2" /> : null}
                   {editingOrg ? "Update" : "Create"} Organization
                 </Button>

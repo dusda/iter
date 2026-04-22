@@ -102,7 +102,7 @@ function StaffDashboard({ user }) {
         title={`Welcome back, ${user.full_name?.split(" ")[0] || "Staff"}`}
         description="Overview of fund requests and disbursements"
         actions={
-          <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700">
+          <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white">
             <Link to={createPageUrl("Queue")}>
               View Queue <ArrowRight className="w-4 h-4 ml-2" />
             </Link>

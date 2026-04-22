@@ -365,7 +365,7 @@ export default function RuleBuilder({
                 !formData.step_name ||
                 !(organizationId ?? rule?.organization_id)
               }
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="w-4 h-4 mr-2" />}
               Save Rule

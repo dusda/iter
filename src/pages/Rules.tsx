@@ -76,7 +76,7 @@ export default function Rules() {
             {selectedFundId && (
               <Button
                 onClick={() => setShowBuilder(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 mt-6"
+                className="bg-indigo-600 hover:bg-indigo-700 mt-6 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Step
@@ -100,7 +100,7 @@ export default function Rules() {
                   <p className="text-slate-500 mb-6 dark:text-slate-400">
                     Set up review steps to define the approval workflow for {selectedFund?.fund_name}
                   </p>
-                  <Button onClick={() => setShowBuilder(true)} className="bg-indigo-600 hover:bg-indigo-700">
+                  <Button onClick={() => setShowBuilder(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                     <Plus className="w-4 h-4 mr-2" />
                     Create First Step
                   </Button>

@@ -120,7 +120,7 @@ export default function Funds() {
         description="Create and manage funds for student assistance"
         actions={
           canManageFunds && (
-            <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700">
+            <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white">
               <Link to={createPageUrl("CreateFund")}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create Fund

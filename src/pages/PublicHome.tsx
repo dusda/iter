@@ -172,7 +172,7 @@ export default function PublicHome() {
               >
                 Choose organization
               </Button>
-              <Button type="button" onClick={handleLogin} className="bg-indigo-600 hover:bg-indigo-700">
+              <Button type="button" onClick={handleLogin} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                 <LogIn className="w-4 h-4 mr-2" />
                 Sign In
               </Button>
@@ -299,7 +299,7 @@ export default function PublicHome() {
                 <Button
                   type="submit"
                   disabled={submitRequest.isPending}
-                  className="w-full bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-lg shadow-indigo-500/25"
+                  className="w-full bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-lg shadow-indigo-500/25 text-white"
                 >
                   {submitRequest.isPending ? (
                     <LoadingSpinner size="sm" className="mr-2" />

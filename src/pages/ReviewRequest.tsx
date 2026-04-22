@@ -845,7 +845,7 @@ export default function ReviewRequest() {
                     });
                     setShowDisbursementModal(true);
                   }}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                   disabled={remainingToDisburse <= 0}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />

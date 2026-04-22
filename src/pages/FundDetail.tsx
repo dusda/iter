@@ -307,7 +307,7 @@ export default function FundDetail() {
         description={isEditing ? "Update fund details and constraints" : fund.description}
         actions={
           !isEditing && (
-            <Button onClick={() => setIsEditing(true)} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button onClick={() => setIsEditing(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
               <Edit className="w-4 h-4 mr-2" />
               Edit Fund
             </Button>
@@ -767,7 +767,7 @@ export default function FundDetail() {
               <Button
                 onClick={handleSave}
                 disabled={submitting || !formData.fund_name || !formData.total_budget}
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
               >
                 {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                 Save Changes

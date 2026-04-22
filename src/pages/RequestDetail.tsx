@@ -388,7 +388,7 @@ export default function RequestDetail() {
                 <Button
                   onClick={submitResponse}
                   disabled={!response.trim() || submitting}
-                  className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto"
+                  className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto text-white"
                 >
                   {submitting ? (
                     <LoadingSpinner size="sm" className="mr-2" />

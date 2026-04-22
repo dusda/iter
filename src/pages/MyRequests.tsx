@@ -93,7 +93,7 @@ export default function MyRequests() {
         title="My Requests"
         description="Track and manage your fund requests"
         actions={
-          <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700">
+          <Button asChild className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white">
             <Link to={createPageUrl("Apply")}>
               <PlusCircle className="w-4 h-4 mr-2" />
               New Request

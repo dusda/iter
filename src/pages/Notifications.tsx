@@ -83,8 +83,8 @@ export default function Notifications() {
           {notifications.map((notification) => (
             <Card
               key={notification.id}
-              className={`bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-md transition-all ${
-                !notification.is_read ? "ring-2 ring-indigo-200" : ""
+              className={`bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-md transition-all dark:bg-slate-900/70 dark:border-slate-800/50 ${
+                !notification.is_read ? "ring-2 ring-indigo-200 dark:ring-indigo-900/60" : ""
               }`}
             >
               <CardContent className="p-5">
@@ -102,7 +102,7 @@ export default function Notifications() {
                     )}
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-4 mb-2">
-                        <h3 className={`${!notification.is_read ? "font-bold" : "font-semibold"} text-slate-900`}>
+                        <h3 className={`${!notification.is_read ? "font-bold" : "font-semibold"} text-slate-900 dark:text-slate-50`}>
                           {notification.title}
                         </h3>
                         <Badge variant={notification.is_read ? "outline" : "default"} className="text-xs shrink-0">

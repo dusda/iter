@@ -542,7 +542,7 @@ export default function Users() {
                   setInviteRole("student");
                   setShowInviteModal(true);
                 }}
-                className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+                className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
                 Invite User
@@ -750,7 +750,7 @@ export default function Users() {
                 return (
                   <article
                     key={request.id}
-                    className={`rounded-xl border border-slate-200/80 bg-white/90 shadow-sm border-l-4 ${borderAccent} overflow-hidden`}
+                    className={`rounded-xl border border-slate-200/80 bg-white/90 shadow-sm border-l-4 ${borderAccent} overflow-hidden dark:border-slate-800/80 dark:bg-slate-900/70`}
                   >
                     <div className="p-4 sm:p-5 space-y-4">
                       <div className="flex gap-3 sm:gap-4">
@@ -955,7 +955,7 @@ export default function Users() {
             <Button
               onClick={handleInvite}
               disabled={!inviteEmail || submitting}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : <Mail className="w-4 h-4 mr-2" />}
               Send Invitation
@@ -1180,7 +1180,7 @@ export default function Users() {
             <Button
               onClick={() => handleUpdateUser(editingUser.app_role, editingUser.dashboard_permissions)}
               disabled={submitting}
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : null}
               Save Changes

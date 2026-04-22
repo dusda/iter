@@ -235,7 +235,7 @@ export default function AdvisorRequestDetail() {
             {!request.advisor_tasks_completed && (
               <Button
                 onClick={() => setShowCompleteModal(true)}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Mark Complete
@@ -469,7 +469,7 @@ export default function AdvisorRequestDetail() {
             <Button
               onClick={handleMarkComplete}
               disabled={submitting}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
               {submitting ? <LoadingSpinner size="sm" className="mr-2" /> : null}
               Mark Complete

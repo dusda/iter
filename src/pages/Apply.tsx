@@ -591,7 +591,7 @@ export default function Apply() {
                         )}
                       </div>
 
-                      <Button className="w-full mt-4 bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700">
+                      <Button className="w-full mt-4 bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white">
                         Apply Now
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
@@ -913,7 +913,7 @@ export default function Apply() {
             <Button
               onClick={handleSubmit}
               disabled={!isFormValid || submitting}
-              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 order-1 sm:order-2"
+              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white order-1 sm:order-2"
             >
               <Send className="w-4 h-4 mr-2" />
               Submit Application
@@ -972,7 +972,7 @@ export default function Apply() {
             <Button
               onClick={confirmSubmit}
               disabled={submitting}
-              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white"
             >
               {submitting ? (
                 <LoadingSpinner size="sm" className="mr-2" />
