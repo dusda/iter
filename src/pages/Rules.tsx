@@ -115,94 +115,96 @@ export default function Rules() {
                   Review Workflow for {selectedFund?.fund_name}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {rules.map((rule, index) => {
-                  const ruleCategories = normalizeStringArray(rule.applicable_categories);
-                  return (
-                  <div key={rule.id} className="relative">
-                    {/* Step Card */}
-                    <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
-                      {/* Step Number */}
-                      <div className="shrink-0">
-                        <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
-                          {rule.step_order}
-                        </div>
-                      </div>
-
-                      {/* Step Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-slate-800 dark:text-slate-100">{rule.step_name}</h4>
-                          <Badge variant={rule.permissions === "approve_deny" ? "default" : "secondary"}>
-                            {rule.permissions === "approve_deny" ? "Can Approve/Deny" : "Recommend Only"}
-                          </Badge>
-                          {!rule.is_active && <Badge variant="outline">Inactive</Badge>}
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <span className="text-slate-500 dark:text-slate-400">Role queue:</span>
-                            <p className="font-medium">
-                              {rule.assigned_to_type === "by_category"
-                                ? "By category (legacy)"
-                                : (rule.assigned_role || "reviewer")}
-                            </p>
+              <CardContent>
+                <div className="relative">
+                  {/* Continuous vertical rail running through the step circles */}
+                  <div
+                    aria-hidden
+                    className="absolute left-[37px] top-5 bottom-5 w-0.5 -translate-x-1/2 bg-slate-200 dark:bg-slate-700 z-10 pointer-events-none"
+                  />
+                  <div className="space-y-3">
+                    {rules.map((rule) => {
+                      const ruleCategories = normalizeStringArray(rule.applicable_categories);
+                      return (
+                        <div
+                          key={rule.id}
+                          className="relative flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-900 dark:border-slate-800"
+                        >
+                          {/* Step Number */}
+                          <div className="shrink-0 relative z-20">
+                            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold ring-4 ring-slate-50 dark:ring-slate-900 shadow-sm">
+                              {rule.step_order}
+                            </div>
                           </div>
 
-                          {(rule.min_amount != null || rule.max_amount != null) && (
-                            <div>
-                              <span className="text-slate-500 dark:text-slate-400">Amount Range:</span>
-                              <p className="font-medium">
-                                {rule.min_amount != null &&
-                                  `≥ $${(Number(rule.min_amount) / 100).toLocaleString()}`}
-                                {rule.min_amount != null && rule.max_amount != null && " - "}
-                                {rule.max_amount != null &&
-                                  `≤ $${(Number(rule.max_amount) / 100).toLocaleString()}`}
-                              </p>
+                          {/* Step Details */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-semibold text-slate-800 dark:text-slate-100">{rule.step_name}</h4>
+                              <Badge variant={rule.permissions === "approve_deny" ? "default" : "secondary"}>
+                                {rule.permissions === "approve_deny" ? "Can Approve/Deny" : "Recommend Only"}
+                              </Badge>
+                              {!rule.is_active && <Badge variant="outline">Inactive</Badge>}
                             </div>
-                          )}
 
-                          {ruleCategories.length > 0 && (
-                            <div>
-                              <span className="text-slate-500 dark:text-slate-400">Categories:</span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {ruleCategories.map((cat) => (
-                                  <Badge key={cat} variant="outline" className="text-xs">
-                                    {cat}
-                                  </Badge>
-                                ))}
+                            <div className="grid md:grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <span className="text-slate-500 dark:text-slate-400">Role queue:</span>
+                                <p className="font-medium">
+                                  {rule.assigned_to_type === "by_category"
+                                    ? "By category (legacy)"
+                                    : (rule.assigned_role || "reviewer")}
+                                </p>
                               </div>
-                            </div>
-                          )}
 
-                          {rule.sla_target_days && (
-                            <div>
-                              <span className="text-slate-500 dark:text-slate-400">SLA Target:</span>
-                              <p className="font-medium">{rule.sla_target_days} days</p>
+                              {(rule.min_amount != null || rule.max_amount != null) && (
+                                <div>
+                                  <span className="text-slate-500 dark:text-slate-400">Amount Range:</span>
+                                  <p className="font-medium">
+                                    {rule.min_amount != null &&
+                                      `≥ $${(Number(rule.min_amount) / 100).toLocaleString()}`}
+                                    {rule.min_amount != null && rule.max_amount != null && " - "}
+                                    {rule.max_amount != null &&
+                                      `≤ $${(Number(rule.max_amount) / 100).toLocaleString()}`}
+                                  </p>
+                                </div>
+                              )}
+
+                              {ruleCategories.length > 0 && (
+                                <div>
+                                  <span className="text-slate-500 dark:text-slate-400">Categories:</span>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {ruleCategories.map((cat) => (
+                                      <Badge key={cat} variant="outline" className="text-xs">
+                                        {cat}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {rule.sla_target_days && (
+                                <div>
+                                  <span className="text-slate-500 dark:text-slate-400">SLA Target:</span>
+                                  <p className="font-medium">{rule.sla_target_days} days</p>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
+
+                          {/* Actions */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowBuilder(rule)}
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Button>
                         </div>
-                      </div>
-
-                      {/* Actions */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowBuilder(rule)}
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                    </div>
-
-                    {/* Connector Arrow */}
-                    {index < rules.length - 1 && (
-                      <div className="flex justify-center py-2">
-                        <div className="w-px h-6 bg-slate-300"></div>
-                      </div>
-                    )}
+                      );
+                    })}
                   </div>
-                  );
-                })}
+                </div>
               </CardContent>
             </Card>
           )}
