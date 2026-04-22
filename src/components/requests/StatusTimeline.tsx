@@ -138,7 +138,7 @@ export default function StatusTimeline({ request, reviews = [], disbursements = 
                   </p>
                 )}
                 {status === "active" && !date && (
-                  <p className="text-xs text-indigo-600 mt-1 font-medium">
+                  <p className="text-xs text-indigo-600 mt-1 font-medium dark:text-indigo-400">
                     In Progress
                   </p>
                 )}

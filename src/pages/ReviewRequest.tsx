@@ -590,8 +590,8 @@ export default function ReviewRequest() {
                 <div className="space-y-4 py-2">
                   <p className="text-slate-500 text-center dark:text-slate-400">No workflow configured</p>
                   {canRegenerateWorkflow && (
-                    <Alert className="border-amber-200 bg-amber-50">
-                      <AlertCircle className="h-4 w-4 text-amber-700" />
+                    <Alert className="border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30">
+                      <AlertCircle className="h-4 w-4 text-amber-700 dark:text-amber-300" />
                       <AlertDescription className="text-amber-950 text-sm space-y-3 sm:space-y-0">
                         <p>
                           Create pending review steps from this fund&apos;s active routing rules (for
@@ -601,7 +601,7 @@ export default function ReviewRequest() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="border-amber-300 bg-white hover:bg-amber-100 dark:bg-slate-900"
+                          className="border-amber-300 bg-white hover:bg-amber-100 dark:bg-slate-900 dark:border-amber-800/60 dark:hover:bg-amber-900/30"
                           disabled={regeneratingWorkflow}
                           onClick={() => void handleRegenerateWorkflow()}
                         >
@@ -618,10 +618,10 @@ export default function ReviewRequest() {
                 <div className="space-y-4">
                   {reviews.map((review, index) => {
                     const decisionColors = {
-                      Approved: "text-emerald-600 bg-emerald-50 border-emerald-200",
-                      Recommended: "text-indigo-600 bg-indigo-50 border-indigo-200",
-                      Denied: "text-red-600 bg-red-50 border-red-200",
-                      "Needs Info": "text-amber-600 bg-amber-50 border-amber-200",
+                      Approved: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-900/50",
+                      Recommended: "text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/30 dark:border-indigo-900/50",
+                      Denied: "text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950/30 dark:border-red-900/50",
+                      "Needs Info": "text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/30 dark:border-amber-900/50",
                       Pending: "text-slate-600 bg-slate-50 border-slate-200 dark:text-slate-300 dark:bg-slate-900 dark:border-slate-800"
                     };
                     const DecisionIcon = review.decision === "Approved" || review.decision === "Recommended" ? CheckCircle
@@ -635,7 +635,7 @@ export default function ReviewRequest() {
                       <div key={review.id}>
                         <div className={`p-4 rounded-xl border ${decisionColors[review.decision]} ${isCurrentStep ? "ring-2 ring-offset-2 ring-indigo-400" : ""}`}>
                           <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white shrink-0">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white shrink-0 dark:bg-slate-800">
                               <DecisionIcon className="w-5 h-5" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -656,7 +656,7 @@ export default function ReviewRequest() {
                                 Decision: {review.decision}
                               </p>
                               {review.comments && (
-                                <div className="bg-white/50 p-3 rounded-lg">
+                                <div className="bg-white/50 p-3 rounded-lg dark:bg-slate-900/50">
                                   <p className="text-sm font-medium mb-1">Comments:</p>
                                   <p className="text-sm">{review.comments}</p>
                                 </div>
@@ -709,12 +709,12 @@ export default function ReviewRequest() {
         <div className="space-y-6">
           {/* Review Action */}
           {canReview && currentReview && (
-            <Card className="bg-indigo-50 border-indigo-200">
+            <Card className="bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-900/50">
               <CardHeader>
-                <CardTitle className="text-lg text-indigo-800">
+                <CardTitle className="text-lg text-indigo-800 dark:text-indigo-200">
                   {currentReview.permissions === "recommend_only" ? "Submit Recommendation" : "Submit Review"}
                 </CardTitle>
-                <p className="text-sm text-indigo-600 mt-1">
+                <p className="text-sm text-indigo-600 mt-1 dark:text-indigo-400">
                   Step {currentReview.step_order}: {currentReview.step_name}
                   {isFinalStep && " (Final Decision)"}
                 </p>
@@ -731,17 +731,17 @@ export default function ReviewRequest() {
                         <>
                           <SelectItem value="Approved">
                             <span className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-emerald-600" /> Approve
+                              <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Approve
                             </span>
                           </SelectItem>
                           <SelectItem value="Denied">
                             <span className="flex items-center gap-2">
-                              <XCircle className="w-4 h-4 text-red-600" /> Deny
+                              <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" /> Deny
                             </span>
                           </SelectItem>
                           <SelectItem value="Needs Info">
                             <span className="flex items-center gap-2">
-                              <AlertCircle className="w-4 h-4 text-amber-600" /> Request More Info
+                              <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" /> Request More Info
                             </span>
                           </SelectItem>
                         </>
@@ -749,7 +749,7 @@ export default function ReviewRequest() {
                       {currentReview.permissions === "recommend_only" && (
                         <SelectItem value="Approved">
                           <span className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-indigo-600" /> Recommend
+                            <CheckCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Recommend
                           </span>
                         </SelectItem>
                       )}
@@ -775,12 +775,12 @@ export default function ReviewRequest() {
                     onChange={(e) => setReviewComments(e.target.value)}
                   />
                   {decision === "Needs Info" && (
-                    <p className="text-xs text-amber-700">
+                    <p className="text-xs text-amber-700 dark:text-amber-300">
                       This message will be visible to the student and will unlock their application for editing.
                     </p>
                   )}
                   {decision === "Denied" && (
-                    <p className="text-xs text-red-700">
+                    <p className="text-xs text-red-700 dark:text-red-300">
                       A reason is required when denying a request.
                     </p>
                   )}
@@ -804,9 +804,9 @@ export default function ReviewRequest() {
 
           {/* Disbursement Action */}
           {canDisburse && (
-            <Card className="bg-emerald-50 border-emerald-200">
+            <Card className="bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/50">
               <CardHeader>
-                <CardTitle className="text-lg text-emerald-800 flex items-center gap-2">
+                <CardTitle className="text-lg text-emerald-800 flex items-center gap-2 dark:text-emerald-200">
                   <CreditCard className="w-5 h-5" />
                   Ready for Disbursement
                 </CardTitle>
@@ -814,22 +814,22 @@ export default function ReviewRequest() {
               <CardContent className="space-y-3">
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                  <span className="text-emerald-700">Approved Amount:</span>
-                  <span className="font-semibold text-emerald-800">
+                  <span className="text-emerald-700 dark:text-emerald-300">Approved Amount:</span>
+                  <span className="font-semibold text-emerald-800 dark:text-emerald-200">
                     ${centsToNumber(request.requested_amount).toLocaleString()}
                   </span>
                   </div>
                   {totalDisbursed > 0 && (
                     <>
                       <div className="flex justify-between text-sm">
-                        <span className="text-emerald-700">Already Disbursed:</span>
-                        <span className="font-semibold text-emerald-800">
+                        <span className="text-emerald-700 dark:text-emerald-300">Already Disbursed:</span>
+                        <span className="font-semibold text-emerald-800 dark:text-emerald-200">
                           ${centsToNumber(totalDisbursed).toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex justify-between text-sm pt-2 border-t border-emerald-200">
-                        <span className="text-emerald-700">Remaining:</span>
-                        <span className="font-bold text-emerald-900">
+                      <div className="flex justify-between text-sm pt-2 border-t border-emerald-200 dark:border-emerald-900/50">
+                        <span className="text-emerald-700 dark:text-emerald-300">Remaining:</span>
+                        <span className="font-bold text-emerald-900 dark:text-emerald-100">
                           ${centsToNumber(remainingToDisburse).toLocaleString()}
                         </span>
                       </div>
@@ -872,7 +872,7 @@ export default function ReviewRequest() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Remaining</span>
-                  <span className="font-semibold text-emerald-600">
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                     ${centsToNumber(fund.remaining_budget || fund.total_budget).toLocaleString()}
                   </span>
                 </div>
@@ -894,26 +894,26 @@ export default function ReviewRequest() {
 
           {/* Disbursement Info */}
           {disbursements.length > 0 && (
-            <Card className="bg-violet-50 border-violet-200">
+            <Card className="bg-violet-50 border-violet-200 dark:bg-violet-950/30 dark:border-violet-900/50">
               <CardHeader>
-                <CardTitle className="text-lg text-violet-800">Payment History</CardTitle>
+                <CardTitle className="text-lg text-violet-800 dark:text-violet-200">Payment History</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {disbursements.map((d) => (
-                  <div key={d.id} className="p-3 bg-white/50 rounded-lg space-y-2">
+                  <div key={d.id} className="p-3 bg-white/50 rounded-lg space-y-2 dark:bg-slate-900/50">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-bold text-violet-800 text-lg">
+                        <p className="font-bold text-violet-800 text-lg dark:text-violet-200">
                           ${d.amount_paid?.toLocaleString()}
                         </p>
-                        <p className="text-sm text-violet-600">{d.payment_method}</p>
+                        <p className="text-sm text-violet-600 dark:text-violet-400">{d.payment_method}</p>
                       </div>
-                      <span className="text-xs text-violet-600">
+                      <span className="text-xs text-violet-600 dark:text-violet-400">
                         {format(new Date(d.paid_at), "MMM d, yyyy")}
                       </span>
                     </div>
                     {d.notes && (
-                      <p className="text-sm text-violet-700 border-t border-violet-200 pt-2">
+                      <p className="text-sm text-violet-700 border-t border-violet-200 pt-2 dark:text-violet-300 dark:border-violet-900/50">
                         {d.notes}
                       </p>
                     )}
@@ -922,7 +922,7 @@ export default function ReviewRequest() {
                         href={d.receipt_upload}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-violet-600 hover:text-violet-800 text-sm"
+                        className="flex items-center gap-2 text-violet-600 hover:text-violet-800 text-sm dark:text-violet-400 dark:hover:text-violet-200"
                       >
                         <FileText className="w-4 h-4" />
                         View Receipt
@@ -930,15 +930,15 @@ export default function ReviewRequest() {
                     )}
                   </div>
                 ))}
-                <div className="pt-3 border-t border-violet-300">
+                <div className="pt-3 border-t border-violet-300 dark:border-violet-800/60">
                   <div className="flex justify-between font-bold">
-                    <span className="text-violet-700">Total Paid:</span>
-                    <span className="text-violet-900">${centsToNumber(totalDisbursed).toLocaleString()}</span>
+                    <span className="text-violet-700 dark:text-violet-300">Total Paid:</span>
+                    <span className="text-violet-900 dark:text-violet-100">${centsToNumber(totalDisbursed).toLocaleString()}</span>
                   </div>
                   {remainingToDisburse > 0 && (
                     <div className="flex justify-between text-sm mt-1">
-                      <span className="text-violet-600">Remaining:</span>
-                      <span className="text-violet-700">${centsToNumber(remainingToDisburse).toLocaleString()}</span>
+                      <span className="text-violet-600 dark:text-violet-400">Remaining:</span>
+                      <span className="text-violet-700 dark:text-violet-300">${centsToNumber(remainingToDisburse).toLocaleString()}</span>
                     </div>
                   )}
                 </div>

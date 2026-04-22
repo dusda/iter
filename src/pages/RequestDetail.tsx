@@ -193,9 +193,9 @@ export default function RequestDetail() {
 
       {/* Needs Info Alert */}
       {canRespond && (
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertCircle className="w-4 h-4 text-amber-600" />
-          <AlertDescription className="text-amber-900">
+        <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50">
+          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          <AlertDescription className="text-amber-900 dark:text-amber-100">
             <strong>Additional Information Requested:</strong> Please review the comments below and provide the requested information.
           </AlertDescription>
         </Alert>
@@ -247,7 +247,7 @@ export default function RequestDetail() {
                 <div className="grid md:grid-cols-2 gap-4 text-sm mb-4">
                   <div>
                     <p className="text-slate-500 dark:text-slate-400">Requested Amount</p>
-                    <p className="text-2xl font-bold text-indigo-600">
+                    <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       ${request.requested_amount?.toLocaleString()}
                     </p>
                   </div>
@@ -306,10 +306,10 @@ export default function RequestDetail() {
                 <div className="space-y-4">
                   {reviews.map((review) => {
                     const decisionColors = {
-                      Approved: "bg-emerald-50 border-emerald-200",
-                      Denied: "bg-red-50 border-red-200",
-                      "Needs Info": "bg-amber-50 border-amber-200",
-                      Pending: "bg-blue-50 border-blue-200"
+                      Approved: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/50",
+                      Denied: "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/50",
+                      "Needs Info": "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50",
+                      Pending: "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50"
                     };
 
                     const isStudentResponse = review.step_name === "Student Response";
@@ -337,10 +337,10 @@ export default function RequestDetail() {
                               </span>
                               {review.decision !== "Pending" && (
                                 <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                                  review.decision === "Approved" ? "bg-emerald-200 text-emerald-800" :
-                                  review.decision === "Denied" ? "bg-red-200 text-red-800" :
-                                  review.decision === "Needs Info" ? "bg-amber-200 text-amber-800" :
-                                  "bg-blue-200 text-blue-800"
+                                  review.decision === "Approved" ? "bg-emerald-200 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200" :
+                                  review.decision === "Denied" ? "bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-200" :
+                                  review.decision === "Needs Info" ? "bg-amber-200 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" :
+                                  "bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
                                 }`}>
                                   {review.decision}
                                 </span>
@@ -366,16 +366,16 @@ export default function RequestDetail() {
 
           {/* Response Form (if Needs Info) */}
           {canRespond && (
-            <Card className="bg-amber-50/50 border-amber-200">
+            <Card className="bg-amber-50/50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50">
               <CardHeader>
-                <CardTitle className="text-lg text-amber-800 flex items-center gap-2">
+                <CardTitle className="text-lg text-amber-800 flex items-center gap-2 dark:text-amber-200">
                   <AlertCircle className="w-5 h-5" />
                   Provide Additional Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="response" className="text-amber-900">Your Response</Label>
+                  <Label htmlFor="response" className="text-amber-900 dark:text-amber-100">Your Response</Label>
                   <Textarea
                     id="response"
                     placeholder="Provide the additional information requested by the reviewer..."
@@ -446,9 +446,9 @@ export default function RequestDetail() {
 
           {/* Disbursement Info */}
           {disbursements.length > 0 && (
-            <Card className="bg-emerald-50 border-emerald-200">
+            <Card className="bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/50">
               <CardHeader>
-                <CardTitle className="text-lg text-emerald-800 flex items-center gap-2">
+                <CardTitle className="text-lg text-emerald-800 flex items-center gap-2 dark:text-emerald-200">
                   <DollarSign className="w-5 h-5" />
                   Payment Disbursed
                 </CardTitle>
@@ -457,25 +457,25 @@ export default function RequestDetail() {
                 {disbursements.map((d) => (
                   <div key={d.id} className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-emerald-700">Amount Paid</span>
-                      <span className="text-2xl font-bold text-emerald-800">
+                      <span className="text-emerald-700 dark:text-emerald-300">Amount Paid</span>
+                      <span className="text-2xl font-bold text-emerald-800 dark:text-emerald-200">
                         ${d.amount_paid?.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-emerald-700">Payment Method</span>
-                      <span className="font-medium text-emerald-800">{d.payment_method}</span>
+                      <span className="text-emerald-700 dark:text-emerald-300">Payment Method</span>
+                      <span className="font-medium text-emerald-800 dark:text-emerald-200">{d.payment_method}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-emerald-700">Date Paid</span>
-                      <span className="font-medium text-emerald-800">
+                      <span className="text-emerald-700 dark:text-emerald-300">Date Paid</span>
+                      <span className="font-medium text-emerald-800 dark:text-emerald-200">
                         {format(new Date(d.paid_at), "MMM d, yyyy")}
                       </span>
                     </div>
                     {d.notes && (
-                      <div className="pt-2 border-t border-emerald-200">
-                        <p className="text-emerald-700 text-xs">Notes:</p>
-                        <p className="text-emerald-800 mt-1">{d.notes}</p>
+                      <div className="pt-2 border-t border-emerald-200 dark:border-emerald-900/50">
+                        <p className="text-emerald-700 text-xs dark:text-emerald-300">Notes:</p>
+                        <p className="text-emerald-800 mt-1 dark:text-emerald-200">{d.notes}</p>
                       </div>
                     )}
                     {d.receipt_upload && (
@@ -483,7 +483,7 @@ export default function RequestDetail() {
                         href={d.receipt_upload}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 pt-2"
+                        className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 pt-2 dark:text-emerald-300 dark:hover:text-emerald-100"
                       >
                         <FileText className="w-4 h-4" />
                         <span className="text-sm">View Receipt</span>

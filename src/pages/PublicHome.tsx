@@ -234,7 +234,7 @@ export default function PublicHome() {
           <CardContent>
             {submitted ? (
               <div className="text-center py-8">
-                <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+                <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 dark:text-emerald-400" />
                 <p className="text-slate-700 text-lg mb-2 dark:text-slate-200">Thank you for your request!</p>
                 <p className="text-slate-500 dark:text-slate-400">
                   An administrator will review your request and contact you via email at{" "}
@@ -316,7 +316,7 @@ export default function PublicHome() {
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
           <p>Already have an account?{" "}
-            <button onClick={handleLogin} className="text-indigo-600 hover:text-indigo-700 font-medium">
+            <button onClick={handleLogin} className="text-indigo-600 hover:text-indigo-700 font-medium dark:text-indigo-400 dark:hover:text-indigo-300">
               Sign in here
             </button>
           </p>

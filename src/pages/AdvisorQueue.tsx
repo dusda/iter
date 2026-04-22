@@ -82,30 +82,30 @@ export default function AdvisorQueue() {
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-2 gap-4">
-        <Card className="bg-linear-to-br from-amber-50 to-orange-50 border-amber-200">
+        <Card className="bg-linear-to-br from-amber-50 to-orange-50 border-amber-200 dark:from-amber-950/30 dark:to-orange-950/30 dark:border-amber-900/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-amber-600">Pending Tasks</p>
-                <p className="text-3xl font-bold text-amber-900 mt-1">
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">Pending Tasks</p>
+                <p className="text-3xl font-bold text-amber-900 mt-1 dark:text-amber-100">
                   {pendingRequests.length}
                 </p>
               </div>
-              <Clock className="w-12 h-12 text-amber-400" />
+              <Clock className="w-12 h-12 text-amber-400 dark:text-amber-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-green-200">
+        <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-green-200 dark:from-green-950/30 dark:to-emerald-950/30 dark:border-green-900/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600">Completed</p>
-                <p className="text-3xl font-bold text-green-900 mt-1">
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Completed</p>
+                <p className="text-3xl font-bold text-green-900 mt-1 dark:text-green-100">
                   {completedRequests.length}
                 </p>
               </div>
-              <CheckCircle className="w-12 h-12 text-green-400" />
+              <CheckCircle className="w-12 h-12 text-green-400 dark:text-green-500" />
             </div>
           </CardContent>
         </Card>
@@ -148,9 +148,9 @@ export default function AdvisorQueue() {
                     <p className="text-sm text-slate-500 dark:text-slate-400">{request.request_id}</p>
                   </div>
                   {request.advisor_tasks_completed ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
+                    <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                   ) : (
-                    <Clock className="w-5 h-5 text-amber-500" />
+                    <Clock className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                   )}
                   </div>
                   <div className="space-y-2 text-sm">
@@ -214,12 +214,12 @@ export default function AdvisorQueue() {
                       </TableCell>
                       <TableCell>
                         {request.advisor_tasks_completed ? (
-                          <div className="flex items-center gap-2 text-green-600">
+                          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                             <CheckCircle className="w-4 h-4" />
                             <span className="text-sm font-medium">Complete</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-amber-600">
+                          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                             <Clock className="w-4 h-4" />
                             <span className="text-sm font-medium">Pending</span>
                           </div>

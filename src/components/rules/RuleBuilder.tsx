@@ -281,7 +281,7 @@ export default function RuleBuilder({
                     size="sm"
                     className={`justify-start ${
                       formData.applicable_categories.includes(category)
-                        ? "bg-indigo-50 border-indigo-300 text-indigo-700"
+                        ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-800/60 dark:text-indigo-300"
                         : ""
                     }`}
                     onClick={() => toggleCategory(category)}

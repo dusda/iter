@@ -206,15 +206,15 @@ export default function Funds() {
                     </div>
                     <div>
                       <p className="text-slate-500 dark:text-slate-400">Paid</p>
-                      <p className="font-semibold text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</p>
+                      <p className="font-semibold text-violet-600 dark:text-violet-400">${centsToNumber(stats.paid).toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-slate-500 dark:text-slate-400">Committed</p>
-                      <p className="font-semibold text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</p>
+                      <p className="font-semibold text-amber-600 dark:text-amber-400">${centsToNumber(stats.approved).toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-slate-500 dark:text-slate-400">Remaining</p>
-                      <p className="font-semibold text-emerald-600">${centsToNumber(remaining).toLocaleString()}</p>
+                      <p className="font-semibold text-emerald-600 dark:text-emerald-400">${centsToNumber(remaining).toLocaleString()}</p>
                     </div>
                   </div>
                   <Button asChild variant="outline" size="sm" className="w-full">
@@ -270,7 +270,7 @@ export default function Funds() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-medium text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</span>
+                          <span className="font-medium text-violet-600 dark:text-violet-400">${centsToNumber(stats.paid).toLocaleString()}</span>
                           <span className="text-xs text-slate-400 dark:text-slate-500">
                             {fund.total_budget ? ((stats.paid / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
@@ -278,7 +278,7 @@ export default function Funds() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
-                          <span className="font-medium text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</span>
+                          <span className="font-medium text-amber-600 dark:text-amber-400">${centsToNumber(stats.approved).toLocaleString()}</span>
                           <span className="text-xs text-slate-400 dark:text-slate-500">
                             {fund.total_budget ? ((stats.approved / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
@@ -287,14 +287,14 @@ export default function Funds() {
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className={`font-medium ${
-                            percentRemaining < 20 ? "text-red-600" : 
-                            percentRemaining < 50 ? "text-amber-600" : 
-                            "text-emerald-600"
+                            percentRemaining < 20 ? "text-red-600 dark:text-red-400" : 
+                            percentRemaining < 50 ? "text-amber-600 dark:text-amber-400" : 
+                            "text-emerald-600 dark:text-emerald-400"
                           }`}>
                             ${centsToNumber(remaining).toLocaleString()}
                           </span>
                           <div className="flex items-center gap-1">
-                            {percentRemaining < 20 && <TrendingDown className="w-3 h-3 text-red-500" />}
+                            {percentRemaining < 20 && <TrendingDown className="w-3 h-3 text-red-500 dark:text-red-400" />}
                             <span className="text-xs text-slate-400 dark:text-slate-500">
                               {percentRemaining.toFixed(0)}%
                             </span>
@@ -325,7 +325,7 @@ export default function Funds() {
                               </DropdownMenuItem>
                             )}
                             {fund.status !== "archived" && (
-                              <DropdownMenuItem className="text-amber-600">
+                              <DropdownMenuItem className="text-amber-600 dark:text-amber-400">
                                 <Archive className="w-4 h-4 mr-2" /> Archive
                               </DropdownMenuItem>
                             )}

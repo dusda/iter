@@ -185,7 +185,7 @@ export default function SuperAdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3 dark:text-slate-50">
-                <Building2 className="w-8 h-8 text-purple-600" />
+                <Building2 className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                 Super Admin Dashboard
               </h1>
               <p className="mt-1 text-slate-500 dark:text-slate-400">Manage organizations and system-wide settings</p>
@@ -232,8 +232,8 @@ export default function SuperAdminDashboard() {
                           {org.logo ? (
                             <img src={org.logo} alt={org.name} className="w-8 h-8 rounded object-cover" />
                           ) : (
-                            <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center">
-                              <Building2 className="w-4 h-4 text-purple-600" />
+                            <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center dark:bg-purple-900/30">
+                              <Building2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                             </div>
                           )}
                           <span>{org.name}</span>
@@ -246,7 +246,7 @@ export default function SuperAdminDashboard() {
                         >
                           {org.id.substring(0, 8)}...
                           {copiedId === org.id ? (
-                            <Check className="w-3 h-3 text-green-600" />
+                            <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
                           ) : (
                             <Copy className="w-3 h-3" />
                           )}
@@ -279,7 +279,7 @@ export default function SuperAdminDashboard() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/30 dark:border-red-900/50"
                             disabled={deleteOrganization.isPending}
                             onClick={() => {
                               const ok = window.confirm(
@@ -413,7 +413,7 @@ export default function SuperAdminDashboard() {
                       className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     >
                       {copiedId === "dialog-" + editingOrg.id ? (
-                        <Check className="w-3 h-3 text-green-600" />
+                        <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
                       ) : (
                         <Copy className="w-3 h-3" />
                       )}
@@ -433,7 +433,7 @@ export default function SuperAdminDashboard() {
                 {viewingOrg?.logo ? (
                   <img src={viewingOrg.logo} alt={viewingOrg.name} className="w-8 h-8 rounded object-cover" />
                 ) : (
-                  <Building2 className="w-6 h-6 text-purple-600" />
+                  <Building2 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 )}
                 {viewingOrg?.name}
               </DialogTitle>
@@ -449,7 +449,7 @@ export default function SuperAdminDashboard() {
                   className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                 >
                   {copiedId === "view-" + viewingOrg?.id ? (
-                    <Check className="w-3 h-3 text-green-600" />
+                    <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
                   ) : (
                     <Copy className="w-3 h-3" />
                   )}

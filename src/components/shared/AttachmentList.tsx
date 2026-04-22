@@ -31,16 +31,16 @@ export default function AttachmentList({ attachments = [], emptyMessage = "No at
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors group"
+            className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors group dark:bg-indigo-950/30 dark:hover:bg-indigo-900/30"
           >
-            <Icon className="w-5 h-5 text-indigo-600 shrink-0" />
+            <Icon className="w-5 h-5 text-indigo-600 shrink-0 dark:text-indigo-400" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-indigo-700 truncate font-medium">{name}</p>
+              <p className="text-sm text-indigo-700 truncate font-medium dark:text-indigo-300">{name}</p>
               {uploadedBy && (
-                <p className="text-xs text-indigo-400 capitalize">Uploaded by {uploadedBy}</p>
+                <p className="text-xs text-indigo-400 capitalize dark:text-indigo-500">Uploaded by {uploadedBy}</p>
               )}
             </div>
-            <ExternalLink className="w-4 h-4 text-indigo-400 group-hover:text-indigo-600 shrink-0" />
+            <ExternalLink className="w-4 h-4 text-indigo-400 group-hover:text-indigo-600 shrink-0 dark:text-indigo-500" />
           </a>
         );
       })}

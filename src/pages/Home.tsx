@@ -163,7 +163,7 @@ function StaffDashboard({ user }) {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-semibold">Requests Needing Attention</CardTitle>
             <Button variant="ghost" size="sm" asChild>
-              <Link to={createPageUrl("Queue")} className="text-indigo-600">
+              <Link to={createPageUrl("Queue")} className="text-indigo-600 dark:text-indigo-400">
                 View All <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
             </Button>
@@ -212,7 +212,7 @@ function StaffDashboard({ user }) {
             <CardTitle className="text-lg font-semibold">Fund Overview</CardTitle>
             {user.app_role !== "reviewer" && (
               <Button variant="ghost" size="sm" asChild>
-                <Link to={createPageUrl("Funds")} className="text-indigo-600">
+                <Link to={createPageUrl("Funds")} className="text-indigo-600 dark:text-indigo-400">
                   Manage
                 </Link>
               </Button>

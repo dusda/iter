@@ -343,39 +343,39 @@ export default function Reports() {
 
       {/* Summary Stats */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-linear-to-br from-indigo-50 to-indigo-100/50 border-indigo-200">
+        <Card className="bg-linear-to-br from-indigo-50 to-indigo-100/50 border-indigo-200 dark:from-indigo-950/30 dark:to-indigo-900/30 dark:border-indigo-900/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-indigo-700 font-medium">Total Budget</p>
-              <Wallet className="w-5 h-5 text-indigo-400" />
+              <p className="text-sm text-indigo-700 font-medium dark:text-indigo-300">Total Budget</p>
+              <Wallet className="w-5 h-5 text-indigo-400 dark:text-indigo-500" />
             </div>
-            <p className="text-3xl font-bold text-indigo-900">${totalBudget.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-indigo-900 dark:text-indigo-100">${totalBudget.toLocaleString()}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+        <Card className="bg-linear-to-br from-emerald-50 to-emerald-100/50 border-emerald-200 dark:from-emerald-950/30 dark:to-emerald-900/30 dark:border-emerald-900/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-emerald-700 font-medium">Total Approved</p>
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              <p className="text-sm text-emerald-700 font-medium dark:text-emerald-300">Total Approved</p>
+              <CheckCircle className="w-5 h-5 text-emerald-400 dark:text-emerald-500" />
             </div>
-            <p className="text-3xl font-bold text-emerald-900">${totalApproved.toLocaleString()}</p>
-            <p className="text-sm text-emerald-600 mt-1">{approvedCount} requests</p>
+            <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">${totalApproved.toLocaleString()}</p>
+            <p className="text-sm text-emerald-600 mt-1 dark:text-emerald-400">{approvedCount} requests</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-violet-50 to-violet-100/50 border-violet-200">
+        <Card className="bg-linear-to-br from-violet-50 to-violet-100/50 border-violet-200 dark:from-violet-950/30 dark:to-violet-900/30 dark:border-violet-900/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-violet-700 font-medium">Total Paid</p>
-              <DollarSign className="w-5 h-5 text-violet-400" />
+              <p className="text-sm text-violet-700 font-medium dark:text-violet-300">Total Paid</p>
+              <DollarSign className="w-5 h-5 text-violet-400 dark:text-violet-500" />
             </div>
-            <p className="text-3xl font-bold text-violet-900">${totalDisbursed.toLocaleString()}</p>
-            <p className="text-sm text-violet-600 mt-1">{paidCount} paid</p>
+            <p className="text-3xl font-bold text-violet-900 dark:text-violet-100">${totalDisbursed.toLocaleString()}</p>
+            <p className="text-sm text-violet-600 mt-1 dark:text-violet-400">{paidCount} paid</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-slate-50 to-slate-100/50 border-slate-200 dark:border-slate-800">
+        <Card className="bg-linear-to-br from-slate-50 to-slate-100/50 border-slate-200 dark:border-slate-800 dark:from-slate-950 dark:to-slate-900">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-slate-700 font-medium dark:text-slate-200">Remaining</p>
@@ -401,14 +401,14 @@ export default function Reports() {
         <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Approved</p>
-            <p className="text-2xl font-bold text-emerald-600">{approvedCount}</p>
+            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{approvedCount}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Denied</p>
-            <p className="text-2xl font-bold text-red-600">{deniedCount}</p>
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{deniedCount}</p>
           </CardContent>
         </Card>
 
@@ -542,7 +542,7 @@ export default function Reports() {
                         <TableCell className="text-right font-medium">
                           ${data.total.toLocaleString()}
                         </TableCell>
-                        <TableCell className="text-right text-violet-600 font-medium">
+                        <TableCell className="text-right text-violet-600 font-medium dark:text-violet-400">
                           ${data.disbursed.toLocaleString()}
                         </TableCell>
                         <TableCell className="text-right">

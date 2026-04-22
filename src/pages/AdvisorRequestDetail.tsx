@@ -256,9 +256,9 @@ export default function AdvisorRequestDetail() {
 
       {/* Status Banner */}
       {request.advisor_tasks_completed && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="w-4 h-4 text-green-600" />
-          <AlertDescription className="text-green-800">
+        <Alert className="bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-900/50">
+          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
             Advisor tasks have been marked as complete for this application.
           </AlertDescription>
         </Alert>
@@ -291,7 +291,7 @@ export default function AdvisorRequestDetail() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Requested Amount</p>
-                  <p className="font-semibold text-lg text-indigo-600">
+                  <p className="font-semibold text-lg text-indigo-600 dark:text-indigo-400">
                     ${request.requested_amount?.toLocaleString()}
                   </p>
                 </div>
@@ -363,11 +363,11 @@ export default function AdvisorRequestDetail() {
                       className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <File className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <File className="w-4 h-4 text-indigo-600 shrink-0 dark:text-indigo-400" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-slate-700 truncate dark:text-slate-200">{file.name}</p>
                           {(file.uploaded_by === "advisor" || file.uploaded_by === "advocate") && (
-                            <p className="text-xs text-green-600">Uploaded by advisor</p>
+                            <p className="text-xs text-green-600 dark:text-green-400">Uploaded by advisor</p>
                           )}
                         </div>
                       </div>
@@ -376,7 +376,7 @@ export default function AdvisorRequestDetail() {
                           href={file.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-700 text-sm"
+                          className="text-indigo-600 hover:text-indigo-700 text-sm dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           View
                         </a>
@@ -385,7 +385,7 @@ export default function AdvisorRequestDetail() {
                             variant="ghost"
                             size="sm"
                             onClick={() => removeAttachment(index)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/30"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -402,20 +402,20 @@ export default function AdvisorRequestDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick Info */}
-          <Card className="bg-linear-to-br from-indigo-50 to-violet-50 border-indigo-200">
+          <Card className="bg-linear-to-br from-indigo-50 to-violet-50 border-indigo-200 dark:from-indigo-950/30 dark:to-violet-950/30 dark:border-indigo-900/50">
             <CardHeader>
               <CardTitle className="text-lg">Quick Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
-                <User className="w-4 h-4 text-indigo-600 mt-0.5" />
+                <User className="w-4 h-4 text-indigo-600 mt-0.5 dark:text-indigo-400" />
                 <div>
                   <p className="text-slate-600 dark:text-slate-300">Advisor</p>
                   <p className="font-medium text-slate-800 dark:text-slate-100">{request.advisor_name || "Unassigned"}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <DollarSign className="w-4 h-4 text-indigo-600 mt-0.5" />
+                <DollarSign className="w-4 h-4 text-indigo-600 mt-0.5 dark:text-indigo-400" />
                 <div>
                   <p className="text-slate-600 dark:text-slate-300">Amount</p>
                   <p className="font-medium text-slate-800 dark:text-slate-100">
@@ -424,7 +424,7 @@ export default function AdvisorRequestDetail() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Calendar className="w-4 h-4 text-indigo-600 mt-0.5" />
+                <Calendar className="w-4 h-4 text-indigo-600 mt-0.5 dark:text-indigo-400" />
                 <div>
                   <p className="text-slate-600 dark:text-slate-300">Submitted</p>
                   <p className="font-medium text-slate-800 dark:text-slate-100">
@@ -444,7 +444,7 @@ export default function AdvisorRequestDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
+              <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
               Mark Tasks Complete
             </DialogTitle>
             <DialogDescription>
@@ -483,7 +483,7 @@ export default function AdvisorRequestDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-500" />
+              <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
               Close Request
             </DialogTitle>
             <DialogDescription>
@@ -491,9 +491,9 @@ export default function AdvisorRequestDetail() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Alert className="bg-amber-50 border-amber-200">
-              <AlertCircle className="w-4 h-4 text-amber-600" />
-              <AlertDescription className="text-amber-900 text-sm">
+            <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50">
+              <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <AlertDescription className="text-amber-900 text-sm dark:text-amber-100">
                 Closing this request will prevent any further changes or reviews.
               </AlertDescription>
             </Alert>

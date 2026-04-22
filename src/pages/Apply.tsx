@@ -556,9 +556,9 @@ export default function Apply() {
                   <CardContent>
                     <div className="space-y-3">
                       {fund.eligibility_notes && (
-                        <Alert className="bg-blue-50 border-blue-200">
-                          <AlertCircle className="w-4 h-4 text-blue-600" />
-                          <AlertDescription className="text-blue-800 text-sm">
+                        <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50">
+                          <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <AlertDescription className="text-blue-800 text-sm dark:text-blue-200">
                             {fund.eligibility_notes}
                           </AlertDescription>
                         </Alert>
@@ -567,10 +567,10 @@ export default function Apply() {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         {fund.max_request_amount && (
                           <div className="flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                            <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                             <div>
                               <p className="text-slate-500 text-xs dark:text-slate-400">Max Request</p>
-                              <p className="font-semibold text-amber-600">
+                              <p className="font-semibold text-amber-600 dark:text-amber-400">
                                 ${fund.max_request_amount?.toLocaleString()}
                               </p>
                             </div>
@@ -579,10 +579,10 @@ export default function Apply() {
                         
                         {fund.end_date && (
                           <div className="flex items-center gap-2 col-span-2">
-                            <Calendar className={`w-4 h-4 ${isExpiringSoon ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`} />
+                            <Calendar className={`w-4 h-4 ${isExpiringSoon ? "text-red-500 dark:text-red-400" : "text-slate-400 dark:text-slate-500"}`} />
                             <div>
                               <p className="text-slate-500 text-xs dark:text-slate-400">Deadline</p>
-                              <p className={`font-semibold text-sm ${isExpiringSoon ? "text-red-600" : ""}`}>
+                              <p className={`font-semibold text-sm ${isExpiringSoon ? "text-red-600 dark:text-red-400" : ""}`}>
                                 {format(new Date(fund.end_date), "MMMM d, yyyy")}
                                 {isExpiringSoon && " (Expiring Soon!)"}
                               </p>
@@ -641,9 +641,9 @@ export default function Apply() {
 
       {/* Fund Info Banner */}
       {(selectedFund.max_request_amount || selectedFund.end_date) && (
-        <Alert className="mb-6 bg-indigo-50 border-indigo-200">
-          <Wallet className="w-4 h-4 text-indigo-600" />
-          <AlertDescription className="text-indigo-900">
+        <Alert className="mb-6 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-900/50">
+          <Wallet className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <AlertDescription className="text-indigo-900 dark:text-indigo-100">
             <div className="flex items-center justify-between">
               {selectedFund.max_request_amount && (
                 <span>
@@ -681,7 +681,7 @@ export default function Apply() {
                 <Label htmlFor="fullName">
                   Full Name * 
                   {errors.student_full_name && (
-                    <span className="text-red-600 text-xs ml-2">{errors.student_full_name}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.student_full_name}</span>
                   )}
                 </Label>
                 <Input
@@ -696,7 +696,7 @@ export default function Apply() {
                 <Label htmlFor="email">
                   Email *
                   {errors.student_email && (
-                    <span className="text-red-600 text-xs ml-2">{errors.student_email}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.student_email}</span>
                   )}
                 </Label>
                 <Input
@@ -735,7 +735,7 @@ export default function Apply() {
                 <Label htmlFor="amount">
                   Requested Amount *
                   {errors.requested_amount && (
-                    <span className="text-red-600 text-xs ml-2">{errors.requested_amount}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.requested_amount}</span>
                   )}
                 </Label>
                 <div className="relative">
@@ -762,7 +762,7 @@ export default function Apply() {
                 <Label htmlFor="category">
                   Intended Use Category *
                   {errors.intended_use_category && (
-                    <span className="text-red-600 text-xs ml-2">{errors.intended_use_category}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.intended_use_category}</span>
                   )}
                 </Label>
                 <Select
@@ -791,7 +791,7 @@ export default function Apply() {
                 <Label htmlFor="useDescription">
                   How will you use these funds? {(selectedFund.application_fields?.intended_use_description?.required ?? true) && "*"} (minimum 30 characters)
                   {errors.intended_use_description && (
-                    <span className="text-red-600 text-xs ml-2">{errors.intended_use_description}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.intended_use_description}</span>
                   )}
                 </Label>
                 <Textarea
@@ -813,7 +813,7 @@ export default function Apply() {
                 <Label htmlFor="justification">
                   Why do you deserve these funds? {(selectedFund.application_fields?.justification_paragraph?.required ?? true) && "*"} (minimum 100 characters)
                   {errors.justification_paragraph && (
-                    <span className="text-red-600 text-xs ml-2">{errors.justification_paragraph}</span>
+                    <span className="text-red-600 text-xs ml-2 dark:text-red-400">{errors.justification_paragraph}</span>
                   )}
                 </Label>
                 <Textarea
@@ -836,12 +836,12 @@ export default function Apply() {
             <div className="space-y-4 pt-4 border-t">
               <h3 className="font-semibold text-slate-800 flex items-center gap-2 dark:text-slate-100">
                 <Paperclip className="w-4 h-4" />
-                Supporting Documents {(selectedFund.application_fields?.attachments?.required ?? false) && <span className="text-red-600">*</span>}
+                Supporting Documents {(selectedFund.application_fields?.attachments?.required ?? false) && <span className="text-red-600 dark:text-red-400">*</span>}
               </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Upload any supporting documents (PDF, JPG, PNG, DOC - max 10MB per file)
               {(selectedFund.application_fields?.attachments?.required ?? false) && (
-                <span className="text-amber-600 font-medium"> - Required for this fund</span>
+                <span className="text-amber-600 font-medium dark:text-amber-400"> - Required for this fund</span>
               )}
             </p>
 
@@ -881,14 +881,14 @@ export default function Apply() {
                     className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <File className="w-4 h-4 text-indigo-600 shrink-0" />
+                      <File className="w-4 h-4 text-indigo-600 shrink-0 dark:text-indigo-400" />
                       <span className="text-sm text-slate-700 truncate dark:text-slate-200">{file.name}</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeAttachment(index)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/30"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -927,7 +927,7 @@ export default function Apply() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-500" />
+              <AlertCircle className="w-5 h-5 text-amber-500 dark:text-amber-400" />
               Confirm Submission
             </DialogTitle>
             <DialogDescription>
@@ -935,9 +935,9 @@ export default function Apply() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Alert className="bg-amber-50 border-amber-200">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <AlertDescription className="text-amber-900 text-sm">
+            <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50">
+              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <AlertDescription className="text-amber-900 text-sm dark:text-amber-100">
                 Once submitted, you will not be able to edit your application unless additional information is requested by a reviewer.
               </AlertDescription>
             </Alert>

@@ -162,13 +162,13 @@ const safeFormatDate = (value?: string | null, dateFormat: string = "MMM d, yyyy
 };
 
 const roleColors: Record<AppRole, string> = {
-  student: "bg-blue-100 text-blue-800 border-blue-200",
-  reviewer: "bg-amber-100 text-amber-800 border-amber-200",
-  advisor: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  approver: "bg-purple-100 text-purple-800 border-purple-200",
-  fund_manager: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  admin: "bg-rose-100 text-rose-800 border-rose-200",
-  super_admin: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+  student: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-900/50",
+  reviewer: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-900/50",
+  advisor: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-200 dark:border-indigo-900/50",
+  approver: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-900/50",
+  fund_manager: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-900/50",
+  admin: "bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-200 dark:border-rose-900/50",
+  super_admin: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-200 dark:border-fuchsia-900/50",
 };
 
 const roleIcons: Record<AppRole, React.ComponentType<{ className?: string }>> = {
@@ -506,7 +506,7 @@ export default function Users() {
                     variant="outline"
                     className={`cursor-pointer shrink-0 transition-all duration-300 ${
                       copiedOrgLink
-                        ? "border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100"
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 dark:border-emerald-800/60 dark:bg-emerald-950/30 dark:text-emerald-100 dark:hover:bg-emerald-900/30"
                         : ""
                     }`}
                     onClick={async () => {
@@ -813,7 +813,7 @@ export default function Users() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="border-green-300 text-green-700 hover:bg-green-50 sm:min-w-28"
+                            className="border-green-300 text-green-700 hover:bg-green-50 sm:min-w-28 dark:border-green-800/60 dark:text-green-300 dark:hover:bg-green-950/30"
                             onClick={() => updateAccessRequest.mutate({ id: request.id, status: "approved" })}
                             disabled={updateAccessRequest.isPending}
                           >
@@ -822,7 +822,7 @@ export default function Users() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="border-red-300 text-red-700 hover:bg-red-50 sm:min-w-28"
+                            className="border-red-300 text-red-700 hover:bg-red-50 sm:min-w-28 dark:border-red-800/60 dark:text-red-300 dark:hover:bg-red-950/30"
                             onClick={() => updateAccessRequest.mutate({ id: request.id, status: "denied" })}
                             disabled={updateAccessRequest.isPending}
                           >
@@ -863,11 +863,11 @@ export default function Users() {
             </DialogDescription>
           </DialogHeader>
           {currentUser?.organization_id ? (
-            <div className="rounded-xl border-2 border-indigo-200 bg-linear-to-br from-indigo-50 to-violet-50 px-5 py-5 text-center shadow-sm">
+            <div className="rounded-xl border-2 border-indigo-200 bg-linear-to-br from-indigo-50 to-violet-50 px-5 py-5 text-center shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/30 dark:to-violet-950/30">
               <div className="flex flex-col items-center gap-3">
                 {inviteOrgLoading ? (
                   <div
-                    className="w-14 h-14 rounded-xl bg-indigo-200/50 animate-pulse shrink-0"
+                    className="w-14 h-14 rounded-xl bg-indigo-200/50 animate-pulse shrink-0 dark:bg-indigo-900/40"
                     aria-hidden
                   />
                 ) : (
@@ -883,7 +883,7 @@ export default function Users() {
                     )}
                   </div>
                 )}
-                <div className="text-sm font-semibold uppercase tracking-wide text-indigo-800">
+                <div className="text-sm font-semibold uppercase tracking-wide text-indigo-800 dark:text-indigo-200">
                   You are inviting to
                 </div>
               </div>
@@ -891,12 +891,12 @@ export default function Users() {
                 {inviteTargetOrganization?.name ?? "Loading organization…"}
               </p>
               {(currentUser.app_role === "admin" || currentUser.app_role === "super_admin") && (
-                <p className="mt-3 text-sm leading-snug text-indigo-900/85">
+                <p className="mt-3 text-sm leading-snug text-indigo-900/85 dark:text-indigo-100">
                   This is your currently selected organization. They will join this one. To invite elsewhere,
                   switch organization in{" "}
                   <Link
                     to={createPageUrl("Settings")}
-                    className="font-semibold text-indigo-800 underline underline-offset-2 hover:text-indigo-950"
+                    className="font-semibold text-indigo-800 underline underline-offset-2 hover:text-indigo-950 dark:text-indigo-200"
                   >
                     Settings
                   </Link>
@@ -906,7 +906,7 @@ export default function Users() {
             </div>
           ) : (
             <div
-              className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-sm font-medium text-amber-950"
+              className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-4 text-center text-sm font-medium text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/30"
               role="alert"
             >
               No organization is selected. Choose an organization in Settings before sending invitations.

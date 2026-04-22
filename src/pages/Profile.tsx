@@ -132,11 +132,11 @@ export default function Profile() {
   };
 
   const roleColors = {
-    student: "bg-blue-100 text-blue-800 border-blue-200",
-    reviewer: "bg-amber-100 text-amber-800 border-amber-200",
-    approver: "bg-purple-100 text-purple-800 border-purple-200",
-    fund_manager: "bg-emerald-100 text-emerald-800 border-emerald-200",
-    admin: "bg-rose-100 text-rose-800 border-rose-200"
+    student: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-900/50",
+    reviewer: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-900/50",
+    approver: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-900/50",
+    fund_manager: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-900/50",
+    admin: "bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-200 dark:border-rose-900/50"
   };
 
   if (!user) {
@@ -160,8 +160,8 @@ export default function Profile() {
         <CardContent className="pt-0">
           <div className="flex flex-col items-center -mt-12 pb-6">
             <div className="w-24 h-24 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center dark:bg-slate-900 dark:border-slate-900">
-              <div className="w-20 h-20 bg-linear-to-br from-indigo-100 to-violet-100 rounded-full flex items-center justify-center">
-                <span className="text-3xl font-bold text-indigo-700">
+              <div className="w-20 h-20 bg-linear-to-br from-indigo-100 to-violet-100 rounded-full flex items-center justify-center dark:from-indigo-900/30 dark:to-violet-900/30">
+                <span className="text-3xl font-bold text-indigo-700 dark:text-indigo-300">
                   {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase() || "U"}
                 </span>
               </div>
@@ -240,7 +240,7 @@ export default function Profile() {
 
           <div className="flex items-center justify-end gap-4 pt-4 border-t">
             {saved && (
-              <span className="text-emerald-600 flex items-center gap-2 text-sm">
+              <span className="text-emerald-600 flex items-center gap-2 text-sm dark:text-emerald-400">
                 <CheckCircle className="w-4 h-4" />
                 Changes saved
               </span>

@@ -121,10 +121,10 @@ export default function MyRequests() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">In Review</p>
-                <p className="text-2xl font-bold text-amber-600">{statusCounts["In Review"]}</p>
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{statusCounts["In Review"]}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                <span className="text-amber-600 font-bold">{statusCounts["In Review"]}</span>
+              <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center dark:bg-amber-900/30">
+                <span className="text-amber-600 font-bold dark:text-amber-400">{statusCounts["In Review"]}</span>
               </div>
             </div>
           </CardContent>
@@ -135,12 +135,12 @@ export default function MyRequests() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Approved</p>
-                <p className="text-2xl font-bold text-emerald-600">
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                   {statusCounts.Approved + statusCounts.Paid}
                 </p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                <span className="text-emerald-600 font-bold">{statusCounts.Approved + statusCounts.Paid}</span>
+              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center dark:bg-emerald-900/30">
+                <span className="text-emerald-600 font-bold dark:text-emerald-400">{statusCounts.Approved + statusCounts.Paid}</span>
               </div>
             </div>
           </CardContent>
@@ -151,10 +151,10 @@ export default function MyRequests() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Need Action</p>
-                <p className="text-2xl font-bold text-orange-600">{statusCounts["Needs Info"]}</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{statusCounts["Needs Info"]}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                <span className="text-orange-600 font-bold">{statusCounts["Needs Info"]}</span>
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center dark:bg-orange-900/30">
+                <span className="text-orange-600 font-bold dark:text-orange-400">{statusCounts["Needs Info"]}</span>
               </div>
             </div>
           </CardContent>
@@ -271,7 +271,7 @@ export default function MyRequests() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Hash className="w-3 h-3 text-slate-400 dark:text-slate-500" />
-                          <span className="font-mono text-sm font-medium text-indigo-600">
+                          <span className="font-mono text-sm font-medium text-indigo-600 dark:text-indigo-400">
                             {request.request_id}
                           </span>
                         </div>

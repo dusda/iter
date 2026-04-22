@@ -88,10 +88,10 @@ export default function AuditLog() {
   };
 
   const getActionIcon = (actionType) => {
-    if (actionType.includes("CREATE")) return <FileText className="w-4 h-4 text-blue-600" />;
-    if (actionType.includes("UPDATE") || actionType.includes("EDIT")) return <Settings className="w-4 h-4 text-amber-600" />;
-    if (actionType.includes("APPROVE")) return <CheckCircle className="w-4 h-4 text-emerald-600" />;
-    if (actionType.includes("DISBURSEMENT")) return <DollarSign className="w-4 h-4 text-violet-600" />;
+    if (actionType.includes("CREATE")) return <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />;
+    if (actionType.includes("UPDATE") || actionType.includes("EDIT")) return <Settings className="w-4 h-4 text-amber-600 dark:text-amber-400" />;
+    if (actionType.includes("APPROVE")) return <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+    if (actionType.includes("DISBURSEMENT")) return <DollarSign className="w-4 h-4 text-violet-600 dark:text-violet-400" />;
     return <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />;
   };
 

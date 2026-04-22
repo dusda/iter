@@ -376,7 +376,7 @@ export default function Settings() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="shrink-0 text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800"
+                        className="shrink-0 text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800 dark:text-red-300 dark:border-red-900/50 dark:hover:bg-red-950/30 dark:hover:text-red-200"
                         disabled={uploading || !user?.organization_id || !orgForm.logo}
                         onClick={() => {
                           const next = { ...orgForm, logo: "" };

@@ -96,7 +96,7 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                     }
                   }}
                   className={`block p-4 hover:bg-slate-50 transition-colors ${
-                    !notification.is_read ? "bg-indigo-50/50" : ""
+                    !notification.is_read ? "bg-indigo-50/50 dark:bg-indigo-950/30" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -122,7 +122,7 @@ export default function NotificationBell({ user }: NotificationBellProps) {
         </div>
         {notifications.length > 0 && (
           <div className="border-t p-2 text-center">
-            <Link to={createPageUrl("Notifications")} className="text-xs text-indigo-600 hover:text-indigo-800">
+            <Link to={createPageUrl("Notifications")} className="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200">
               View all notifications
             </Link>
           </div>

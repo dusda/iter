@@ -43,7 +43,7 @@ export default function PageNotFound({}) {
                     {isFetched && authData.isAuthenticated && authData.user?.role === 'admin' && (
                         <div className="mt-8 p-4 bg-slate-100 rounded-lg border border-slate-200 dark:bg-slate-800 dark:border-slate-800">
                             <div className="flex items-start space-x-3">
-                                <div className="shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
+                                <div className="shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5 dark:bg-orange-900/30">
                                     <div className="w-2 h-2 rounded-full bg-orange-400"></div>
                                 </div>
                                 <div className="text-left space-y-1">

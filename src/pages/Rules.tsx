@@ -208,9 +208,9 @@ export default function Rules() {
           )}
 
           {/* Info Alert */}
-          <Alert className="bg-blue-50 border-blue-200">
-            <AlertCircle className="w-4 h-4 text-blue-600" />
-            <AlertDescription className="text-blue-800 text-sm">
+          <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50">
+            <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 text-sm dark:text-blue-200">
               <strong>How it works:</strong> When a student submits a request, the system evaluates all active rules based on the requested amount and category. Matching steps are assigned in order, and reviewers can only act on their assigned step once the previous step is complete.
             </AlertDescription>
           </Alert>

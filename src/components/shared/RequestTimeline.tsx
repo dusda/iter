@@ -66,7 +66,7 @@ export default function RequestTimeline({ status }) {
                   item.completed 
                     ? colorClasses[item.color]
                     : item.active 
-                    ? "bg-white border-2 border-indigo-600 text-indigo-600 animate-pulse dark:bg-slate-900"
+                    ? "bg-white border-2 border-indigo-600 text-indigo-600 animate-pulse dark:bg-slate-900 dark:text-indigo-400"
                     : "bg-slate-100 text-slate-400 dark:text-slate-500 dark:bg-slate-800"
                 }`}
               >

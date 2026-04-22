@@ -335,7 +335,7 @@ export default function FundDetail() {
               <p className="text-sm text-slate-500 dark:text-slate-400">Paid</p>
               <TrendingDown className="w-5 h-5 text-violet-200" />
             </div>
-            <p className="text-2xl font-bold text-violet-600">
+            <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">
               ${centsToNumber(stats.paid).toLocaleString()}
             </p>
             <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">{percentPaid.toFixed(1)}% of budget</p>
@@ -348,7 +348,7 @@ export default function FundDetail() {
               <p className="text-sm text-slate-500 dark:text-slate-400">Committed</p>
               <FileText className="w-5 h-5 text-amber-200" />
             </div>
-            <p className="text-2xl font-bold text-amber-600">
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
               ${centsToNumber(stats.approved).toLocaleString()}
             </p>
             <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">{percentCommitted.toFixed(1)}% of budget</p>
@@ -362,9 +362,9 @@ export default function FundDetail() {
               <TrendingUp className="w-5 h-5 text-emerald-200" />
             </div>
             <p className={`text-2xl font-bold ${
-              percentRemaining < 20 ? "text-red-600" :
-              percentRemaining < 50 ? "text-amber-600" :
-              "text-emerald-600"
+              percentRemaining < 20 ? "text-red-600 dark:text-red-400" :
+              percentRemaining < 50 ? "text-amber-600 dark:text-amber-400" :
+              "text-emerald-600 dark:text-emerald-400"
             }`}>
               ${centsToNumber(stats.remaining).toLocaleString()}
             </p>
@@ -573,7 +573,7 @@ export default function FundDetail() {
                       size="sm"
                       className={`justify-start ${
                         (formData.allowed_categories || []).includes(category)
-                          ? "bg-indigo-50 border-indigo-300 text-indigo-700"
+                          ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-800/60 dark:text-indigo-300"
                           : ""
                       }`}
                       onClick={() => toggleCategory(category)}
@@ -794,8 +794,8 @@ export default function FundDetail() {
                 {fund.eligibility_notes && (
                   <div>
                     <p className="text-sm font-medium text-slate-500 mb-1 dark:text-slate-400">Eligibility</p>
-                    <Alert className="bg-blue-50 border-blue-200">
-                      <AlertDescription className="text-blue-800 text-sm">
+                    <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/50">
+                      <AlertDescription className="text-blue-800 text-sm dark:text-blue-200">
                         {fund.eligibility_notes}
                       </AlertDescription>
                     </Alert>
@@ -920,9 +920,9 @@ export default function FundDetail() {
 
             {/* Warning if low budget */}
             {percentRemaining < 20 && (
-              <Alert className="bg-red-50 border-red-200">
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-                <AlertDescription className="text-red-800 text-sm">
+              <Alert className="bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/50">
+                <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-red-800 text-sm dark:text-red-200">
                   <strong>Low Budget Warning</strong>
                   <p className="mt-1">Only {percentRemaining.toFixed(0)}% of the budget remains.</p>
                 </AlertDescription>

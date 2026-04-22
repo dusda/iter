@@ -73,7 +73,7 @@ export default function StatCard({
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
           <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50">{value}</p>
           {trend && (
-            <p className={`text-xs font-medium ${trendUp ? "text-emerald-600" : "text-slate-500 dark:text-slate-400"}`}>
+            <p className={`text-xs font-medium ${trendUp ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`}>
               {trend}
             </p>
           )}
