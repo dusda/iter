@@ -92,7 +92,7 @@ export default function AuditLog() {
     if (actionType.includes("UPDATE") || actionType.includes("EDIT")) return <Settings className="w-4 h-4 text-amber-600" />;
     if (actionType.includes("APPROVE")) return <CheckCircle className="w-4 h-4 text-emerald-600" />;
     if (actionType.includes("DISBURSEMENT")) return <DollarSign className="w-4 h-4 text-violet-600" />;
-    return <User className="w-4 h-4 text-slate-600" />;
+    return <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />;
   };
 
   if (!user) {
@@ -106,7 +106,7 @@ export default function AuditLog() {
   if (user.app_role !== "admin" && user.app_role !== "super_admin" && user.app_role !== "fund_manager") {
     return (
       <div className="text-center py-16">
-        <p className="text-slate-500">Access restricted to administrators and fund managers</p>
+        <p className="text-slate-500 dark:text-slate-400">Access restricted to administrators and fund managers</p>
       </div>
     );
   }
@@ -125,11 +125,11 @@ export default function AuditLog() {
       />
 
       {/* Filters */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <Input
                 placeholder="Search logs..."
                 className="pl-9"
@@ -166,7 +166,7 @@ export default function AuditLog() {
       </Card>
 
       {/* Audit Log Table */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-0">
           {isLoading ? (
             <LoadingSpinner className="py-16" />
@@ -174,7 +174,7 @@ export default function AuditLog() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50">
+                  <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableHead>Date & Time</TableHead>
                     <TableHead>Actor</TableHead>
                     <TableHead>Action</TableHead>
@@ -192,11 +192,11 @@ export default function AuditLog() {
                     }
 
                     return (
-                      <TableRow key={log.id} className="hover:bg-slate-50/50">
+                      <TableRow key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                         <TableCell className="text-sm">
                           {format(new Date(log.created_date), "MMM d, yyyy")}
                           <br />
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
                             {format(new Date(log.created_date), "h:mm a")}
                           </span>
                         </TableCell>
@@ -215,16 +215,16 @@ export default function AuditLog() {
                           <div className="text-sm">
                             <p className="font-medium">{log.entity_type}</p>
                             {log.entity_id && (
-                              <p className="text-xs text-slate-500 font-mono">{log.entity_id.substring(0, 8)}...</p>
+                              <p className="text-xs text-slate-500 font-mono dark:text-slate-400">{log.entity_id.substring(0, 8)}...</p>
                             )}
                           </div>
                         </TableCell>
                         <TableCell className="max-w-xs">
-                          <div className="text-xs text-slate-600 space-y-1">
+                          <div className="text-xs text-slate-600 space-y-1 dark:text-slate-300">
                             {Object.entries(details).slice(0, 3).map(([key, value]) => (
                               <div key={key}>
                                 <span className="font-medium">{key}:</span>{" "}
-                                <span className="text-slate-500">
+                                <span className="text-slate-500 dark:text-slate-400">
                                   {typeof value === "string" ? value.substring(0, 50) : JSON.stringify(value).substring(0, 50)}
                                 </span>
                               </div>

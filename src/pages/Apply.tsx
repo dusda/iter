@@ -540,7 +540,7 @@ export default function Apply() {
               return (
                 <Card
                   key={fund.id}
-                  className="cursor-pointer transition-all hover:shadow-lg hover:border-indigo-200 bg-white/70 backdrop-blur-xs"
+                  className="cursor-pointer transition-all hover:shadow-lg hover:border-indigo-200 bg-white/70 backdrop-blur-xs dark:bg-slate-900/70"
                   onClick={() => setSelectedFund(fund)}
                 >
                   <CardHeader>
@@ -569,7 +569,7 @@ export default function Apply() {
                           <div className="flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4 text-amber-500" />
                             <div>
-                              <p className="text-slate-500 text-xs">Max Request</p>
+                              <p className="text-slate-500 text-xs dark:text-slate-400">Max Request</p>
                               <p className="font-semibold text-amber-600">
                                 ${fund.max_request_amount?.toLocaleString()}
                               </p>
@@ -579,9 +579,9 @@ export default function Apply() {
                         
                         {fund.end_date && (
                           <div className="flex items-center gap-2 col-span-2">
-                            <Calendar className={`w-4 h-4 ${isExpiringSoon ? "text-red-500" : "text-slate-400"}`} />
+                            <Calendar className={`w-4 h-4 ${isExpiringSoon ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`} />
                             <div>
-                              <p className="text-slate-500 text-xs">Deadline</p>
+                              <p className="text-slate-500 text-xs dark:text-slate-400">Deadline</p>
                               <p className={`font-semibold text-sm ${isExpiringSoon ? "text-red-600" : ""}`}>
                                 {format(new Date(fund.end_date), "MMMM d, yyyy")}
                                 {isExpiringSoon && " (Expiring Soon!)"}
@@ -660,7 +660,7 @@ export default function Apply() {
         </Alert>
       )}
 
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle>Application Form</CardTitle>
           <CardDescription>All fields marked with * are required</CardDescription>
@@ -668,11 +668,11 @@ export default function Apply() {
         <CardContent className="space-y-6">
           {/* Contact Information */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+            <h3 className="font-semibold text-slate-800 flex items-center gap-2 dark:text-slate-100">
               <AlertCircle className="w-4 h-4" />
               Contact Information
             </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               These details can be edited and will be saved as a snapshot with your application.
             </p>
             
@@ -725,7 +725,7 @@ export default function Apply() {
 
           {/* Request Details */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+            <h3 className="font-semibold text-slate-800 flex items-center gap-2 dark:text-slate-100">
               <DollarSign className="w-4 h-4" />
               Request Details
             </h3>
@@ -739,7 +739,7 @@ export default function Apply() {
                   )}
                 </Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <Input
                     id="amount"
                     type="number"
@@ -752,7 +752,7 @@ export default function Apply() {
                   />
                 </div>
                 {selectedFund.max_request_amount && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Maximum allowed: ${centsToNumber(selectedFund.max_request_amount).toLocaleString()}
                   </p>
                 )}
@@ -779,7 +779,7 @@ export default function Apply() {
                   </SelectContent>
                 </Select>
                 {allowedCategories.length > 0 && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Only selected categories are allowed for this fund
                   </p>
                 )}
@@ -802,7 +802,7 @@ export default function Apply() {
                   onChange={(e) => handleInputChange("intended_use_description", e.target.value)}
                   className={errors.intended_use_description ? "border-red-500" : ""}
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {formData.intended_use_description.length} / 30 characters minimum
                 </p>
               </div>
@@ -824,7 +824,7 @@ export default function Apply() {
                   onChange={(e) => handleInputChange("justification_paragraph", e.target.value)}
                   className={errors.justification_paragraph ? "border-red-500" : ""}
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {formData.justification_paragraph.length} / 100 characters minimum
                 </p>
               </div>
@@ -834,18 +834,18 @@ export default function Apply() {
           {/* Attachments */}
           {(selectedFund.application_fields?.attachments?.enabled ?? true) && (
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+              <h3 className="font-semibold text-slate-800 flex items-center gap-2 dark:text-slate-100">
                 <Paperclip className="w-4 h-4" />
                 Supporting Documents {(selectedFund.application_fields?.attachments?.required ?? false) && <span className="text-red-600">*</span>}
               </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Upload any supporting documents (PDF, JPG, PNG, DOC - max 10MB per file)
               {(selectedFund.application_fields?.attachments?.required ?? false) && (
                 <span className="text-amber-600 font-medium"> - Required for this fund</span>
               )}
             </p>
 
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors">
+            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors dark:border-slate-800">
               <input
                 type="file"
                 multiple
@@ -859,12 +859,12 @@ export default function Apply() {
                 {uploading ? (
                   <LoadingSpinner size="sm" className="mx-auto mb-2" />
                 ) : (
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2 dark:text-slate-500" />
                 )}
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600 dark:text-slate-300">
                   {uploading ? "Uploading..." : "Click to upload documents"}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">
                   PDF, JPG, PNG, DOC • Max 10MB per file
                 </p>
               </label>
@@ -872,17 +872,17 @@ export default function Apply() {
 
             {formData.attachments.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-700">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                   Uploaded Files ({formData.attachments.length})
                 </p>
                 {formData.attachments.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <File className="w-4 h-4 text-indigo-600 shrink-0" />
-                      <span className="text-sm text-slate-700 truncate">{file.name}</span>
+                      <span className="text-sm text-slate-700 truncate dark:text-slate-200">{file.name}</span>
                     </div>
                     <Button
                       variant="ghost"
@@ -944,19 +944,19 @@ export default function Apply() {
 
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-500">Fund:</span>
+                <span className="text-slate-500 dark:text-slate-400">Fund:</span>
                 <span className="font-medium">{selectedFund.fund_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Amount:</span>
+                <span className="text-slate-500 dark:text-slate-400">Amount:</span>
                 <span className="font-medium">${parseFloat(formData.requested_amount).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Category:</span>
+                <span className="text-slate-500 dark:text-slate-400">Category:</span>
                 <span className="font-medium">{formData.intended_use_category}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Attachments:</span>
+                <span className="text-slate-500 dark:text-slate-400">Attachments:</span>
                 <span className="font-medium">{formData.attachments.length} files</span>
               </div>
             </div>

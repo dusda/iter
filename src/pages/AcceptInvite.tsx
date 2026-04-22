@@ -116,7 +116,7 @@ export default function AcceptInvite() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 dark:bg-slate-900">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Accept your invite</CardTitle>
@@ -129,7 +129,7 @@ export default function AcceptInvite() {
         <CardContent>
           {!isReady ? (
             <div className="flex items-center justify-center py-6">
-              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin dark:border-slate-800"></div>
             </div>
           ) : !hasInviteSession ? (
             <div className="space-y-3">

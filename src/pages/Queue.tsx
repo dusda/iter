@@ -190,7 +190,7 @@ export default function Queue() {
 
       {showQueueTabs && (
         <Tabs value={queueViewMode} onValueChange={setViewModeUserPick}>
-          <TabsList className="bg-white/70 border flex-wrap h-auto gap-1 py-1">
+          <TabsList className="bg-white/70 border flex-wrap h-auto gap-1 py-1 dark:bg-slate-900/70">
             <TabsTrigger
               value="all_org_pending"
               className="data-[state=active]:bg-slate-800 data-[state=active]:text-white"
@@ -208,12 +208,12 @@ export default function Queue() {
       )}
 
       {/* Filters */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <Input
                   placeholder="Search by Request ID, student, or fund..."
                   className="pl-9"
@@ -285,7 +285,7 @@ export default function Queue() {
       </Card>
 
       {/* Requests Table */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         {isLoading ? (
           <LoadingSpinner className="py-16" />
         ) : filteredRequests.length === 0 ? (
@@ -302,16 +302,16 @@ export default function Queue() {
                 <Link
                   key={request.id}
                   to={createPageUrl(`ReviewRequest?id=${request.id}`)}
-                  className="block p-4 hover:bg-slate-50 transition-colors"
+                  className="block p-4 hover:bg-slate-50 transition-colors dark:hover:bg-slate-800"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="font-semibold text-slate-800">{request.student_full_name}</p>
-                      <p className="text-sm text-slate-500">{request.fund_name}</p>
+                      <p className="font-semibold text-slate-800 dark:text-slate-100">{request.student_full_name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{request.fund_name}</p>
                     </div>
                     <StatusBadge status={request.status} />
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
+                  <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4" />
                       {request.requested_amount?.toLocaleString()}
@@ -329,7 +329,7 @@ export default function Queue() {
             <div className="hidden md:block">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50">
+                  <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableHead>Request ID</TableHead>
                     <TableHead>Student</TableHead>
                     <TableHead>Fund</TableHead>
@@ -346,25 +346,25 @@ export default function Queue() {
                     const daysSince = getDaysSince(request.submitted_at || request.created_date);
                     
                     return (
-                      <TableRow key={request.id} className="group hover:bg-slate-50/50">
+                      <TableRow key={request.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                         <TableCell>
                           <span className="font-mono text-sm">{request.request_id}</span>
                         </TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">{request.student_full_name}</p>
-                            <p className="text-xs text-slate-500">{request.student_email}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{request.student_email}</p>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-600">{request.fund_name}</TableCell>
+                        <TableCell className="text-slate-600 dark:text-slate-300">{request.fund_name}</TableCell>
                         <TableCell className="font-semibold">${request.requested_amount?.toLocaleString()}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="bg-slate-100 text-xs">
+                          <Badge variant="secondary" className="bg-slate-100 text-xs dark:bg-slate-800">
                             {request.intended_use_category}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm text-slate-600">
+                          <span className="text-sm text-slate-600 dark:text-slate-300">
                             {request.current_step || "Not started"}
                           </span>
                         </TableCell>
@@ -372,7 +372,7 @@ export default function Queue() {
                           <StatusBadge status={request.status} />
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-slate-500">
+                          <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                             <Clock className="w-3 h-3" />
                             <span className="text-sm">{daysSince}d</span>
                           </div>

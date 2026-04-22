@@ -159,7 +159,7 @@ function StaffDashboard({ user }) {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Pending Requests */}
         {permissions.view_pending_requests !== false && (
-          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-semibold">Requests Needing Attention</CardTitle>
             <Button variant="ghost" size="sm" asChild>
@@ -172,7 +172,7 @@ function StaffDashboard({ user }) {
             {isLoading ? (
               <LoadingSpinner className="py-8" />
             ) : pendingRequests.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-slate-500 dark:text-slate-400">
                 <CheckCircle className="w-10 h-10 mx-auto mb-2 text-emerald-300" />
                 <p>All caught up!</p>
                 <p className="text-sm">No pending requests</p>
@@ -183,13 +183,13 @@ function StaffDashboard({ user }) {
                   <Link
                     key={request.id}
                     to={createPageUrl(`ReviewRequest?id=${request.id}`)}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group dark:hover:bg-slate-800"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate group-hover:text-indigo-600">
+                      <p className="font-medium text-slate-800 truncate group-hover:text-indigo-600 dark:text-slate-100">
                         {request.student_full_name}
                       </p>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         {request.fund_name} • ${request.requested_amount?.toLocaleString()}
                       </p>
                     </div>
@@ -207,7 +207,7 @@ function StaffDashboard({ user }) {
 
         {/* Fund Overview */}
         {permissions.view_fund_overview !== false && (
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-semibold">Fund Overview</CardTitle>
             {user.app_role !== "reviewer" && (
@@ -220,7 +220,7 @@ function StaffDashboard({ user }) {
           </CardHeader>
           <CardContent>
             {funds.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-slate-500 dark:text-slate-400">
                 <Wallet className="w-10 h-10 mx-auto mb-2 text-slate-300" />
                 <p>No funds created</p>
               </div>
@@ -229,19 +229,19 @@ function StaffDashboard({ user }) {
                 {funds.slice(0, 5).map((fund) => (
                   <div
                     key={fund.id}
-                    className="p-3 rounded-xl border border-slate-100"
+                    className="p-3 rounded-xl border border-slate-100 dark:border-slate-800"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <p className="font-medium text-slate-800">{fund.fund_name}</p>
+                      <p className="font-medium text-slate-800 dark:text-slate-100">{fund.fund_name}</p>
                       <StatusBadge status={fund.status} />
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-500">Budget</span>
+                      <span className="text-slate-500 dark:text-slate-400">Budget</span>
                       <span className="font-medium">${fund.total_budget?.toLocaleString()}</span>
                     </div>
                     {fund.remaining_budget !== undefined && (
                       <div className="mt-2">
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                           <div
                             className="h-full bg-linear-to-r from-indigo-500 to-violet-500 rounded-full"
                             style={{
@@ -249,7 +249,7 @@ function StaffDashboard({ user }) {
                             }}
                           />
                         </div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">
                           ${fund.remaining_budget?.toLocaleString()} remaining
                         </p>
                       </div>

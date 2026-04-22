@@ -132,7 +132,7 @@ export default function Funds() {
 
       {/* Status Tabs */}
       <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList className="bg-white/70 border">
+        <TabsList className="bg-white/70 border dark:bg-slate-900/70">
           <TabsTrigger value="all" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             All ({statusCounts.all})
           </TabsTrigger>
@@ -149,10 +149,10 @@ export default function Funds() {
       </Tabs>
 
       {/* Search */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
             <Input
               placeholder="Search funds..."
               className="pl-9"
@@ -183,7 +183,7 @@ export default function Funds() {
           }
         />
       ) : (
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
           {/* Mobile View */}
           <div className="md:hidden divide-y">
             {filteredFunds.map((fund) => {
@@ -194,26 +194,26 @@ export default function Funds() {
                 <div key={fund.id} className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-800">{fund.fund_name}</h3>
-                      <p className="text-sm text-slate-500">{fund.fund_owner_name}</p>
+                      <h3 className="font-semibold text-slate-800 dark:text-slate-100">{fund.fund_name}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{fund.fund_owner_name}</p>
                     </div>
                     <StatusBadge status={fund.status} />
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm mb-3">
                     <div>
-                      <p className="text-slate-500">Budget</p>
+                      <p className="text-slate-500 dark:text-slate-400">Budget</p>
                       <p className="font-semibold">${centsToNumber(fund.total_budget).toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Paid</p>
+                      <p className="text-slate-500 dark:text-slate-400">Paid</p>
                       <p className="font-semibold text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Committed</p>
+                      <p className="text-slate-500 dark:text-slate-400">Committed</p>
                       <p className="font-semibold text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Remaining</p>
+                      <p className="text-slate-500 dark:text-slate-400">Remaining</p>
                       <p className="font-semibold text-emerald-600">${centsToNumber(remaining).toLocaleString()}</p>
                     </div>
                   </div>
@@ -232,7 +232,7 @@ export default function Funds() {
           <div className="hidden md:block">
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50/50">
+                <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                   <TableHead>Fund Name</TableHead>
                   <TableHead>Owner</TableHead>
                   <TableHead className="text-right">Budget</TableHead>
@@ -250,18 +250,18 @@ export default function Funds() {
                   const percentRemaining = fund.total_budget ? ((remaining / fund.total_budget) * 100) : 0;
                   
                   return (
-                    <TableRow key={fund.id} className="hover:bg-slate-50/50">
+                    <TableRow key={fund.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                       <TableCell>
                         <div>
                           <p className="font-semibold">{fund.fund_name}</p>
                           {fund.description && (
-                            <p className="text-sm text-slate-500 line-clamp-1">{fund.description}</p>
+                            <p className="text-sm text-slate-500 line-clamp-1 dark:text-slate-400">{fund.description}</p>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2 text-sm">
-                          <Users className="w-4 h-4 text-slate-400" />
+                          <Users className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                           {fund.fund_owner_name || "Unknown"}
                         </div>
                       </TableCell>
@@ -271,7 +271,7 @@ export default function Funds() {
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className="font-medium text-violet-600">${centsToNumber(stats.paid).toLocaleString()}</span>
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-slate-400 dark:text-slate-500">
                             {fund.total_budget ? ((stats.paid / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
                         </div>
@@ -279,7 +279,7 @@ export default function Funds() {
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className="font-medium text-amber-600">${centsToNumber(stats.approved).toLocaleString()}</span>
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-slate-400 dark:text-slate-500">
                             {fund.total_budget ? ((stats.approved / fund.total_budget) * 100).toFixed(0) : "0"}%
                           </span>
                         </div>
@@ -295,7 +295,7 @@ export default function Funds() {
                           </span>
                           <div className="flex items-center gap-1">
                             {percentRemaining < 20 && <TrendingDown className="w-3 h-3 text-red-500" />}
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-slate-400 dark:text-slate-500">
                               {percentRemaining.toFixed(0)}%
                             </span>
                           </div>

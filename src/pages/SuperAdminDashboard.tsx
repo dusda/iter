@@ -171,7 +171,7 @@ export default function SuperAdminDashboard() {
       <div className="flex items-center justify-center py-16">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-slate-600">Access restricted to Super Administrators</p>
+            <p className="text-slate-600 dark:text-slate-300">Access restricted to Super Administrators</p>
           </CardContent>
         </Card>
       </div>
@@ -184,11 +184,11 @@ export default function SuperAdminDashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3 dark:text-slate-50">
                 <Building2 className="w-8 h-8 text-purple-600" />
                 Super Admin Dashboard
               </h1>
-              <p className="mt-1 text-slate-500">Manage organizations and system-wide settings</p>
+              <p className="mt-1 text-slate-500 dark:text-slate-400">Manage organizations and system-wide settings</p>
             </div>
             <Button onClick={openCreateDialog} className="bg-purple-600 hover:bg-purple-700">
               <Plus className="w-4 h-4 mr-2" />
@@ -198,7 +198,7 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* Organizations List */}
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader>
             <CardTitle>Organizations</CardTitle>
           </CardHeader>
@@ -206,7 +206,7 @@ export default function SuperAdminDashboard() {
             {isLoading ? (
               <LoadingSpinner className="py-8" />
             ) : organizations.length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                 <Building2 className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                 <p>No organizations yet</p>
               </div>
@@ -242,7 +242,7 @@ export default function SuperAdminDashboard() {
                       <TableCell>
                         <button
                           onClick={() => copyToClipboard(org.id, org.id)}
-                          className="font-mono text-xs text-slate-600 hover:text-slate-900 flex items-center gap-2"
+                          className="font-mono text-xs text-slate-600 hover:text-slate-900 flex items-center gap-2 dark:text-slate-300 dark:hover:text-slate-50"
                         >
                           {org.id.substring(0, 8)}...
                           {copiedId === org.id ? (
@@ -252,9 +252,9 @@ export default function SuperAdminDashboard() {
                           )}
                         </button>
                       </TableCell>
-                      <TableCell className="font-mono text-sm text-slate-600">{org.slug}</TableCell>
+                      <TableCell className="font-mono text-sm text-slate-600 dark:text-slate-300">{org.slug}</TableCell>
                       <TableCell className="max-w-md">
-                        <p className="text-sm text-slate-600 line-clamp-2">{org.description || "-"}</p>
+                        <p className="text-sm text-slate-600 line-clamp-2 dark:text-slate-300">{org.description || "-"}</p>
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={org.status} />
@@ -264,7 +264,7 @@ export default function SuperAdminDashboard() {
                           {org.listing_visibility === "unlisted" ? "Unlisted" : "Public"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-slate-500">
+                      <TableCell className="text-sm text-slate-500 dark:text-slate-400">
                         {new Date(org.created_date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
@@ -330,7 +330,7 @@ export default function SuperAdminDashboard() {
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
                   placeholder="acme-university"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Public URL: /publichome?org={formData.slug || "org-slug"}
                 </p>
               </div>
@@ -380,7 +380,7 @@ export default function SuperAdminDashboard() {
                     setFormData({ ...formData, listing_visibility: value })
                   }
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white dark:bg-slate-900">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -388,7 +388,7 @@ export default function SuperAdminDashboard() {
                     <SelectItem value="unlisted">Unlisted — direct link only</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Unlisted organizations do not appear in the public organization picker; share the org URL for access requests.
                 </p>
               </div>
@@ -403,14 +403,14 @@ export default function SuperAdminDashboard() {
                 </Button>
               </div>
               {editingOrg && (
-                <div className="bg-slate-50 -mx-6 -mt-4 mb-4 px-6 py-3 border-b">
-                  <p className="text-xs text-slate-500">Organization ID</p>
+                <div className="bg-slate-50 -mx-6 -mt-4 mb-4 px-6 py-3 border-b dark:bg-slate-900">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Organization ID</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <code className="text-sm font-mono text-slate-700">{editingOrg.id}</code>
+                    <code className="text-sm font-mono text-slate-700 dark:text-slate-200">{editingOrg.id}</code>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(editingOrg.id, "dialog-" + editingOrg.id)}
-                      className="text-slate-400 hover:text-slate-600"
+                      className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     >
                       {copiedId === "dialog-" + editingOrg.id ? (
                         <Check className="w-3 h-3 text-green-600" />
@@ -441,12 +441,12 @@ export default function SuperAdminDashboard() {
                 Manage funds and users for this organization.
               </DialogDescription>
               <div className="flex items-center gap-2 mt-2">
-                <code className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                <code className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded dark:text-slate-400 dark:bg-slate-800">
                   {viewingOrg?.id}
                 </code>
                 <button
                   onClick={() => copyToClipboard(viewingOrg?.id, "view-" + viewingOrg?.id)}
-                  className="text-slate-400 hover:text-slate-600"
+                  className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                 >
                   {copiedId === "view-" + viewingOrg?.id ? (
                     <Check className="w-3 h-3 text-green-600" />
@@ -471,7 +471,7 @@ export default function SuperAdminDashboard() {
 
               <TabsContent value="funds" className="space-y-4">
                 {orgFunds.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                     <Wallet className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                     <p>No funds created yet</p>
                   </div>
@@ -493,7 +493,7 @@ export default function SuperAdminDashboard() {
                           <TableCell>
                             <div className="text-sm">
                               <p className="font-medium">${fund.total_budget?.toLocaleString()}</p>
-                              <p className="text-slate-500">
+                              <p className="text-slate-500 dark:text-slate-400">
                                 ${fund.remaining_budget?.toLocaleString()} remaining
                               </p>
                             </div>
@@ -502,7 +502,7 @@ export default function SuperAdminDashboard() {
                             <StatusBadge status={fund.status} />
                           </TableCell>
                           <TableCell className="text-sm">{fund.fund_owner_name || "-"}</TableCell>
-                          <TableCell className="text-sm text-slate-500">
+                          <TableCell className="text-sm text-slate-500 dark:text-slate-400">
                             {formatDate(fund.created_date)}
                           </TableCell>
                         </TableRow>
@@ -514,7 +514,7 @@ export default function SuperAdminDashboard() {
 
               <TabsContent value="users" className="space-y-4">
                 {orgUsers.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                     <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
                     <p>No users yet</p>
                   </div>
@@ -537,8 +537,8 @@ export default function SuperAdminDashboard() {
                           <TableCell>
                             <Badge variant="outline">{u.app_role || "student"}</Badge>
                           </TableCell>
-                          <TableCell className="text-sm text-slate-600">{u.student_id || "-"}</TableCell>
-                          <TableCell className="text-sm text-slate-500">
+                          <TableCell className="text-sm text-slate-600 dark:text-slate-300">{u.student_id || "-"}</TableCell>
+                          <TableCell className="text-sm text-slate-500 dark:text-slate-400">
                             {formatDate(u.created_date)}
                           </TableCell>
                         </TableRow>

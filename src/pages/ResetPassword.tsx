@@ -107,7 +107,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 dark:bg-slate-900">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Choose a new password</CardTitle>
@@ -120,7 +120,7 @@ export default function ResetPassword() {
         <CardContent>
           {!isReady ? (
             <div className="flex items-center justify-center py-6">
-              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin dark:border-slate-800"></div>
             </div>
           ) : !hasRecoverySession ? (
             <div className="space-y-3">

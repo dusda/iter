@@ -259,7 +259,7 @@ export default function Settings() {
 
         {/* Organization Settings */}
         <TabsContent value="organization">
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle>Active Organization</CardTitle>
             </CardHeader>
@@ -271,7 +271,7 @@ export default function Settings() {
                   onValueChange={(value) => switchOrganization.mutate(value)}
                   disabled={switchOrganization.isPending || availableOrganizations.length === 0}
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white dark:bg-slate-900">
                     <SelectValue placeholder={availableOrganizations.length ? "Select an organization" : "No organizations available"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -283,13 +283,13 @@ export default function Settings() {
                   </SelectContent>
                 </Select>
                 {!isSuperAdmin && availableOrganizations.length === 0 ? (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     No approved organizations found for your account yet.
                   </p>
                 ) : null}
               </div>
               {switchOrganization.isPending ? (
-                <div className="flex items-center gap-2 text-sm text-slate-500">
+                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                   <LoadingSpinner size="sm" />
                   Switching organization…
                 </div>
@@ -299,18 +299,18 @@ export default function Settings() {
 
           {!isAdmin ? (
             <div className="text-center py-10">
-              <p className="text-slate-500">Organization settings are restricted to administrators.</p>
+              <p className="text-slate-500 dark:text-slate-400">Organization settings are restricted to administrators.</p>
             </div>
           ) : null}
 
           {isAdmin ? (
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle>Organization Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               {!user?.organization_id ? (
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
                   Select an organization above to edit its settings.
                 </div>
               ) : null}
@@ -320,7 +320,7 @@ export default function Settings() {
                   <Input
                     value={user.organization_id}
                     disabled
-                    className="bg-slate-50 text-slate-500"
+                    className="bg-slate-50 text-slate-500 dark:text-slate-400 dark:bg-slate-900"
                   />
                 </div>
               )}
@@ -346,10 +346,10 @@ export default function Settings() {
                       <img
                         src={logoSrc}
                         alt="Organization logo"
-                        className="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white"
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-xs text-slate-500">
+                      <div className="w-16 h-16 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-700">
                         No logo
                       </div>
                     )}
@@ -367,7 +367,7 @@ export default function Settings() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="flex-1 justify-start bg-white"
+                        className="flex-1 justify-start bg-white dark:bg-slate-900"
                         disabled={uploading || !user?.organization_id}
                         onClick={() => logoFileInputRef.current?.click()}
                       >
@@ -388,9 +388,9 @@ export default function Settings() {
                       </Button>
                     </div>
                     {uploading ? (
-                      <div className="mt-1 text-xs text-slate-500">Uploading…</div>
+                      <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">Uploading…</div>
                     ) : orgForm.logo?.startsWith("placeholder://") ? (
-                      <div className="mt-1 text-xs text-slate-500">
+                      <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                         Logo set (storage not configured in this environment)
                       </div>
                     ) : null}
@@ -437,7 +437,7 @@ export default function Settings() {
                   }}
                   disabled={!user?.organization_id}
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white dark:bg-slate-900">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -445,7 +445,7 @@ export default function Settings() {
                     <SelectItem value="unlisted">Unlisted — direct link only</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Unlisted organizations are hidden from the public organization list; share your org link for access requests.
                 </p>
               </div>

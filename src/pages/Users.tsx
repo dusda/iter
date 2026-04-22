@@ -432,8 +432,8 @@ export default function Users() {
     if (!showAccessRequestPagination) return null;
     const borderClass =
       variant === "top"
-        ? "pb-4 mb-4 border-b border-slate-200/60"
-        : "pt-4 mt-4 border-t border-slate-200/60";
+        ? "pb-4 mb-4 border-b border-slate-200/60 dark:border-slate-800/60"
+        : "pt-4 mt-4 border-t border-slate-200/60 dark:border-slate-800/60";
     const navLabel =
       variant === "top"
         ? "Access requests pagination, top of list"
@@ -442,13 +442,13 @@ export default function Users() {
       <div
         className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${borderClass}`}
       >
-        <p className="text-sm text-slate-500 sm:order-1">
+        <p className="text-sm text-slate-500 sm:order-1 dark:text-slate-400">
           Showing{" "}
-          <span className="font-medium text-slate-700 tabular-nums">
+          <span className="font-medium text-slate-700 tabular-nums dark:text-slate-200">
             {accessRequestRangeStart + 1}–{accessRequestRangeEnd}
           </span>{" "}
           of{" "}
-          <span className="font-medium text-slate-700 tabular-nums">{accessRequests.length}</span>
+          <span className="font-medium text-slate-700 tabular-nums dark:text-slate-200">{accessRequests.length}</span>
         </p>
         <nav
           className="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:order-2"
@@ -468,7 +468,7 @@ export default function Users() {
             <ChevronLeft className="h-4 w-4" />
             Previous
           </Button>
-          <span className="flex h-9 min-w-22 items-center justify-center px-2 text-sm text-slate-600 tabular-nums">
+          <span className="flex h-9 min-w-22 items-center justify-center px-2 text-sm text-slate-600 tabular-nums dark:text-slate-300">
             Page {accessRequestsPage} of {accessRequestTotalPages}
           </span>
           <Button
@@ -571,11 +571,11 @@ export default function Users() {
 
         <TabsContent value="users" className="space-y-4 mt-4">
       {/* Filters */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <Input
                 placeholder="Search users..."
                 className="pl-9"
@@ -603,7 +603,7 @@ export default function Users() {
       </Card>
 
       {/* Users Table */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         {isLoading ? (
           <LoadingSpinner className="py-16" />
         ) : filteredUsers.length === 0 ? (
@@ -626,8 +626,8 @@ export default function Users() {
                           <RoleIcon className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-800">{user.full_name || "No name"}</p>
-                          <p className="text-sm text-slate-500">{user.email}</p>
+                          <p className="font-semibold text-slate-800 dark:text-slate-100">{user.full_name || "No name"}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
                         </div>
                       </div>
                       {actorMayEditUser(currentUser.app_role, user) && (
@@ -651,7 +651,7 @@ export default function Users() {
             <div className="hidden md:block">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50">
+                  <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
@@ -664,7 +664,7 @@ export default function Users() {
                   {filteredUsers.map((user) => {
                     const RoleIcon = roleIcons[user.app_role] || GraduationCap;
                     return (
-                      <TableRow key={user.id} className="hover:bg-slate-50/50">
+                      <TableRow key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${roleColors[user.app_role] || roleColors.student}`}>
@@ -673,7 +673,7 @@ export default function Users() {
                             <div>
                               <p className="font-medium">{user.full_name || "No name"}</p>
                               {user.phone && (
-                                <p className="text-xs text-slate-500 flex items-center gap-1">
+                                <p className="text-xs text-slate-500 flex items-center gap-1 dark:text-slate-400">
                                   <Phone className="w-3 h-3" /> {user.phone}
                                 </p>
                               )}
@@ -681,7 +681,7 @@ export default function Users() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-slate-600">
+                          <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
                             <Mail className="w-4 h-4" />
                             {user.email}
                           </div>
@@ -694,7 +694,7 @@ export default function Users() {
                         <TableCell>
                           <StatusBadge status={user.status || "active"} />
                         </TableCell>
-                        <TableCell className="text-slate-500">
+                        <TableCell className="text-slate-500 dark:text-slate-400">
                           {safeFormatDate(user.created_date)}
                         </TableCell>
                         <TableCell>
@@ -763,15 +763,15 @@ export default function Users() {
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                             <div className="min-w-0">
-                              <h3 className="font-semibold text-slate-900 leading-snug">
+                              <h3 className="font-semibold text-slate-900 leading-snug dark:text-slate-50">
                                 {request.full_name || "Unnamed applicant"}
                               </h3>
-                              <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                              <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5 dark:text-slate-400">
                                 <Mail className="w-3.5 h-3.5 shrink-0" />
                                 <span className="truncate">{request.email}</span>
                               </p>
                               {request.phone && (
-                                <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5">
+                                <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-0.5 dark:text-slate-400">
                                   <Phone className="w-3.5 h-3.5 shrink-0" />
                                   {request.phone}
                                 </p>
@@ -780,7 +780,7 @@ export default function Users() {
                             <div className="flex flex-wrap items-center gap-2 shrink-0">
                               <StatusBadge status={request.status} />
                               <time
-                                className="text-xs text-slate-400 tabular-nums"
+                                className="text-xs text-slate-400 tabular-nums dark:text-slate-500"
                                 dateTime={request.created_date}
                                 title={request.created_date}
                               >
@@ -789,21 +789,21 @@ export default function Users() {
                             </div>
                           </div>
                           {request.student_id && (
-                            <p className="text-xs text-slate-500">
-                              Student ID: <span className="font-mono text-slate-600">{request.student_id}</span>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                              Student ID: <span className="font-mono text-slate-600 dark:text-slate-300">{request.student_id}</span>
                             </p>
                           )}
                         </div>
                       </div>
 
                       <div className="pl-0 sm:pl-13 space-y-2">
-                        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                           <MessageSquare className="w-3.5 h-3.5" />
                           Reason
                         </div>
-                        <div className="rounded-lg bg-slate-50/90 border border-slate-100 px-4 py-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-word min-h-12">
+                        <div className="rounded-lg bg-slate-50/90 border border-slate-100 px-4 py-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-word min-h-12 dark:text-slate-200 dark:bg-slate-900/90 dark:border-slate-800">
                           {request.reason?.trim() ? request.reason : (
-                            <span className="text-slate-400 italic">No reason provided.</span>
+                            <span className="text-slate-400 italic dark:text-slate-500">No reason provided.</span>
                           )}
                         </div>
                       </div>
@@ -831,7 +831,7 @@ export default function Users() {
                         </div>
                       ) : (
                         (request.reviewed_by || request.reviewed_at) && (
-                          <div className="pl-0 sm:pl-13 text-sm text-slate-500 border-t border-slate-100 pt-3">
+                          <div className="pl-0 sm:pl-13 text-sm text-slate-500 border-t border-slate-100 pt-3 dark:text-slate-400 dark:border-slate-800">
                             {request.reviewed_by && <span>Reviewed by {request.reviewed_by}</span>}
                             {request.reviewed_by && request.reviewed_at && <span className="text-slate-300 mx-1.5">·</span>}
                             {request.reviewed_at && (
@@ -943,7 +943,7 @@ export default function Users() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 They will be added to your organization when the invitation is sent.
               </p>
             </div>
@@ -984,9 +984,9 @@ export default function Users() {
               </TabsList>
               
               <TabsContent value="basic" className="space-y-4 pt-4">
-                <div className="p-4 bg-slate-50 rounded-lg">
+                <div className="p-4 bg-slate-50 rounded-lg dark:bg-slate-900">
                   <p className="font-medium">{editingUser.full_name}</p>
-                  <p className="text-sm text-slate-500">{editingUser.email}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{editingUser.email}</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Role</Label>
@@ -1011,11 +1011,11 @@ export default function Users() {
                 {canReassignOrganization && (
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-slate-500" aria-hidden />
+                      <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" aria-hidden />
                       Organization
                     </Label>
                     {organizationsLoading ? (
-                      <p className="text-sm text-slate-500">Loading organizations…</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Loading organizations…</p>
                     ) : (
                       <Select
                         value={editingUser.organization_id ?? undefined}
@@ -1044,7 +1044,7 @@ export default function Users() {
                         </SelectContent>
                       </Select>
                     )}
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {currentUser.app_role === "super_admin"
                         ? "Assign this user to any organization."
                         : "Move this user to another organization. They will lose access to this org’s data."}
@@ -1056,14 +1056,14 @@ export default function Users() {
               <TabsContent value="permissions" className="space-y-4 pt-4">
                 <div className="space-y-1 mb-4">
                   <p className="text-sm font-medium">Dashboard Permissions</p>
-                  <p className="text-xs text-slate-500">Control what sections this user can access in the dashboard</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Control what sections this user can access in the dashboard</p>
                 </div>
                 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">View Statistics</p>
-                      <p className="text-xs text-slate-500">Access to stats cards on dashboard</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Access to stats cards on dashboard</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.view_stats !== false}
@@ -1074,7 +1074,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">View Pending Requests</p>
-                      <p className="text-xs text-slate-500">See pending requests section</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">See pending requests section</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.view_pending_requests !== false}
@@ -1085,7 +1085,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">View Fund Overview</p>
-                      <p className="text-xs text-slate-500">See fund overview section</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">See fund overview section</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.view_fund_overview !== false}
@@ -1096,7 +1096,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access Review Queue</p>
-                      <p className="text-xs text-slate-500">Navigate to review queue page</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Navigate to review queue page</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_queue !== false}
@@ -1107,7 +1107,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access Funds Management</p>
-                      <p className="text-xs text-slate-500">View and manage funds</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">View and manage funds</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_funds !== false}
@@ -1118,7 +1118,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access Reports</p>
-                      <p className="text-xs text-slate-500">View reporting dashboard</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">View reporting dashboard</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_reports !== false}
@@ -1129,7 +1129,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access Routing Rules</p>
-                      <p className="text-xs text-slate-500">Configure fund routing</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Configure fund routing</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_rules === true}
@@ -1140,7 +1140,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access User Management</p>
-                      <p className="text-xs text-slate-500">Manage users and roles</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Manage users and roles</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_users === true}
@@ -1151,7 +1151,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2 border-b">
                     <div>
                       <p className="font-medium text-sm">Access Audit Log</p>
-                      <p className="text-xs text-slate-500">View system audit trail</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">View system audit trail</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_audit_log === true}
@@ -1162,7 +1162,7 @@ export default function Users() {
                   <div className="flex items-center justify-between py-2">
                     <div>
                       <p className="font-medium text-sm">Access Settings</p>
-                      <p className="text-xs text-slate-500">Modify system settings</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Modify system settings</p>
                     </div>
                     <Switch
                       checked={editingUser.dashboard_permissions?.access_settings === true}

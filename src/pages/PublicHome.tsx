@@ -80,11 +80,11 @@ export default function PublicHome() {
 
   if (!orgSlug) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30">
-        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-950 dark:to-indigo-950/30">
+        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-800/50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <div className="font-bold text-slate-800 text-lg">Select your organization</div>
+              <div className="font-bold text-slate-800 text-lg dark:text-slate-100">Select your organization</div>
               <Button onClick={handleLogin} variant="outline">
                 <LogIn className="w-4 h-4 mr-2" />
                 Sign In
@@ -95,8 +95,8 @@ export default function PublicHome() {
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Welcome</h1>
-            <p className="mt-2 text-slate-600">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50">Welcome</h1>
+            <p className="mt-2 text-slate-600 dark:text-slate-300">
               Choose your organization to request access.
             </p>
           </div>
@@ -108,8 +108,8 @@ export default function PublicHome() {
           ) : organizations.length === 0 ? (
             <Card className="max-w-xl">
               <CardContent className="pt-6">
-                <p className="text-slate-700 font-medium">No organizations found.</p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-slate-700 font-medium dark:text-slate-200">No organizations found.</p>
+                <p className="text-sm text-slate-500 mt-1 dark:text-slate-400">
                   Ask an administrator to create an organization, or browse with `?org=your-org-slug`.
                 </p>
               </CardContent>
@@ -123,7 +123,7 @@ export default function PublicHome() {
                   onClick={() => navigate(`/org/${encodeURIComponent(org.slug)}`)}
                   className="text-left"
                 >
-                  <Card className="h-full bg-white/70 backdrop-blur-xs border-slate-200/50 shadow-sm hover:shadow-md transition-shadow">
+                  <Card className="h-full bg-white/70 backdrop-blur-xs border-slate-200/50 shadow-sm hover:shadow-md transition-shadow dark:bg-slate-900/70 dark:border-slate-800/50">
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
                         {org.logo ? (
@@ -138,8 +138,8 @@ export default function PublicHome() {
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="font-semibold text-slate-900 truncate">{org.name}</div>
-                          <div className="text-sm text-slate-600 mt-1 line-clamp-3">
+                          <div className="font-semibold text-slate-900 truncate dark:text-slate-50">{org.name}</div>
+                          <div className="text-sm text-slate-600 mt-1 line-clamp-3 dark:text-slate-300">
                             {org.description || "Apply for financial assistance to support your educational journey."}
                           </div>
                         </div>
@@ -157,11 +157,11 @@ export default function PublicHome() {
 
   if (!organization) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-900">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-slate-700 font-medium mb-2">Organization not found</p>
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-slate-700 font-medium mb-2 dark:text-slate-200">Organization not found</p>
+            <p className="text-sm text-slate-500 mb-4 dark:text-slate-400">
               The organization slug <span className="font-mono">{orgSlug}</span> doesn’t match any organization.
             </p>
             <div className="flex items-center justify-center gap-2">
@@ -184,9 +184,9 @@ export default function PublicHome() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30 dark:from-slate-950 dark:via-slate-950 dark:to-indigo-950/30">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
@@ -197,7 +197,7 @@ export default function PublicHome() {
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
               )}
-              <span className="font-bold text-slate-800 text-lg">{organization.name}</span>
+              <span className="font-bold text-slate-800 text-lg dark:text-slate-100">{organization.name}</span>
             </div>
             <Button onClick={handleLogin} variant="outline">
               <LogIn className="w-4 h-4 mr-2" />
@@ -216,16 +216,16 @@ export default function PublicHome() {
               <img src={organization.logo} alt="Logo" className="w-24 h-24 rounded-2xl object-cover shadow-xl" />
             </div>
           )}
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 dark:text-slate-50">
             {organization.name}
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto dark:text-slate-300">
             {organization.description || "Apply for financial assistance to support your educational journey."}
           </p>
         </div>
 
         {/* Request Access Form */}
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 shadow-xl">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 shadow-xl dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader>
             <CardTitle className="text-2xl text-center">
               {submitted ? "Request Submitted!" : organization.welcome_message || "Request Access"}
@@ -235,8 +235,8 @@ export default function PublicHome() {
             {submitted ? (
               <div className="text-center py-8">
                 <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-                <p className="text-slate-700 text-lg mb-2">Thank you for your request!</p>
-                <p className="text-slate-500">
+                <p className="text-slate-700 text-lg mb-2 dark:text-slate-200">Thank you for your request!</p>
+                <p className="text-slate-500 dark:text-slate-400">
                   An administrator will review your request and contact you via email at{" "}
                   <span className="font-medium">{formData.email}</span>
                 </p>
@@ -314,7 +314,7 @@ export default function PublicHome() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-sm text-slate-500">
+        <div className="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
           <p>Already have an account?{" "}
             <button onClick={handleLogin} className="text-indigo-600 hover:text-indigo-700 font-medium">
               Sign in here

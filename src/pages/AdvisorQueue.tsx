@@ -112,10 +112,10 @@ export default function AdvisorQueue() {
       </div>
 
       {/* Search */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
             <Input
               placeholder="Search by student name, request ID, or fund..."
               className="pl-9"
@@ -127,7 +127,7 @@ export default function AdvisorQueue() {
       </Card>
 
       {/* Requests Table */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         {isLoading ? (
           <LoadingSpinner className="py-16" />
         ) : filteredRequests.length === 0 ? (
@@ -141,11 +141,11 @@ export default function AdvisorQueue() {
             {/* Mobile View */}
             <div className="md:hidden divide-y">
               {filteredRequests.map((request) => (
-                <div key={request.id} className="p-4 hover:bg-slate-50">
+                <div key={request.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800">
                   <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="font-semibold text-slate-800">{request.student_full_name}</p>
-                    <p className="text-sm text-slate-500">{request.request_id}</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-100">{request.student_full_name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{request.request_id}</p>
                   </div>
                   {request.advisor_tasks_completed ? (
                     <CheckCircle className="w-5 h-5 text-green-500" />
@@ -155,15 +155,15 @@ export default function AdvisorQueue() {
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Fund:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Fund:</span>
                       <span className="font-medium">{request.fund_name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Amount:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Amount:</span>
                       <span className="font-medium">${request.requested_amount?.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500">Status:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Status:</span>
                       <StatusBadge status={request.status} />
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export default function AdvisorQueue() {
             <div className="hidden md:block">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50">
+                  <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableHead>Request ID</TableHead>
                     <TableHead>Student</TableHead>
                     <TableHead>Fund</TableHead>
@@ -195,14 +195,14 @@ export default function AdvisorQueue() {
                 </TableHeader>
                 <TableBody>
                   {filteredRequests.map((request) => (
-                    <TableRow key={request.id} className="hover:bg-slate-50/50">
+                    <TableRow key={request.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                       <TableCell className="font-mono text-sm">
                         {request.request_id}
                       </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium">{request.student_full_name}</p>
-                          <p className="text-xs text-slate-500">{request.student_email}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{request.student_email}</p>
                         </div>
                       </TableCell>
                       <TableCell>{request.fund_name}</TableCell>
@@ -225,7 +225,7 @@ export default function AdvisorQueue() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-slate-500 text-sm">
+                      <TableCell className="text-slate-500 text-sm dark:text-slate-400">
                         {request.submitted_at
                           ? format(new Date(request.submitted_at), "MMM d, yyyy")
                           : "Not submitted"}

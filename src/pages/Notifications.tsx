@@ -72,10 +72,10 @@ export default function Notifications() {
       {isLoading ? (
         <LoadingSpinner className="py-16" />
       ) : notifications.length === 0 ? (
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-12 text-center">
             <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500">No notifications yet</p>
+            <p className="text-slate-500 dark:text-slate-400">No notifications yet</p>
           </CardContent>
         </Card>
       ) : (
@@ -109,8 +109,8 @@ export default function Notifications() {
                           {notification.type.replace(/_/g, " ")}
                         </Badge>
                       </div>
-                      <p className="text-slate-600 mb-2">{notification.message}</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-slate-600 mb-2 dark:text-slate-300">{notification.message}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">
                         {format(new Date(notification.created_date), "MMM d, yyyy 'at' h:mm a")}
                       </p>
                     </div>

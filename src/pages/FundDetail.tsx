@@ -278,7 +278,7 @@ export default function FundDetail() {
   if (!fund) {
     return (
       <div className="text-center py-16">
-        <p className="text-slate-500">Fund not found</p>
+        <p className="text-slate-500 dark:text-slate-400">Fund not found</p>
         <Button asChild className="mt-4">
           <Link to={createPageUrl("Funds")}>Back to Funds</Link>
         </Button>
@@ -317,48 +317,48 @@ export default function FundDetail() {
 
       {/* Budget Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-slate-500">Total Budget</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Total Budget</p>
               <DollarSign className="w-5 h-5 text-indigo-200" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">
               ${centsToNumber(stats.totalBudget).toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-slate-500">Paid</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Paid</p>
               <TrendingDown className="w-5 h-5 text-violet-200" />
             </div>
             <p className="text-2xl font-bold text-violet-600">
               ${centsToNumber(stats.paid).toLocaleString()}
             </p>
-            <p className="text-xs text-slate-400 mt-1">{percentPaid.toFixed(1)}% of budget</p>
+            <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">{percentPaid.toFixed(1)}% of budget</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-slate-500">Committed</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Committed</p>
               <FileText className="w-5 h-5 text-amber-200" />
             </div>
             <p className="text-2xl font-bold text-amber-600">
               ${centsToNumber(stats.approved).toLocaleString()}
             </p>
-            <p className="text-xs text-slate-400 mt-1">{percentCommitted.toFixed(1)}% of budget</p>
+            <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">{percentCommitted.toFixed(1)}% of budget</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-slate-500">Remaining</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Remaining</p>
               <TrendingUp className="w-5 h-5 text-emerald-200" />
             </div>
             <p className={`text-2xl font-bold ${
@@ -368,19 +368,19 @@ export default function FundDetail() {
             }`}>
               ${centsToNumber(stats.remaining).toLocaleString()}
             </p>
-            <p className="text-xs text-slate-400 mt-1">{percentRemaining.toFixed(1)}% remaining</p>
+            <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">{percentRemaining.toFixed(1)}% remaining</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Budget Progress */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle className="text-lg">Budget Utilization</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="h-8 bg-slate-100 rounded-full overflow-hidden flex">
+            <div className="h-8 bg-slate-100 rounded-full overflow-hidden flex dark:bg-slate-800">
               {percentPaid > 0 && (
                 <div 
                   className="bg-violet-500 flex items-center justify-center text-white text-xs font-medium"
@@ -420,7 +420,7 @@ export default function FundDetail() {
 
       {isEditing ? (
         /* Edit Mode */
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader>
             <CardTitle>Fund Details</CardTitle>
             <CardDescription>Update fund information and constraints</CardDescription>
@@ -428,7 +428,7 @@ export default function FundDetail() {
           <CardContent className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-slate-800">Basic Information</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100">Basic Information</h3>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -498,13 +498,13 @@ export default function FundDetail() {
 
             {/* Budget Settings */}
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-slate-800">Budget Settings</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100">Budget Settings</h3>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Total Budget *</Label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                     <Input
                       type="number"
                       className="pl-9"
@@ -535,12 +535,12 @@ export default function FundDetail() {
 
             {/* Constraints */}
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-slate-800">Application Constraints</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100">Application Constraints</h3>
               
               <div className="space-y-2">
                 <Label>Maximum Request Amount (Optional)</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <Input
                     type="number"
                     className="pl-9"
@@ -551,10 +551,10 @@ export default function FundDetail() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900">
                 <div>
                   <Label className="text-sm">Require Attachments</Label>
-                  <p className="text-xs text-slate-500">Students must upload supporting documents</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Students must upload supporting documents</p>
                 </div>
                 <Switch
                   checked={formData.requires_attachments}
@@ -581,7 +581,7 @@ export default function FundDetail() {
                       {(formData.allowed_categories || []).includes(category) ? (
                         <CheckCircle className="w-3 h-3 mr-2" />
                       ) : (
-                        <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300" />
+                        <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300 dark:border-slate-700" />
                       )}
                       <span className="text-xs">{category.split("/")[0]}</span>
                     </Button>
@@ -592,15 +592,15 @@ export default function FundDetail() {
 
             {/* Application Form Fields */}
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-slate-800">Application Form Fields</h3>
-              <p className="text-sm text-slate-500">Choose which fields appear in the student application form</p>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100">Application Form Fields</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Choose which fields appear in the student application form</p>
               
               <div className="space-y-3">
-                <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+                <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-sm">Phone Number</Label>
-                      <p className="text-xs text-slate-500">Collect student phone number</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Collect student phone number</p>
                     </div>
                     <Switch
                       checked={formData.application_fields?.phone?.enabled ?? true}
@@ -615,7 +615,7 @@ export default function FundDetail() {
                   </div>
                   {(formData.application_fields?.phone?.enabled ?? true) && (
                     <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                      <Label className="text-xs text-slate-600">Required</Label>
+                      <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                       <Switch
                         checked={formData.application_fields?.phone?.required ?? false}
                         onCheckedChange={(checked) => setFormData({ 
@@ -630,11 +630,11 @@ export default function FundDetail() {
                   )}
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+                <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-sm">Intended Use Description</Label>
-                      <p className="text-xs text-slate-500">Detailed description of how funds will be used</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Detailed description of how funds will be used</p>
                     </div>
                     <Switch
                       checked={formData.application_fields?.intended_use_description?.enabled ?? true}
@@ -649,7 +649,7 @@ export default function FundDetail() {
                   </div>
                   {(formData.application_fields?.intended_use_description?.enabled ?? true) && (
                     <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                      <Label className="text-xs text-slate-600">Required</Label>
+                      <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                       <Switch
                         checked={formData.application_fields?.intended_use_description?.required ?? true}
                         onCheckedChange={(checked) => setFormData({ 
@@ -664,11 +664,11 @@ export default function FundDetail() {
                   )}
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+                <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-sm">Justification Paragraph</Label>
-                      <p className="text-xs text-slate-500">Why the student needs this funding</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Why the student needs this funding</p>
                     </div>
                     <Switch
                       checked={formData.application_fields?.justification_paragraph?.enabled ?? true}
@@ -683,7 +683,7 @@ export default function FundDetail() {
                   </div>
                   {(formData.application_fields?.justification_paragraph?.enabled ?? true) && (
                     <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                      <Label className="text-xs text-slate-600">Required</Label>
+                      <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                       <Switch
                         checked={formData.application_fields?.justification_paragraph?.required ?? true}
                         onCheckedChange={(checked) => setFormData({ 
@@ -698,11 +698,11 @@ export default function FundDetail() {
                   )}
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+                <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-sm">Attachments</Label>
-                      <p className="text-xs text-slate-500">Allow students to upload supporting documents</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Allow students to upload supporting documents</p>
                     </div>
                     <Switch
                       checked={formData.application_fields?.attachments?.enabled ?? true}
@@ -717,7 +717,7 @@ export default function FundDetail() {
                   </div>
                   {(formData.application_fields?.attachments?.enabled ?? true) && (
                     <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                      <Label className="text-xs text-slate-600">Required</Label>
+                      <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                       <Switch
                         checked={formData.application_fields?.attachments?.required ?? false}
                         onCheckedChange={(checked) => setFormData({ 
@@ -780,20 +780,20 @@ export default function FundDetail() {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Fund Info */}
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg">Fund Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {fund.description && (
                   <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Description</p>
-                    <p className="text-slate-700">{fund.description}</p>
+                    <p className="text-sm font-medium text-slate-500 mb-1 dark:text-slate-400">Description</p>
+                    <p className="text-slate-700 dark:text-slate-200">{fund.description}</p>
                   </div>
                 )}
                 {fund.eligibility_notes && (
                   <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Eligibility</p>
+                    <p className="text-sm font-medium text-slate-500 mb-1 dark:text-slate-400">Eligibility</p>
                     <Alert className="bg-blue-50 border-blue-200">
                       <AlertDescription className="text-blue-800 text-sm">
                         {fund.eligibility_notes}
@@ -804,18 +804,18 @@ export default function FundDetail() {
                 <div className="grid md:grid-cols-2 gap-4 pt-2">
                   {fund.start_date && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Start Date</p>
+                      <p className="text-sm font-medium text-slate-500 mb-1 dark:text-slate-400">Start Date</p>
                       <p className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-slate-400" />
+                        <Calendar className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         {format(new Date(fund.start_date), "MMMM d, yyyy")}
                       </p>
                     </div>
                   )}
                   {fund.end_date && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">End Date</p>
+                      <p className="text-sm font-medium text-slate-500 mb-1 dark:text-slate-400">End Date</p>
                       <p className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-slate-400" />
+                        <Calendar className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         {format(new Date(fund.end_date), "MMMM d, yyyy")}
                       </p>
                     </div>
@@ -825,7 +825,7 @@ export default function FundDetail() {
             </Card>
 
             {/* Recent Requests */}
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Recent Requests</CardTitle>
@@ -834,7 +834,7 @@ export default function FundDetail() {
               </CardHeader>
               <CardContent>
                 {requests.length === 0 ? (
-                  <p className="text-center text-slate-500 py-8">No requests yet</p>
+                  <p className="text-center text-slate-500 py-8 dark:text-slate-400">No requests yet</p>
                 ) : (
                   <Table>
                     <TableHeader>
@@ -851,7 +851,7 @@ export default function FundDetail() {
                           <TableCell className="font-medium">{request.student_full_name}</TableCell>
                           <TableCell>${request.requested_amount?.toLocaleString()}</TableCell>
                           <TableCell><StatusBadge status={request.status} /></TableCell>
-                          <TableCell className="text-slate-500 text-sm">
+                          <TableCell className="text-slate-500 text-sm dark:text-slate-400">
                             {format(new Date(request.created_date), "MMM d")}
                           </TableCell>
                         </TableRow>
@@ -866,25 +866,25 @@ export default function FundDetail() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Constraints */}
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg">Constraints</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Max Request</span>
+                  <span className="text-slate-500 dark:text-slate-400">Max Request</span>
                   <span className="font-medium">
                     {fund.max_request_amount ? `$${centsToNumber(fund.max_request_amount).toLocaleString()}` : "No limit"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Attachments Required</span>
+                  <span className="text-slate-500 dark:text-slate-400">Attachments Required</span>
                   <span className="font-medium">
                     {fund.requires_attachments ? "Yes" : "No"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Budget Enforcement</span>
+                  <span className="text-slate-500 dark:text-slate-400">Budget Enforcement</span>
                   <Badge variant={
                     fund.budget_enforcement === "block" ? "destructive" :
                     fund.budget_enforcement === "warn" ? "secondary" : "outline"
@@ -894,7 +894,7 @@ export default function FundDetail() {
                 </div>
                 {Array.isArray(fund.allowed_categories) && fund.allowed_categories.length > 0 && (
                   <div>
-                    <p className="text-slate-500 mb-2">Allowed Categories</p>
+                    <p className="text-slate-500 mb-2 dark:text-slate-400">Allowed Categories</p>
                     <div className="flex flex-wrap gap-1">
                       {fund.allowed_categories.map((cat) => (
                         <Badge key={cat} variant="outline" className="text-xs">
@@ -908,13 +908,13 @@ export default function FundDetail() {
             </Card>
 
             {/* Fund Owner */}
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg">Fund Owner</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="font-medium">{fund.fund_owner_name || "Unknown"}</p>
-                <p className="text-sm text-slate-500 mt-1">Fund Manager</p>
+                <p className="text-sm text-slate-500 mt-1 dark:text-slate-400">Fund Manager</p>
               </CardContent>
             </Card>
 

@@ -383,7 +383,7 @@ export default function ReviewRequest() {
   if (!request) {
     return (
       <div className="text-center py-16">
-        <p className="text-slate-500">Request not found</p>
+        <p className="text-slate-500 dark:text-slate-400">Request not found</p>
         <Button asChild className="mt-4">
           <Link to={createPageUrl("Queue")}>Back to Queue</Link>
         </Button>
@@ -505,7 +505,7 @@ export default function ReviewRequest() {
       </div>
 
       {/* Header Card */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         <div className="p-6 bg-linear-to-r from-indigo-600 to-violet-600 text-white">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -534,22 +534,22 @@ export default function ReviewRequest() {
         <div className="lg:col-span-2 space-y-6">
           {/* Student Info */}
           {canSeePII && (
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg">Student Information</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-slate-500">Full Name</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Full Name</p>
                     <p className="font-medium">{request.student_full_name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">Email</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
                     <p className="font-medium">{request.student_email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500">Phone</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Phone</p>
                     <p className="font-medium">{request.student_phone || "Not provided"}</p>
                   </div>
                 </div>
@@ -558,22 +558,22 @@ export default function ReviewRequest() {
           )}
 
           {/* Request Details */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Request Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <p className="text-sm text-slate-500 mb-2">Intended Use Description</p>
-                <p className="text-slate-700 whitespace-pre-wrap bg-slate-50 p-4 rounded-lg">{request.intended_use_description}</p>
+                <p className="text-sm text-slate-500 mb-2 dark:text-slate-400">Intended Use Description</p>
+                <p className="text-slate-700 whitespace-pre-wrap bg-slate-50 p-4 rounded-lg dark:text-slate-200 dark:bg-slate-900">{request.intended_use_description}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-2">Justification</p>
-                <p className="text-slate-700 whitespace-pre-wrap bg-slate-50 p-4 rounded-lg">{request.justification_paragraph}</p>
+                <p className="text-sm text-slate-500 mb-2 dark:text-slate-400">Justification</p>
+                <p className="text-slate-700 whitespace-pre-wrap bg-slate-50 p-4 rounded-lg dark:text-slate-200 dark:bg-slate-900">{request.justification_paragraph}</p>
               </div>
               {request.attachments && request.attachments.length > 0 && (
                 <div>
-                  <p className="text-sm text-slate-500 mb-2">Attachments ({request.attachments.length})</p>
+                  <p className="text-sm text-slate-500 mb-2 dark:text-slate-400">Attachments ({request.attachments.length})</p>
                   <AttachmentList attachments={request.attachments} />
                 </div>
               )}
@@ -581,14 +581,14 @@ export default function ReviewRequest() {
           </Card>
 
           {/* Review Workflow */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Review Workflow</CardTitle>
             </CardHeader>
             <CardContent>
               {reviews.length === 0 ? (
                 <div className="space-y-4 py-2">
-                  <p className="text-slate-500 text-center">No workflow configured</p>
+                  <p className="text-slate-500 text-center dark:text-slate-400">No workflow configured</p>
                   {canRegenerateWorkflow && (
                     <Alert className="border-amber-200 bg-amber-50">
                       <AlertCircle className="h-4 w-4 text-amber-700" />
@@ -601,7 +601,7 @@ export default function ReviewRequest() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="border-amber-300 bg-white hover:bg-amber-100"
+                          className="border-amber-300 bg-white hover:bg-amber-100 dark:bg-slate-900"
                           disabled={regeneratingWorkflow}
                           onClick={() => void handleRegenerateWorkflow()}
                         >
@@ -622,7 +622,7 @@ export default function ReviewRequest() {
                       Recommended: "text-indigo-600 bg-indigo-50 border-indigo-200",
                       Denied: "text-red-600 bg-red-50 border-red-200",
                       "Needs Info": "text-amber-600 bg-amber-50 border-amber-200",
-                      Pending: "text-slate-600 bg-slate-50 border-slate-200"
+                      Pending: "text-slate-600 bg-slate-50 border-slate-200 dark:text-slate-300 dark:bg-slate-900 dark:border-slate-800"
                     };
                     const DecisionIcon = review.decision === "Approved" || review.decision === "Recommended" ? CheckCircle
                                        : review.decision === "Denied" ? XCircle
@@ -679,7 +679,7 @@ export default function ReviewRequest() {
 
           {/* Internal Comments Thread */}
           {internalComments.length > 0 && (
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
@@ -689,14 +689,14 @@ export default function ReviewRequest() {
               <CardContent>
                 <div className="space-y-3">
                   {internalComments.map((comment) => (
-                    <div key={comment.id} className="p-3 bg-slate-50 rounded-lg">
+                    <div key={comment.id} className="p-3 bg-slate-50 rounded-lg dark:bg-slate-900">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-medium text-sm">{comment.reviewer_name}</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {format(new Date(comment.decided_at || comment.created_date), "MMM d 'at' h:mm a")}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-700">{comment.comments}</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-200">{comment.comments}</p>
                     </div>
                   ))}
                 </div>
@@ -857,27 +857,27 @@ export default function ReviewRequest() {
 
           {/* Fund Info */}
           {fund && (
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="text-lg">Fund Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm text-slate-500">Fund Name</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Fund Name</p>
                   <p className="font-medium">{fund.fund_name}</p>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Total Budget</span>
+                  <span className="text-slate-500 dark:text-slate-400">Total Budget</span>
                     <span className="font-semibold">${centsToNumber(fund.total_budget).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Remaining</span>
+                  <span className="text-slate-500 dark:text-slate-400">Remaining</span>
                   <span className="font-semibold text-emerald-600">
                     ${centsToNumber(fund.remaining_budget || fund.total_budget).toLocaleString()}
                   </span>
                 </div>
                 <div className="pt-2">
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                     <div
                       className="h-full bg-linear-to-r from-indigo-500 to-violet-500 rounded-full"
                       style={{
@@ -947,31 +947,31 @@ export default function ReviewRequest() {
           )}
 
           {/* Submitted Info */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Timeline</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Calendar className="w-4 h-4 text-slate-400" />
+                <Calendar className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <div>
-                  <p className="text-slate-500">Created</p>
+                  <p className="text-slate-500 dark:text-slate-400">Created</p>
                   <p className="font-medium">{format(new Date(request.created_date), "MMM d, yyyy 'at' h:mm a")}</p>
                 </div>
               </div>
               {request.submitted_at && (
                 <div className="flex items-center gap-3 text-sm">
-                  <Send className="w-4 h-4 text-slate-400" />
+                  <Send className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <div>
-                    <p className="text-slate-500">Submitted</p>
+                    <p className="text-slate-500 dark:text-slate-400">Submitted</p>
                     <p className="font-medium">{format(new Date(request.submitted_at), "MMM d, yyyy 'at' h:mm a")}</p>
                   </div>
                 </div>
               )}
               <div className="flex items-center gap-3 text-sm">
-                <Clock className="w-4 h-4 text-slate-400" />
+                <Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <div>
-                  <p className="text-slate-500">Last Updated</p>
+                  <p className="text-slate-500 dark:text-slate-400">Last Updated</p>
                   <p className="font-medium">{format(new Date(request.updated_date), "MMM d, yyyy 'at' h:mm a")}</p>
                 </div>
               </div>
@@ -990,19 +990,19 @@ export default function ReviewRequest() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="p-3 bg-slate-50 rounded-lg text-sm space-y-1">
+            <div className="p-3 bg-slate-50 rounded-lg text-sm space-y-1 dark:bg-slate-900">
               <div className="flex justify-between">
-                <span className="text-slate-600">Requested:</span>
+                <span className="text-slate-600 dark:text-slate-300">Requested:</span>
                 <span className="font-semibold">${centsToNumber(request.requested_amount).toLocaleString()}</span>
               </div>
               {totalDisbursed > 0 && (
                 <>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Previously Paid:</span>
+                    <span className="text-slate-600 dark:text-slate-300">Previously Paid:</span>
                 <span className="font-semibold">${centsToNumber(totalDisbursed).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between pt-1 border-t">
-                    <span className="text-slate-600">Remaining:</span>
+                    <span className="text-slate-600 dark:text-slate-300">Remaining:</span>
                     <span className="font-bold">${remainingToDisburse.toLocaleString()}</span>
                   </div>
                 </>
@@ -1012,7 +1012,7 @@ export default function ReviewRequest() {
             <div className="space-y-2">
               <Label>Amount to Pay *</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <Input
                   type="number"
                   className="pl-9"
@@ -1021,7 +1021,7 @@ export default function ReviewRequest() {
                   onChange={(e) => setDisbursementData({ ...disbursementData, amount_paid: e.target.value })}
                 />
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Can be partial. Max: ${remainingToDisburse.toLocaleString()}
               </p>
             </div>
@@ -1065,7 +1065,7 @@ export default function ReviewRequest() {
 
             <div className="space-y-2">
               <Label>Receipt (Optional)</Label>
-              <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
+              <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center dark:border-slate-800">
                 <input
                   type="file"
                   className="hidden"
@@ -1074,11 +1074,11 @@ export default function ReviewRequest() {
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 <label htmlFor="receiptUpload" className="cursor-pointer">
-                  <Upload className="w-6 h-6 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600">
+                  <Upload className="w-6 h-6 text-slate-400 mx-auto mb-2 dark:text-slate-500" />
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     {disbursementData.receipt_upload ? "✓ Receipt uploaded" : "Click to upload receipt"}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG</p>
+                  <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">PDF, JPG, PNG</p>
                 </label>
               </div>
             </div>

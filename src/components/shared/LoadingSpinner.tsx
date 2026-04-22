@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function LoadingSpinner({ size = "default", className = "" }) {
+export default function LoadingSpinner({ size = "default", className="" }) {
   const sizes = {
     sm: "w-4 h-4",
     default: "w-8 h-8",

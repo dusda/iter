@@ -104,23 +104,23 @@ export default function MyRequests() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total</p>
-                <p className="text-2xl font-bold text-slate-900">{statusCounts.all}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Total</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{statusCounts.all}</p>
               </div>
               <FileText className="w-8 h-8 text-indigo-200" />
             </div>
           </CardContent>
         </Card>
         
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">In Review</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">In Review</p>
                 <p className="text-2xl font-bold text-amber-600">{statusCounts["In Review"]}</p>
               </div>
               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
@@ -130,11 +130,11 @@ export default function MyRequests() {
           </CardContent>
         </Card>
         
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Approved</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Approved</p>
                 <p className="text-2xl font-bold text-emerald-600">
                   {statusCounts.Approved + statusCounts.Paid}
                 </p>
@@ -146,11 +146,11 @@ export default function MyRequests() {
           </CardContent>
         </Card>
         
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Need Action</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Need Action</p>
                 <p className="text-2xl font-bold text-orange-600">{statusCounts["Needs Info"]}</p>
               </div>
               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
@@ -162,11 +162,11 @@ export default function MyRequests() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <Input
                 placeholder="Search by request ID, fund, or category..."
                 className="pl-9"
@@ -195,7 +195,7 @@ export default function MyRequests() {
       </Card>
 
       {/* Requests Table */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         {isLoading ? (
           <LoadingSpinner className="py-16" />
         ) : filteredRequests.length === 0 ? (
@@ -222,20 +222,20 @@ export default function MyRequests() {
                 <Link
                   key={request.id}
                   to={createPageUrl(`RequestDetail?id=${request.id}`)}
-                  className="block p-4 hover:bg-slate-50 transition-colors"
+                  className="block p-4 hover:bg-slate-50 transition-colors dark:hover:bg-slate-800"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Hash className="w-3 h-3 text-slate-400" />
-                        <span className="text-xs font-mono text-slate-500">{request.request_id}</span>
+                        <Hash className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                        <span className="text-xs font-mono text-slate-500 dark:text-slate-400">{request.request_id}</span>
                       </div>
-                      <p className="font-semibold text-slate-800 truncate">{request.fund_name}</p>
-                      <p className="text-sm text-slate-500">{request.intended_use_category}</p>
+                      <p className="font-semibold text-slate-800 truncate dark:text-slate-100">{request.fund_name}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{request.intended_use_category}</p>
                     </div>
                     <StatusBadge status={request.status} />
                   </div>
-                  <div className="flex items-center justify-between text-sm text-slate-500 mt-3">
+                  <div className="flex items-center justify-between text-sm text-slate-500 mt-3 dark:text-slate-400">
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4" />
                       {request.requested_amount?.toLocaleString()}
@@ -255,7 +255,7 @@ export default function MyRequests() {
             <div className="hidden md:block">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/50">
+                  <TableRow className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableHead>Request ID</TableHead>
                     <TableHead>Fund</TableHead>
                     <TableHead>Category</TableHead>
@@ -267,10 +267,10 @@ export default function MyRequests() {
                 </TableHeader>
                 <TableBody>
                   {filteredRequests.map((request) => (
-                    <TableRow key={request.id} className="group hover:bg-slate-50/50">
+                    <TableRow key={request.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Hash className="w-3 h-3 text-slate-400" />
+                          <Hash className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                           <span className="font-mono text-sm font-medium text-indigo-600">
                             {request.request_id}
                           </span>
@@ -278,7 +278,7 @@ export default function MyRequests() {
                       </TableCell>
                       <TableCell className="font-medium">{request.fund_name}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="bg-slate-100">
+                        <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800">
                           {request.intended_use_category}
                         </Badge>
                       </TableCell>
@@ -286,7 +286,7 @@ export default function MyRequests() {
                       <TableCell>
                         <StatusBadge status={request.status} />
                       </TableCell>
-                      <TableCell className="text-slate-500">
+                      <TableCell className="text-slate-500 dark:text-slate-400">
                         {request.submitted_at
                           ? format(new Date(request.submitted_at), "MMM d, yyyy")
                           : format(new Date(request.created_date), "MMM d, yyyy")}

@@ -81,7 +81,7 @@ export default function NotificationBell({ user }: NotificationBellProps) {
         </div>
         <div className="max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-sm">
+            <div className="p-8 text-center text-slate-500 text-sm dark:text-slate-400">
               No notifications yet
             </div>
           ) : (
@@ -107,10 +107,10 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                       <p className={`text-sm ${!notification.is_read ? "font-semibold" : "font-medium"}`}>
                         {notification.title}
                       </p>
-                      <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                      <p className="text-sm text-slate-600 mt-1 line-clamp-2 dark:text-slate-300">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">
                         {format(new Date(notification.created_date), "MMM d 'at' h:mm a")}
                       </p>
                     </div>

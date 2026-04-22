@@ -117,7 +117,7 @@ export default function RequestDetail() {
     return (
       <div className="text-center py-16">
         <FileText className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-        <p className="text-slate-500 mb-4">Request not found</p>
+        <p className="text-slate-500 mb-4 dark:text-slate-400">Request not found</p>
         <Button asChild>
           <Link to={createPageUrl("MyRequests")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -144,7 +144,7 @@ export default function RequestDetail() {
       </div>
 
       {/* Header Card */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         <div className="p-6 bg-linear-to-r from-indigo-600 to-violet-600 text-white">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div className="flex-1">
@@ -178,7 +178,7 @@ export default function RequestDetail() {
       </Card>
 
       {/* Status Timeline */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle className="text-lg">Application Progress</CardTitle>
         </CardHeader>
@@ -205,31 +205,31 @@ export default function RequestDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Application Details */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Application Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Contact Information */}
               <div>
-                <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2 dark:text-slate-200">
                   <User className="w-4 h-4" />
                   Contact Information
                 </h4>
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-slate-500">Name</p>
+                    <p className="text-slate-500 dark:text-slate-400">Name</p>
                     <p className="font-medium">{request.student_full_name}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500">Email</p>
+                    <p className="text-slate-500 dark:text-slate-400">Email</p>
                     <p className="font-medium flex items-center gap-1">
                       <Mail className="w-3 h-3" />
                       {request.student_email}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500">Phone</p>
+                    <p className="text-slate-500 dark:text-slate-400">Phone</p>
                     <p className="font-medium flex items-center gap-1">
                       <Phone className="w-3 h-3" />
                       {request.student_phone || "Not provided"}
@@ -240,19 +240,19 @@ export default function RequestDetail() {
 
               {/* Request Information */}
               <div className="pt-4 border-t">
-                <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2 dark:text-slate-200">
                   <DollarSign className="w-4 h-4" />
                   Request Information
                 </h4>
                 <div className="grid md:grid-cols-2 gap-4 text-sm mb-4">
                   <div>
-                    <p className="text-slate-500">Requested Amount</p>
+                    <p className="text-slate-500 dark:text-slate-400">Requested Amount</p>
                     <p className="text-2xl font-bold text-indigo-600">
                       ${request.requested_amount?.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500">Category</p>
+                    <p className="text-slate-500 dark:text-slate-400">Category</p>
                     <p className="font-medium">{request.intended_use_category}</p>
                   </div>
                 </div>
@@ -260,24 +260,24 @@ export default function RequestDetail() {
 
               {/* Intended Use */}
               <div className="pt-4 border-t">
-                <p className="text-sm font-semibold text-slate-700 mb-2">How will you use these funds?</p>
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="text-slate-700 whitespace-pre-wrap">{request.intended_use_description}</p>
+                <p className="text-sm font-semibold text-slate-700 mb-2 dark:text-slate-200">How will you use these funds?</p>
+                <div className="bg-slate-50 p-4 rounded-lg dark:bg-slate-900">
+                  <p className="text-slate-700 whitespace-pre-wrap dark:text-slate-200">{request.intended_use_description}</p>
                 </div>
               </div>
 
               {/* Justification */}
               <div className="pt-4 border-t">
-                <p className="text-sm font-semibold text-slate-700 mb-2">Why do you deserve these funds?</p>
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="text-slate-700 whitespace-pre-wrap">{request.justification_paragraph}</p>
+                <p className="text-sm font-semibold text-slate-700 mb-2 dark:text-slate-200">Why do you deserve these funds?</p>
+                <div className="bg-slate-50 p-4 rounded-lg dark:bg-slate-900">
+                  <p className="text-slate-700 whitespace-pre-wrap dark:text-slate-200">{request.justification_paragraph}</p>
                 </div>
               </div>
 
               {/* Attachments */}
               {request.attachments && request.attachments.length > 0 && (
                 <div className="pt-4 border-t">
-                  <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2 dark:text-slate-200">
                     <Paperclip className="w-4 h-4" />
                     Supporting Documents ({request.attachments.length})
                   </p>
@@ -288,7 +288,7 @@ export default function RequestDetail() {
           </Card>
 
           {/* Activity / Reviews */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
@@ -299,8 +299,8 @@ export default function RequestDetail() {
               {reviews.length === 0 ? (
                 <div className="text-center py-8">
                   <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                  <p className="text-slate-500">No activity yet</p>
-                  <p className="text-sm text-slate-400">Reviews and comments will appear here</p>
+                  <p className="text-slate-500 dark:text-slate-400">No activity yet</p>
+                  <p className="text-sm text-slate-400 dark:text-slate-500">Reviews and comments will appear here</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -317,10 +317,10 @@ export default function RequestDetail() {
                     return (
                       <div 
                         key={review.id} 
-                        className={`p-4 rounded-xl border ${decisionColors[review.decision] || "bg-slate-50 border-slate-200"}`}
+                        className={`p-4 rounded-xl border ${decisionColors[review.decision] || "bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800"}`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white border-2 border-current flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-white border-2 border-current flex items-center justify-center shrink-0 dark:bg-slate-900">
                             {isStudentResponse ? (
                               <User className="w-5 h-5" />
                             ) : (
@@ -329,10 +329,10 @@ export default function RequestDetail() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="font-semibold text-slate-800">
+                              <span className="font-semibold text-slate-800 dark:text-slate-100">
                                 {review.reviewer_name}
                               </span>
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
                                 {review.step_name}
                               </span>
                               {review.decision !== "Pending" && (
@@ -346,12 +346,12 @@ export default function RequestDetail() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-500 mb-2">
+                            <p className="text-xs text-slate-500 mb-2 dark:text-slate-400">
                               {format(new Date(review.created_date), "MMMM d, yyyy 'at' h:mm a")}
                             </p>
                             {review.comments && (
-                              <div className="bg-white/70 p-3 rounded-lg mt-2">
-                                <p className="text-slate-700 whitespace-pre-wrap">{review.comments}</p>
+                              <div className="bg-white/70 p-3 rounded-lg mt-2 dark:bg-slate-900/70">
+                                <p className="text-slate-700 whitespace-pre-wrap dark:text-slate-200">{review.comments}</p>
                               </div>
                             )}
                           </div>
@@ -382,7 +382,7 @@ export default function RequestDetail() {
                     rows={5}
                     value={response}
                     onChange={(e) => setResponse(e.target.value)}
-                    className="mt-2 bg-white"
+                    className="mt-2 bg-white dark:bg-slate-900"
                   />
                 </div>
                 <Button
@@ -405,15 +405,15 @@ export default function RequestDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Timeline Info */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Timeline</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
-                <Calendar className="w-4 h-4 text-slate-400 mt-0.5" />
+                <Calendar className="w-4 h-4 text-slate-400 mt-0.5 dark:text-slate-500" />
                 <div>
-                  <p className="text-slate-500">Created</p>
+                  <p className="text-slate-500 dark:text-slate-400">Created</p>
                   <p className="font-medium">
                     {format(new Date(request.created_date), "MMM d, yyyy 'at' h:mm a")}
                   </p>
@@ -422,9 +422,9 @@ export default function RequestDetail() {
               
               {request.submitted_at && (
                 <div className="flex items-start gap-3">
-                  <Send className="w-4 h-4 text-slate-400 mt-0.5" />
+                  <Send className="w-4 h-4 text-slate-400 mt-0.5 dark:text-slate-500" />
                   <div>
-                    <p className="text-slate-500">Submitted</p>
+                    <p className="text-slate-500 dark:text-slate-400">Submitted</p>
                     <p className="font-medium">
                       {format(new Date(request.submitted_at), "MMM d, yyyy 'at' h:mm a")}
                     </p>
@@ -433,9 +433,9 @@ export default function RequestDetail() {
               )}
               
               <div className="flex items-start gap-3">
-                <FileText className="w-4 h-4 text-slate-400 mt-0.5" />
+                <FileText className="w-4 h-4 text-slate-400 mt-0.5 dark:text-slate-500" />
                 <div>
-                  <p className="text-slate-500">Last Updated</p>
+                  <p className="text-slate-500 dark:text-slate-400">Last Updated</p>
                   <p className="font-medium">
                     {format(new Date(request.updated_date), "MMM d, yyyy 'at' h:mm a")}
                   </p>
@@ -497,30 +497,30 @@ export default function RequestDetail() {
           )}
 
           {/* Quick Stats */}
-          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+          <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
             <CardHeader>
               <CardTitle className="text-lg">Request Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-500">Request ID</span>
+                <span className="text-slate-500 dark:text-slate-400">Request ID</span>
                 <span className="font-mono font-medium">{request.request_id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Fund</span>
+                <span className="text-slate-500 dark:text-slate-400">Fund</span>
                 <span className="font-medium">{request.fund_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Status</span>
+                <span className="text-slate-500 dark:text-slate-400">Status</span>
                 <StatusBadge status={request.status} />
               </div>
               <div className="flex justify-between items-start">
-                <span className="text-slate-500">Reviews</span>
+                <span className="text-slate-500 dark:text-slate-400">Reviews</span>
                 <span className="font-medium">{reviews.filter(r => r.decision !== "Pending").length}</span>
               </div>
               {isLocked && (
                 <div className="pt-3 border-t">
-                  <div className="flex items-center gap-2 text-slate-500">
+                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                     <Lock className="w-4 h-4" />
                     <span className="text-xs">
                       This request is locked and cannot be edited

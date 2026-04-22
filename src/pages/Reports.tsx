@@ -309,7 +309,7 @@ export default function Reports() {
       />
 
       {/* Filters */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <Select value={selectedFund} onValueChange={setSelectedFund}>
@@ -375,14 +375,14 @@ export default function Reports() {
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-slate-50 to-slate-100/50 border-slate-200">
+        <Card className="bg-linear-to-br from-slate-50 to-slate-100/50 border-slate-200 dark:border-slate-800">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-slate-700 font-medium">Remaining</p>
-              <TrendingUp className="w-5 h-5 text-slate-400" />
+              <p className="text-sm text-slate-700 font-medium dark:text-slate-200">Remaining</p>
+              <TrendingUp className="w-5 h-5 text-slate-400 dark:text-slate-500" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">${remaining.toLocaleString()}</p>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">${remaining.toLocaleString()}</p>
+            <p className="text-sm text-slate-600 mt-1 dark:text-slate-300">
               {((remaining / totalBudget) * 100 || 0).toFixed(1)}% left
             </p>
           </CardContent>
@@ -391,30 +391,30 @@ export default function Reports() {
 
       {/* Request Counts */}
       <div className="grid md:grid-cols-4 gap-4">
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500 mb-1">Submitted</p>
+            <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Submitted</p>
             <p className="text-2xl font-bold">{submittedCount}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500 mb-1">Approved</p>
+            <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Approved</p>
             <p className="text-2xl font-bold text-emerald-600">{approvedCount}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500 mb-1">Denied</p>
+            <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Denied</p>
             <p className="text-2xl font-bold text-red-600">{deniedCount}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500 mb-1">Average Requested</p>
+            <p className="text-sm text-slate-500 mb-1 dark:text-slate-400">Average Requested</p>
             <p className="text-2xl font-bold">${avgRequested.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
           </CardContent>
         </Card>
@@ -423,7 +423,7 @@ export default function Reports() {
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Spend Over Time */}
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="w-5 h-5" />
@@ -432,7 +432,7 @@ export default function Reports() {
           </CardHeader>
           <CardContent>
             {spendOverTimeData.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">No disbursement data</p>
+              <p className="text-slate-500 text-center py-8 dark:text-slate-400">No disbursement data</p>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={spendOverTimeData}>
@@ -451,7 +451,7 @@ export default function Reports() {
         </Card>
 
         {/* Approved vs Denied */}
-        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+        <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <PieChart className="w-5 h-5" />
@@ -460,7 +460,7 @@ export default function Reports() {
           </CardHeader>
           <CardContent>
             {approvalData.length === 0 ? (
-              <p className="text-slate-500 text-center py-8">No data</p>
+              <p className="text-slate-500 text-center py-8 dark:text-slate-400">No data</p>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <RechartPie>
@@ -487,7 +487,7 @@ export default function Reports() {
       </div>
 
       {/* Usage by Category */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
@@ -496,7 +496,7 @@ export default function Reports() {
         </CardHeader>
         <CardContent>
           {Object.keys(usageByCategory).length === 0 ? (
-            <p className="text-slate-500 text-center py-8">No data</p>
+            <p className="text-slate-500 text-center py-8 dark:text-slate-400">No data</p>
           ) : (
             <>
               <div className="mb-6">
@@ -558,13 +558,13 @@ export default function Reports() {
       </Card>
 
       {/* Recent Disbursements */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle>Recent Disbursements</CardTitle>
         </CardHeader>
         <CardContent>
           {filteredDisbursements.length === 0 ? (
-            <p className="text-slate-500 text-center py-8">No disbursements yet</p>
+            <p className="text-slate-500 text-center py-8 dark:text-slate-400">No disbursements yet</p>
           ) : (
             <Table>
               <TableHeader>
@@ -590,7 +590,7 @@ export default function Reports() {
                           {request?.intended_use_category || "N/A"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate text-sm text-slate-600">
+                      <TableCell className="max-w-xs truncate text-sm text-slate-600 dark:text-slate-300">
                         {request?.intended_use_description || "N/A"}
                       </TableCell>
                       <TableCell className="text-right font-semibold">

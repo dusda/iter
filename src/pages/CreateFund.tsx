@@ -182,7 +182,7 @@ export default function CreateFund() {
         description="Set up a new fund for student assistance"
       />
 
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle>Fund Details</CardTitle>
           <CardDescription>Configure fund settings and constraints</CardDescription>
@@ -190,7 +190,7 @@ export default function CreateFund() {
         <CardContent className="space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-slate-800">Basic Information</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Basic Information</h3>
             
             <div className="space-y-2">
               <Label>Fund Name *</Label>
@@ -244,13 +244,13 @@ export default function CreateFund() {
 
           {/* Budget Settings */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Budget Settings</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Budget Settings</h3>
             
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Total Budget *</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <Input
                     type="number"
                     className="pl-9"
@@ -284,12 +284,12 @@ export default function CreateFund() {
 
           {/* Constraints */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Application Constraints</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Application Constraints</h3>
             
             <div className="space-y-2">
               <Label>Maximum Request Amount (Optional)</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <Input
                   type="number"
                   className="pl-9"
@@ -300,10 +300,10 @@ export default function CreateFund() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900">
               <div>
                 <Label className="text-sm">Require Attachments</Label>
-                <p className="text-xs text-slate-500">Students must upload supporting documents</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Students must upload supporting documents</p>
               </div>
               <Switch
                 checked={formData.requires_attachments}
@@ -330,7 +330,7 @@ export default function CreateFund() {
                     {formData.allowed_categories.includes(category) ? (
                       <CheckCircle className="w-3 h-3 mr-2" />
                     ) : (
-                      <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300" />
+                      <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300 dark:border-slate-700" />
                     )}
                     <span className="text-xs">{category.split("/")[0]}</span>
                   </Button>
@@ -341,15 +341,15 @@ export default function CreateFund() {
 
             {/* Application Form Fields */}
             <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Application Form Fields</h3>
-            <p className="text-sm text-slate-500">Choose which fields appear in the student application form</p>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Application Form Fields</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Choose which fields appear in the student application form</p>
 
             <div className="space-y-3">
-              <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+              <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-sm">Phone Number</Label>
-                    <p className="text-xs text-slate-500">Collect student phone number</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Collect student phone number</p>
                   </div>
                   <Switch
                     checked={formData.application_fields?.phone?.enabled ?? true}
@@ -364,7 +364,7 @@ export default function CreateFund() {
                 </div>
                 {(formData.application_fields?.phone?.enabled ?? true) && (
                   <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                    <Label className="text-xs text-slate-600">Required</Label>
+                    <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                     <Switch
                       checked={formData.application_fields?.phone?.required ?? false}
                       onCheckedChange={(checked) => setFormData({ 
@@ -379,11 +379,11 @@ export default function CreateFund() {
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+              <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-sm">Intended Use Description</Label>
-                    <p className="text-xs text-slate-500">Detailed description of how funds will be used</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Detailed description of how funds will be used</p>
                   </div>
                   <Switch
                     checked={formData.application_fields?.intended_use_description?.enabled ?? true}
@@ -398,7 +398,7 @@ export default function CreateFund() {
                 </div>
                 {(formData.application_fields?.intended_use_description?.enabled ?? true) && (
                   <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                    <Label className="text-xs text-slate-600">Required</Label>
+                    <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                     <Switch
                       checked={formData.application_fields?.intended_use_description?.required ?? true}
                       onCheckedChange={(checked) => setFormData({ 
@@ -413,11 +413,11 @@ export default function CreateFund() {
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+              <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-sm">Justification Paragraph</Label>
-                    <p className="text-xs text-slate-500">Why the student needs this funding</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Why the student needs this funding</p>
                   </div>
                   <Switch
                     checked={formData.application_fields?.justification_paragraph?.enabled ?? true}
@@ -432,7 +432,7 @@ export default function CreateFund() {
                 </div>
                 {(formData.application_fields?.justification_paragraph?.enabled ?? true) && (
                   <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                    <Label className="text-xs text-slate-600">Required</Label>
+                    <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                     <Switch
                       checked={formData.application_fields?.justification_paragraph?.required ?? true}
                       onCheckedChange={(checked) => setFormData({ 
@@ -447,11 +447,11 @@ export default function CreateFund() {
                 )}
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-lg space-y-3">
+              <div className="p-3 bg-slate-50 rounded-lg space-y-3 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-sm">Attachments</Label>
-                    <p className="text-xs text-slate-500">Allow students to upload supporting documents</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Allow students to upload supporting documents</p>
                   </div>
                   <Switch
                     checked={formData.application_fields?.attachments?.enabled ?? true}
@@ -466,7 +466,7 @@ export default function CreateFund() {
                 </div>
                 {(formData.application_fields?.attachments?.enabled ?? true) && (
                   <div className="flex items-center justify-between pl-4 pt-2 border-t">
-                    <Label className="text-xs text-slate-600">Required</Label>
+                    <Label className="text-xs text-slate-600 dark:text-slate-300">Required</Label>
                     <Switch
                       checked={formData.application_fields?.attachments?.required ?? false}
                       onCheckedChange={(checked) => setFormData({ 

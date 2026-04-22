@@ -155,19 +155,19 @@ export default function Profile() {
       />
 
       {/* Profile Card */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 overflow-hidden dark:bg-slate-900/70 dark:border-slate-800/50">
         <div className="h-24 bg-linear-to-r from-indigo-600 to-violet-600"></div>
         <CardContent className="pt-0">
           <div className="flex flex-col items-center -mt-12 pb-6">
-            <div className="w-24 h-24 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+            <div className="w-24 h-24 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center dark:bg-slate-900 dark:border-slate-900">
               <div className="w-20 h-20 bg-linear-to-br from-indigo-100 to-violet-100 rounded-full flex items-center justify-center">
                 <span className="text-3xl font-bold text-indigo-700">
                   {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase() || "U"}
                 </span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-slate-800 mt-4">{user.full_name}</h2>
-            <p className="text-slate-500">{user.email}</p>
+            <h2 className="text-2xl font-bold text-slate-800 mt-4 dark:text-slate-100">{user.full_name}</h2>
+            <p className="text-slate-500 dark:text-slate-400">{user.email}</p>
             <Badge 
               variant="outline" 
               className={`mt-3 capitalize ${roleColors[user.app_role] || roleColors.student}`}
@@ -180,7 +180,7 @@ export default function Profile() {
       </Card>
 
       {/* Edit Profile */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle>Account Information</CardTitle>
           <CardDescription>Update your contact information</CardDescription>
@@ -189,7 +189,7 @@ export default function Profile() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
-                <User className="w-4 h-4 text-slate-400" />
+                <User className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 Full Name
               </Label>
               <Input
@@ -203,19 +203,19 @@ export default function Profile() {
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-slate-400" />
+                <Mail className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 Email
               </Label>
               <Input
                 value={user.email || ""}
                 disabled
-                className="bg-slate-50"
+                className="bg-slate-50 dark:bg-slate-900"
               />
             </div>
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-slate-400" />
+                <Phone className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 Phone Number
               </Label>
               <Input
@@ -227,7 +227,7 @@ export default function Profile() {
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-slate-400" />
+                <GraduationCap className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 School ID
               </Label>
               <Input
@@ -262,10 +262,10 @@ export default function Profile() {
       </Card>
 
       {/* Change password */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <KeyRound className="w-5 h-5 text-slate-500" />
+            <KeyRound className="w-5 h-5 text-slate-500 dark:text-slate-400" />
             Change password
           </CardTitle>
           <CardDescription>
@@ -321,28 +321,28 @@ export default function Profile() {
       </Card>
 
       {/* Account Stats */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardHeader>
           <CardTitle>Account Details</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-slate-500">Role</p>
+              <p className="text-slate-500 dark:text-slate-400">Role</p>
               <p className="font-medium capitalize">{(user.app_role || "student").replace("_", " ")}</p>
             </div>
             <div>
-              <p className="text-slate-500">Status</p>
+              <p className="text-slate-500 dark:text-slate-400">Status</p>
               <p className="font-medium capitalize">{user.status || "active"}</p>
             </div>
             <div>
-              <p className="text-slate-500">Member Since</p>
+              <p className="text-slate-500 dark:text-slate-400">Member Since</p>
               <p className="font-medium">
                 {user.created_date ? new Date(user.created_date).toLocaleDateString() : "N/A"}
               </p>
             </div>
             <div>
-              <p className="text-slate-500">Account Type</p>
+              <p className="text-slate-500 dark:text-slate-400">Account Type</p>
               <p className="font-medium capitalize">{user.role}</p>
             </div>
           </div>

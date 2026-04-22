@@ -53,11 +53,11 @@ export default function Rules() {
       />
 
       {/* Fund Selector */}
-      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+      <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">
+              <label className="text-sm font-medium text-slate-700 mb-2 block dark:text-slate-200">
                 Select Fund
               </label>
               <Select value={selectedFundId} onValueChange={setSelectedFundId}>
@@ -90,14 +90,14 @@ export default function Rules() {
         <>
           {/* Rules Overview */}
           {rules.length === 0 ? (
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardContent className="py-16">
                 <div className="text-center">
                   <GitBranch className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                  <h3 className="text-lg font-semibold text-slate-800 mb-2 dark:text-slate-100">
                     No Routing Rules Configured
                   </h3>
-                  <p className="text-slate-500 mb-6">
+                  <p className="text-slate-500 mb-6 dark:text-slate-400">
                     Set up review steps to define the approval workflow for {selectedFund?.fund_name}
                   </p>
                   <Button onClick={() => setShowBuilder(true)} className="bg-indigo-600 hover:bg-indigo-700">
@@ -108,7 +108,7 @@ export default function Rules() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50">
+            <Card className="bg-white/70 backdrop-blur-xs border-slate-200/50 dark:bg-slate-900/70 dark:border-slate-800/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <GitBranch className="w-5 h-5" />
@@ -121,7 +121,7 @@ export default function Rules() {
                   return (
                   <div key={rule.id} className="relative">
                     {/* Step Card */}
-                    <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                       {/* Step Number */}
                       <div className="shrink-0">
                         <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
@@ -132,7 +132,7 @@ export default function Rules() {
                       {/* Step Details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-slate-800">{rule.step_name}</h4>
+                          <h4 className="font-semibold text-slate-800 dark:text-slate-100">{rule.step_name}</h4>
                           <Badge variant={rule.permissions === "approve_deny" ? "default" : "secondary"}>
                             {rule.permissions === "approve_deny" ? "Can Approve/Deny" : "Recommend Only"}
                           </Badge>
@@ -141,7 +141,7 @@ export default function Rules() {
 
                         <div className="grid md:grid-cols-2 gap-3 text-sm">
                           <div>
-                            <span className="text-slate-500">Role queue:</span>
+                            <span className="text-slate-500 dark:text-slate-400">Role queue:</span>
                             <p className="font-medium">
                               {rule.assigned_to_type === "by_category"
                                 ? "By category (legacy)"
@@ -151,7 +151,7 @@ export default function Rules() {
 
                           {(rule.min_amount != null || rule.max_amount != null) && (
                             <div>
-                              <span className="text-slate-500">Amount Range:</span>
+                              <span className="text-slate-500 dark:text-slate-400">Amount Range:</span>
                               <p className="font-medium">
                                 {rule.min_amount != null &&
                                   `≥ $${(Number(rule.min_amount) / 100).toLocaleString()}`}
@@ -164,7 +164,7 @@ export default function Rules() {
 
                           {ruleCategories.length > 0 && (
                             <div>
-                              <span className="text-slate-500">Categories:</span>
+                              <span className="text-slate-500 dark:text-slate-400">Categories:</span>
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {ruleCategories.map((cat) => (
                                   <Badge key={cat} variant="outline" className="text-xs">
@@ -177,7 +177,7 @@ export default function Rules() {
 
                           {rule.sla_target_days && (
                             <div>
-                              <span className="text-slate-500">SLA Target:</span>
+                              <span className="text-slate-500 dark:text-slate-400">SLA Target:</span>
                               <p className="font-medium">{rule.sla_target_days} days</p>
                             </div>
                           )}

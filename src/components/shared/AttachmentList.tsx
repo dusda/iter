@@ -13,7 +13,7 @@ const FILE_ICONS = {
 export default function AttachmentList({ attachments = [], emptyMessage = "No attachments" }) {
   if (!attachments || attachments.length === 0) {
     return (
-      <p className="text-sm text-slate-400 italic">{emptyMessage}</p>
+      <p className="text-sm text-slate-400 italic dark:text-slate-500">{emptyMessage}</p>
     );
   }
 

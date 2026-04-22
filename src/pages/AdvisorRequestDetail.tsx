@@ -268,7 +268,7 @@ export default function AdvisorRequestDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Request Overview */}
-          <Card className="bg-white/70 backdrop-blur-xs">
+          <Card className="bg-white/70 backdrop-blur-xs dark:bg-slate-900/70">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 Request Details
@@ -278,29 +278,29 @@ export default function AdvisorRequestDetail() {
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-500">Student Name</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Student Name</p>
                   <p className="font-medium">{request.student_full_name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Email</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
                   <p className="font-medium">{request.student_email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Fund Name</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Fund Name</p>
                   <p className="font-medium">{request.fund_name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Requested Amount</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Requested Amount</p>
                   <p className="font-semibold text-lg text-indigo-600">
                     ${request.requested_amount?.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Category</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Category</p>
                   <p className="font-medium">{request.intended_use_category}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Submitted</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Submitted</p>
                   <p className="font-medium">
                     {request.submitted_at
                       ? format(new Date(request.submitted_at), "MMM d, yyyy")
@@ -310,19 +310,19 @@ export default function AdvisorRequestDetail() {
               </div>
 
               <div className="pt-4 border-t">
-                <p className="text-sm text-slate-500 mb-2">Intended Use</p>
-                <p className="text-slate-700">{request.intended_use_description}</p>
+                <p className="text-sm text-slate-500 mb-2 dark:text-slate-400">Intended Use</p>
+                <p className="text-slate-700 dark:text-slate-200">{request.intended_use_description}</p>
               </div>
 
               <div className="pt-4 border-t">
-                <p className="text-sm text-slate-500 mb-2">Justification</p>
-                <p className="text-slate-700">{request.justification_paragraph}</p>
+                <p className="text-sm text-slate-500 mb-2 dark:text-slate-400">Justification</p>
+                <p className="text-slate-700 dark:text-slate-200">{request.justification_paragraph}</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Supporting Documents */}
-          <Card className="bg-white/70 backdrop-blur-xs">
+          <Card className="bg-white/70 backdrop-blur-xs dark:bg-slate-900/70">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Paperclip className="w-5 h-5" />
@@ -330,7 +330,7 @@ export default function AdvisorRequestDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors">
+              <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors dark:border-slate-800">
                 <input
                   type="file"
                   multiple
@@ -344,12 +344,12 @@ export default function AdvisorRequestDetail() {
                   {uploading ? (
                     <LoadingSpinner size="sm" className="mx-auto mb-2" />
                   ) : (
-                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2 dark:text-slate-500" />
                   )}
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     {uploading ? "Uploading..." : "Click to upload additional documents"}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">
                     PDF, JPG, PNG, DOC • Max 10MB per file
                   </p>
                 </label>
@@ -360,12 +360,12 @@ export default function AdvisorRequestDetail() {
                   {request.attachments.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <File className="w-4 h-4 text-indigo-600 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-700 truncate">{file.name}</p>
+                          <p className="text-sm text-slate-700 truncate dark:text-slate-200">{file.name}</p>
                           {(file.uploaded_by === "advisor" || file.uploaded_by === "advocate") && (
                             <p className="text-xs text-green-600">Uploaded by advisor</p>
                           )}
@@ -410,15 +410,15 @@ export default function AdvisorRequestDetail() {
               <div className="flex items-start gap-3">
                 <User className="w-4 h-4 text-indigo-600 mt-0.5" />
                 <div>
-                  <p className="text-slate-600">Advisor</p>
-                  <p className="font-medium text-slate-800">{request.advisor_name || "Unassigned"}</p>
+                  <p className="text-slate-600 dark:text-slate-300">Advisor</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">{request.advisor_name || "Unassigned"}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <DollarSign className="w-4 h-4 text-indigo-600 mt-0.5" />
                 <div>
-                  <p className="text-slate-600">Amount</p>
-                  <p className="font-medium text-slate-800">
+                  <p className="text-slate-600 dark:text-slate-300">Amount</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">
                     ${request.requested_amount?.toLocaleString()}
                   </p>
                 </div>
@@ -426,8 +426,8 @@ export default function AdvisorRequestDetail() {
               <div className="flex items-start gap-3">
                 <Calendar className="w-4 h-4 text-indigo-600 mt-0.5" />
                 <div>
-                  <p className="text-slate-600">Submitted</p>
-                  <p className="font-medium text-slate-800">
+                  <p className="text-slate-600 dark:text-slate-300">Submitted</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">
                     {request.submitted_at
                       ? format(new Date(request.submitted_at), "MMM d, yyyy")
                       : "Not submitted"}

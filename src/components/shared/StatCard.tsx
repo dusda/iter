@@ -48,7 +48,7 @@ export default function StatCard({
   return (
     <Card
       className={cn(
-        "p-6 bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-lg transition-all duration-300",
+        "p-6 bg-white/70 backdrop-blur-xs border-slate-200/50 hover:shadow-lg transition-all duration-300 dark:bg-slate-900/70 dark:border-slate-800/50",
         interactive &&
           "cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
       )}
@@ -70,10 +70,10 @@ export default function StatCard({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="text-2xl md:text-3xl font-bold text-slate-900">{value}</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
+          <p className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50">{value}</p>
           {trend && (
-            <p className={`text-xs font-medium ${trendUp ? "text-emerald-600" : "text-slate-500"}`}>
+            <p className={`text-xs font-medium ${trendUp ? "text-emerald-600" : "text-slate-500 dark:text-slate-400"}`}>
               {trend}
             </p>
           )}

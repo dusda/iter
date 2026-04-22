@@ -225,7 +225,7 @@ export default function RuleBuilder({
 
           {/* Role queue: any org member with this app role may complete the step */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Role queue</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Role queue</h3>
             <div className="space-y-2">
               <Label>Role *</Label>
               <Select
@@ -247,7 +247,7 @@ export default function RuleBuilder({
 
           {/* Conditions */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Conditions (Optional)</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Conditions (Optional)</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -289,7 +289,7 @@ export default function RuleBuilder({
                     {formData.applicable_categories.includes(category) ? (
                       <CheckCircle className="w-3 h-3 mr-2" />
                     ) : (
-                      <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300" />
+                      <div className="w-3 h-3 mr-2 rounded border-2 border-slate-300 dark:border-slate-700" />
                     )}
                     <span className="text-xs">{category.split("/")[0]}</span>
                   </Button>
@@ -300,7 +300,7 @@ export default function RuleBuilder({
 
           {/* Settings */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-semibold text-slate-800">Settings</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Settings</h3>
             
             <div className="space-y-2">
               <Label>SLA Target Days</Label>
@@ -328,10 +328,10 @@ export default function RuleBuilder({
               </Select>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg dark:bg-slate-900">
               <div>
                 <Label className="text-sm">Active</Label>
-                <p className="text-xs text-slate-500">Enable this rule for new requests</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Enable this rule for new requests</p>
               </div>
               <Switch
                 checked={formData.is_active}

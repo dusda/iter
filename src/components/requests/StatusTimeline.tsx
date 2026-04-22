@@ -77,7 +77,7 @@ export default function StatusTimeline({ request, reviews = [], disbursements = 
   return (
     <div className="relative">
       {/* Timeline Line */}
-      <div className="absolute top-5 left-5 right-5 h-0.5 bg-slate-200" />
+      <div className="absolute top-5 left-5 right-5 h-0.5 bg-slate-200 dark:bg-slate-700" />
       
       {/* Steps */}
       <div className="relative flex justify-between">
@@ -90,14 +90,14 @@ export default function StatusTimeline({ request, reviews = [], disbursements = 
             completed: "bg-emerald-500 text-white border-emerald-500",
             active: "bg-indigo-500 text-white border-indigo-500 animate-pulse",
             denied: "bg-red-500 text-white border-red-500",
-            pending: "bg-white text-slate-400 border-slate-200"
+            pending: "bg-white text-slate-400 border-slate-200 dark:text-slate-500 dark:bg-slate-900 dark:border-slate-800"
           };
 
           const lineColors = {
             completed: "bg-emerald-500",
             active: "bg-linear-to-r from-emerald-500 to-slate-200",
             denied: "bg-red-500",
-            pending: "bg-slate-200"
+            pending: "bg-slate-200 dark:bg-slate-700"
           };
 
           return (
@@ -128,12 +128,12 @@ export default function StatusTimeline({ request, reviews = [], disbursements = 
               {/* Step Label */}
               <div className="mt-3 text-center">
                 <p className={`text-sm font-medium ${
-                  status === "completed" || status === "active" ? "text-slate-800" : "text-slate-400"
+                  status === "completed" || status === "active" ? "text-slate-800 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
                 }`}>
                   {step.label}
                 </p>
                 {date && (
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">
                     {format(date, "MMM d, yyyy")}
                   </p>
                 )}
